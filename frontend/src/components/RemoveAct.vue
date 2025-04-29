@@ -3,12 +3,15 @@
     <!-- Header -->
     <div class="page-header">
       <div class="left">
-        <button class="back-button" @click="goBack">⬅</button>
+        <button class="back-button" @click="goBack">
+          <img src="@/assets/arrow-left.png" alt="Kembali" />
+        </button>
       </div>
       <div class="center">
         <h1 class="app-title">Smartkartika</h1>
       </div>
-      <div class="right"></div> <!-- dummy agar kiri dan kanan seimbang -->
+      <div class="right"></div>
+      <!-- dummy agar kiri dan kanan seimbang -->
     </div>
 
     <div class="container">
@@ -46,20 +49,20 @@ const kegiatanList = ref([
     id: 1,
     tanggal: '2025-03-27',
     judul: 'Membuat kreasi kertas lipat',
-    ringkasan: 'Siswa/Siswi berlatih di bidang kreativitas...'
+    ringkasan: 'Siswa/Siswi berlatih di bidang kreativitas...',
   },
   {
     id: 2,
     tanggal: '2025-04-01',
     judul: 'Olahraga Senam Di Lapangan',
-    ringkasan: 'Puji syukur pada hari ini anak-anak...'
+    ringkasan: 'Puji syukur pada hari ini anak-anak...',
   },
   {
     id: 3,
     tanggal: '2025-04-07',
     judul: 'Lorem Ipsum Dolor Sit Amet',
-    ringkasan: 'Lorem ipsum dolor sit amet...'
-  }
+    ringkasan: 'Lorem ipsum dolor sit amet...',
+  },
 ])
 
 function formatTanggal(tanggal) {
@@ -74,8 +77,8 @@ function goToEdit(kegiatan) {
   router.push({ name: 'HapusKegiatan', params: { id: kegiatan.id } })
 }
 
-function goBack() {
-  router.push('/kelolakegiatan')
+const goBack = () => {
+  router.push('/kelola')
 }
 </script>
 
@@ -98,7 +101,9 @@ function goBack() {
   padding: 1rem;
 }
 
-.left, .center, .right {
+.left,
+.center,
+.right {
   flex: 1;
   display: flex;
   align-items: center;
@@ -113,13 +118,10 @@ function goBack() {
   justify-content: flex-end;
 }
 
-.back-button {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 1.5rem;
-  cursor: pointer;
-  font-weight: bold;
+.back-button img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
 }
 
 .app-title {
@@ -136,21 +138,22 @@ function goBack() {
   flex-direction: column;
   background-color: #fff;
   border-radius: 20px 20px 0 0;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   height: 100%;
   width: 100%;
   box-sizing: border-box;
+  padding: 1rem;
 }
 
 .container h1 {
-  padding: 2rem;
+  font-size: 1.5rem;
   text-align: center;
   font-weight: bold;
   color: #1f3a2d;
   margin-bottom: 0.5rem;
 }
 
-.container p{
+.container p {
   padding: 0.5rem;
   color: black;
   margin-bottom: 0.5rem;
@@ -177,7 +180,7 @@ function goBack() {
 }
 
 .kegiatan-item::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 10.5rem;
   top: 5%;
@@ -214,7 +217,6 @@ function goBack() {
   font-size: 20px;
 }
 
-
 .detail {
   margin-left: 2.5rem;
   flex: 1;
@@ -236,6 +238,13 @@ function goBack() {
 @media (min-width: 768px) {
   .page-header {
     display: none;
+  }
+  .container {
+    padding: 0;
+  }
+  .container h1 {
+    font-size: 2rem;
+    text-align: start;
   }
   .list-kegiatan {
     flex-direction: column;

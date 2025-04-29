@@ -21,7 +21,7 @@ const routes = [
   { path: '/profil', name: 'profil', component: ProfilView },
   { path: '/laporan', name: 'laporan', component: ReportForm },
   { path: '/dashboard', name: 'dashboard', component: DasboardGuru },
-  { path: '/keloal', name: 'manage', component: ManageAct }, // Kelola Kegiatan
+  { path: '/kelola', name: 'manage', component: ManageAct }, // Kelola Kegiatan
   { path: '/unggah', name: 'uploadNews', component: UpNews }, // Unggah Berita
   { path: '/add', name: 'upload', component: AddAct }, // Tambah Kegiatan
   { path: '/edit', name: 'edit', component: EditAct },

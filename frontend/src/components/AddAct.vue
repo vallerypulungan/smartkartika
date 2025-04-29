@@ -3,12 +3,15 @@
     <!-- Header -->
     <div class="page-header">
       <div class="left">
-        <button class="back-button" @click="goBack">⬅</button>
+        <button class="back-button" @click="goBack">
+          <img src="@/assets/arrow-left.png" alt="Kembali" />
+        </button>
       </div>
       <div class="center">
         <h1 class="app-title">Smartkartika</h1>
       </div>
-      <div class="right"></div> <!-- dummy agar kiri dan kanan seimbang -->
+      <div class="right"></div>
+      <!-- dummy agar kiri dan kanan seimbang -->
     </div>
 
     <!-- Content -->
@@ -35,7 +38,7 @@
       </form>
     </main>
 
-        <!-- Confirm Dialog Component -->
+    <!-- Confirm Dialog Component -->
     <PopupConfirm
       v-if="showSaveConfirm"
       :title="'TAMBAH KEGIATAN'"
@@ -62,7 +65,6 @@
       :title="'KEGIATAN BERHASIL DISIMPAN'"
       @close="goToKelolaKegiatan"
     />
-
   </div>
 </template>
 
@@ -79,7 +81,7 @@ const router = useRouter()
 const form = ref({
   kegiatan: '',
   tanggal: '',
-  rincian: ''
+  rincian: '',
 })
 
 const showExitConfirm = ref(false)
@@ -107,13 +109,13 @@ const saveActivity = () => {
 
 // Saat user klik "YA" di popup keluar
 const confirmExit = () => {
-  router.push('/kelolakegiatan')
+  router.push('/kelola')
 }
 
 // Saat user klik tombol "OK" setelah sukses
 const goToKelolaKegiatan = () => {
   showSuccess.value = false
-  router.push('/kelolakegiatan')
+  router.back('')
 }
 
 // Saat batal keluar
@@ -150,7 +152,9 @@ const cancelSave = () => {
   padding: 1.5rem 1rem;
 }
 
-.left, .center, .right {
+.left,
+.center,
+.right {
   flex: 1;
   display: flex;
   align-items: center;
@@ -171,6 +175,9 @@ const cancelSave = () => {
   color: #fff;
   font-size: 1.5rem;
   cursor: pointer;
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
 }
 
 .app-title {
@@ -188,7 +195,7 @@ const cancelSave = () => {
   background-color: #fff;
   padding: 1rem;
   border-radius: 20px 20px 0 0;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   height: 100%;
   width: 100vw;
   box-sizing: border-box;
@@ -228,7 +235,8 @@ const cancelSave = () => {
   font-size: 12px;
 }
 
-input, textarea {
+input,
+textarea {
   width: 100%;
   padding: 10px;
   border: 1px solid #cccccc;
@@ -243,15 +251,25 @@ input, textarea {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   margin-top: 2rem;
 }
 
 /* Responsive Desktop */
 @media (min-width: 768px) {
+  .page-header {
+    display: none;
+  }
+
+  .subtitle {
+    font-size: 2rem;
+    text-align: start;
+  }
+
   .content {
-    padding: 40px;
-    max-width: 600px;
+    padding: 0;
+    width: 100%;
+    height: 100%;
     margin: 0 auto;
   }
 

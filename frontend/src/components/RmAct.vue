@@ -3,7 +3,9 @@
     <!-- Mobile Header -->
     <div class="page-header">
       <div class="left">
-        <button class="back-button" @click="goBack">⬅</button>
+        <button class="back-button" @click="goBack">
+          <img src="@/assets/arrow-left.png" alt="Kembali" />
+        </button>
       </div>
       <div class="center">
         <h1 class="app-title">Smartkartika</h1>
@@ -69,20 +71,21 @@ const kegiatanDatabase = [
     id: 1,
     judul: 'Membuat kreasi kertas lipat',
     tanggal: '2025-03-27',
-    rincian: 'Siswa/Siswi berlatih di bidang kreativitas dengan membuat kreasi kertas lipat dari origami.'
+    rincian:
+      'Siswa/Siswi berlatih di bidang kreativitas dengan membuat kreasi kertas lipat dari origami.',
   },
   {
     id: 2,
     judul: 'Olahraga Senam Di Lapangan',
     tanggal: '2025-04-01',
-    rincian: 'Puji syukur pada hari ini anak-anak dapat melaksanakan kegiatan senam pagi.'
+    rincian: 'Puji syukur pada hari ini anak-anak dapat melaksanakan kegiatan senam pagi.',
   },
   {
     id: 3,
     judul: 'Lorem Ipsum Dolor Sit Amet',
     tanggal: '2025-04-07',
-    rincian: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
-  }
+    rincian: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+  },
 ]
 
 const route = useRoute()
@@ -93,7 +96,7 @@ const showSuccess = ref(false)
 
 onMounted(() => {
   const id = parseInt(route.params.id)
-  kegiatan.value = kegiatanDatabase.find(k => k.id === id) || {}
+  kegiatan.value = kegiatanDatabase.find((k) => k.id === id) || {}
 })
 
 function hapusKegiatan() {
@@ -102,7 +105,7 @@ function hapusKegiatan() {
 
 function confirmHapus() {
   const id = kegiatan.value.id
-  const index = kegiatanDatabase.value.findIndex(k => k.id === id)
+  const index = kegiatanDatabase.value.findIndex((k) => k.id === id)
   if (index !== -1) {
     kegiatanDatabase.value.splice(index, 1) // Hapus dari database
   }
@@ -141,7 +144,9 @@ function goToKelolaKegiatan() {
   padding: 0.5rem;
 }
 
-.left, .center, .right {
+.left,
+.center,
+.right {
   flex: 1;
   display: flex;
   align-items: center;
@@ -159,16 +164,15 @@ function goToKelolaKegiatan() {
 .back-button {
   background: none;
   border: none;
-  color: #fff;
-  font-size: 1.5rem;
   cursor: pointer;
   outline: none;
   box-shadow: none;
   display: flex;
   justify-content: start;
   align-items: center;
-  margin: 0 auto;
-  font-weight: bold;
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
 }
 
 .app-title {
@@ -185,7 +189,7 @@ function goToKelolaKegiatan() {
   background-color: #fff;
   padding: 2rem;
   border-radius: 20px 20px 0 0;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   height: 100%;
   width: 100%;
   box-sizing: border-box;
@@ -212,19 +216,21 @@ function goToKelolaKegiatan() {
   color: black;
 }
 
-input, textarea {
+input,
+textarea {
   width: 100%;
   padding: 12px 10px 8px 10px; /* ada jarak bawah biar garis bawah keliatan */
   background: #eee; /* warna latar kotaknya */
   border: none;
   border-radius: 12px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   position: relative;
   font-size: 16px;
   outline: none;
 }
 
-input::after, textarea::after {
+input::after,
+textarea::after {
   content: '';
   display: block;
   width: 100%;
@@ -238,7 +244,7 @@ input::after, textarea::after {
   border-radius: 12px;
   padding: 10px;
   position: relative;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   margin-bottom: 0rem;
 }
 
@@ -278,7 +284,7 @@ button {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   margin-top: 0.5rem;
   width: 100%;
 }

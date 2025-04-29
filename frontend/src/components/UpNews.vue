@@ -375,5 +375,9 @@ function confirmBack() {
     max-width: 800%;
     padding: 1.5rem;
   }
+  .title {
+    text-align: start;
+    font-size: 2rem;
+  }
 }
 </style>
