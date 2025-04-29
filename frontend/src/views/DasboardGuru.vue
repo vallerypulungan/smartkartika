@@ -4,18 +4,19 @@
     <HeaderDashboard
       v-if="!isMobile || (isMobile && !selectedMenu)"
       :isMobile="isMobile"
+      :isLoggedIn="true"
       @toggleSidebar="showSidebar = !showSidebar"
     />
 
     <!-- MOBILE -->
-    <div v-if="isMobile" class="mobile-content">
+    <div v-if="isMobile" :class="['mobile-content', { 'no-background': selectedMenu }]">
       <template v-if="!selectedMenu">
         <div class="greeting">
-          <p>Halo <strong>{{ userName }}</strong></p>
+          <p>Halo <strong class="user-name">{{ userName }}</strong></p>
           <p>Selamat Datang</p>
         </div>
         <div class="menu-grid">
-          <div class="menu-item" @click="selectMenu('upload')">
+          <div class="menu-item" @click="selectMenu('laporan')">
             <img src="@/assets/plus.png" alt="Buat Laporan" />
             <p>BUAT LAPORAN</p>
           </div>
@@ -32,7 +33,7 @@
 
       <template v-else>
         <div class="mobile-component">
-          <component :is="currentMobileComponent" />
+          <component v-if="currentMobileComponent" :is="currentMobileComponent" @back="backToMobileMenu" />
         </div>
       </template>
     </div>
@@ -58,7 +59,7 @@
           <div class="icon-container">
             <img src="@/assets/plus.png" alt="Tambah Kegiatan" />
           </div>
-          <span>Tambah Kegiatan</span>
+          <span>Buat Laporan</span>
         </div>
         <div
           class="menu"
@@ -96,69 +97,110 @@
   </div>
 </template>
 
+
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import HeaderDashboard from '@/components/HeaderDashboard.vue'
 
-import UploadPage from '@/components/AddAct.vue'
+import HomeContent from '@/components/MainHome.vue'
+import UploadPage from '@/components/ReportForm.vue'
 import UploadNewsPage from '@/components/UpNews.vue'
 import ManagePage from '@/components/ManageAct.vue'
 
-const router = useRouter()
 const route = useRoute()
 
 const userName = 'User'
 const isMobile = ref(window.innerWidth <= 768)
-const showSidebar = ref(true)
+const selectedMenu = ref('home') // default halaman utama
+const showMobileMenu = ref(false) // dashboard mobile menu grid
 
-const selectedMenu = ref(null)
-
-// Daftar komponen untuk mobile
-const mobileComponents = {
+const components = {
+  home: HomeContent,
   upload: UploadPage,
   uploadNews: UploadNewsPage,
   manage: ManagePage,
+  laporan: UploadPage,
 }
 
-// Pilih komponen berdasarkan selectedMenu
-const currentMobileComponent = computed(() => {
-  if (selectedMenu.value === 'uploadNews') {
-    return null;
-  }
-  return mobileComponents[selectedMenu.value] || null
+// === Komponen desktop ===
+const currentPageComponent = computed(() => {
+  return components[selectedMenu.value] || HomeContent
 })
+
+// === Komponen mobile ===
+const currentMobileComponent = computed(() => {
+  if (showMobileMenu.value) return null // kalau dashboard mobile aktif, tidak tampil konten menu
+  return components[selectedMenu.value] || null
+})
+
+function handleResize() {
+  const wasMobile = isMobile.value
+  isMobile.value = window.innerWidth <= 768
+
+  if (wasMobile !== isMobile.value) {
+    if (isMobile.value) {
+      // Pindah ke Mobile
+      if (selectedMenu.value === 'home') {
+        selectedMenu.value = null // khusus halaman utama, tampilkan dashboard mobile
+        showMobileMenu.value = true
+      } else {
+        showMobileMenu.value = false
+      }
+    } else {
+      // Pindah ke Desktop
+      if (!selectedMenu.value) {
+        selectedMenu.value = 'home'
+      }
+      showMobileMenu.value = false
+    }
+  }
+}
+
+// Menangani klik menu
+function selectMenu(menu) {
+  selectedMenu.value = menu
+  if (isMobile.value) {
+    showMobileMenu.value = false  // Tambahkan ini agar kontennya bisa tampil
+  }
+}
+
+// Monitoring perubahan route (optional)
+watch(
+  () => route.name,
+  (newRouteName) => {
+    if (newRouteName && !isMobile.value) {
+      selectedMenu.value = newRouteName
+    }
+  }
+)
 
 onMounted(() => {
-  window.addEventListener('resize', () => {
-    isMobile.value = window.innerWidth <= 768
-  })
+  window.addEventListener('resize', handleResize)
 
-  if (!isMobile.value && !route.name) {
-    router.push({ name: 'home' })
-  }
-})
-
-watch(route, (newRoute) => {
   if (isMobile.value) {
-    if (newRoute.name !== 'uploadNews') {
-      selectedMenu.value = newRoute.name;
-    } else {
-      selectedMenu.value = 'home';
+    if (selectedMenu.value === 'home') {
+      selectedMenu.value = null
+      showMobileMenu.value = true
     }
-  } else {
-    selectedMenu.value = newRoute.name || 'home';
   }
 })
 
-function selectMenu(menu) {
-  router.push({ name: menu })
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize)
+})
+
+function backToMobileMenu() {
+  selectedMenu.value = null
+  showMobileMenu.value = true
 }
 
 function logout() {
   console.log('Logout clicked')
 }
 </script>
+
+
 
 <style scoped>
 .dashboard-container {
@@ -178,8 +220,20 @@ function logout() {
   background-color: #fff;
 }
 
+.mobile-content.no-background {
+  background-color: transparent; /* Kalau sudah pilih menu: transparan */
+}
+
 .greeting p {
-  margin: 0;
+  padding-left: 1rem;
+  color:#2c3930;
+  margin-top: 0.3rem;
+  font-weight: bold;
+}
+
+.greeting .user-name {
+  font-weight: bold;
+  font-size: 1.3rem;
 }
 
 .menu-grid {
@@ -235,17 +289,18 @@ function logout() {
 }
 
 .left-panel {
-  width: 350px;
+  width: 300px;
   background-color: #fff;
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 10px;
+  border-right: 1px solid #2c3930;
 }
 
 .menu {
   background: #a27b5c;
   color: white;
-  margin: 8px;
+  margin: 5px;
   height: 80px;
   display: flex;
   align-items: center;
@@ -300,6 +355,8 @@ function logout() {
   border-radius: 12px;
   transition: background 0.3s;
   margin-top: 5rem;
+  width: 100%;
+  padding-left: 0;
 }
 
 .logout:hover {
@@ -318,10 +375,32 @@ function logout() {
 }
 
 .right-panel {
+  width: 100%;
+  height: 100vh;
   flex-grow: 1;
   background-color: #f9f9f9;
-  padding: 40px;
   overflow-y: auto;
   min-height: 0;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.right-panel > * {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+}
+
+.right-panel > .desktop-component {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+
+.desktop-content .right-panel {
+  height: calc(100vh - 60px); /* Menyesuaikan tinggi dengan tinggi layar minus header jika ada */
 }
 </style>

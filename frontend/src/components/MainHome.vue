@@ -1,17 +1,18 @@
 <template>
   <div class="dashboard">
     <!-- Header -->
-    <div v-if="!selectedBerita" class="header">
-      <HeaderDashboard :isMobile="isMobile" @toggleSidebar="showSidebar = !showSidebar" />
-    </div>
-    <div v-else class="page-header">
+
+    <div v-if="selectedBerita" class="page-header">
       <div class="left">
-        <button class="back-button" @click="goBack">⬅</button>
+        <button class="back-button" @click="goBack">
+          <img src="@/assets/arrow-left.png" alt="kembali">
+        </button>
       </div>
       <div class="center">
         <h1 class="app-title">Detail Berita</h1>
       </div>
-      <div class="right"></div>
+      <div class="right">
+      </div>
     </div>
 
     <!-- Main content -->
@@ -30,6 +31,13 @@
 
       <!-- Konten utama -->
       <div class="content-area">
+
+        <div v-if="!selectedBerita && userRole === 'teacher' && !isMobile" class="greeting-section">
+          <p class="greeting-text">Selamat Datang, {{ userName }}</p>
+          <div class="berita-hari-ini" v-if="userRole === 'teacher'">
+            <h3>Berita hari ini</h3>
+          </div>
+        </div>
         <div v-if="!selectedBerita" class="berita-list">
           <div
             v-for="berita in beritaList"
@@ -44,6 +52,7 @@
             </div>
           </div>
         </div>
+
 
         <div v-else class="berita-detail">
 
@@ -73,7 +82,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import HeaderDashboard from '@/components/HeaderDashboard.vue'
+//import HeaderDashboard from '@/components/HeaderDashboard.vue'
 import Sidebar from '@/components/SidebarTemplate.vue'
 
 // States
@@ -85,6 +94,7 @@ const showSidebar = ref(false)
 const isLoggedIn = ref(true)
 const userName = ref('User')
 const selectedMenu = ref('')
+const userRole = ref('teacher')
 
 // Dummy berita
 const dummyBerita = [
@@ -159,13 +169,10 @@ window.addEventListener('resize', () => {
   justify-content: flex-end;
 }
 
-.back-button {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 1.5rem;
-  cursor: pointer;
-  font-weight: bold;
+.back-button img{
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
 }
 
 .app-title {
@@ -178,18 +185,57 @@ window.addEventListener('resize', () => {
 .main-content {
   display: flex;
   flex: 1;
-  height: calc(100% - 60px);
+  height: 100%;
   overflow: hidden;
+  position: relative;
+  flex-direction: column;
 }
 
 .content-area {
   flex: 1;
-  padding: 3rem;
-  overflow-y: auto;
+  overflow-y: auto; /* scrollable di sini */
   display: flex;
   flex-direction: column;
   background-color: #fff;
+  padding: 0;
 }
+
+/* Welcome Section */
+.greeting-section {
+  position: sticky;
+  top: 0; /* agar greeting tetap sticky di atas */
+  background-color: #fff;
+  z-index: 10;
+  padding: 1.5rem; /* beri padding pada greeting */
+  min-height: 100px; /* pastikan cukup tinggi */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-bottom: 1px solid #ccc; /* bisa tambahkan border untuk efek */
+}
+
+.greeting-text {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  color: #2c3930;
+  margin-left: 0.8rem;
+  margin-top: 1.5rem;
+}
+
+.berita-hari-ini {
+  margin-bottom: 1rem;
+}
+
+.berita-hari-ini h3 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2c3930;
+  margin: 0;
+  text-decoration: underline;
+  margin-left: 11.5rem;
+}
+
 
 /* Berita List */
 .berita-list {
@@ -237,6 +283,8 @@ window.addEventListener('resize', () => {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  padding: 2rem;
+  height: 100%;
 }
 
 /* Kartu berita */
@@ -294,11 +342,39 @@ window.addEventListener('resize', () => {
 
 /* Desktop responsive */
 @media (min-width: 768px) {
+  .dashboard{
+    height: 100%;
+    min-height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
   .berita-item {
-    width: calc(33.333% - 16px);
+    width: 60%;
+    margin: 0 auto;
   }
   .detail-image {
-    height: 400px;
+    height: 100%;
+  }
+  .main-content {
+    height: 100%;
+    box-sizing: border-box;
+    min-height: calc(100vh - 60px);
+    width: 100%;
+    max-width: 800%;
+    padding: 0;
+  }
+  .page-header {
+    background:
+      linear-gradient(rgba(44, 57, 48, 0.93), rgba(44, 57, 48, 0.93)),
+      url("@/assets/bg.png");
+      background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding: 1rem;
+    height: 100%;
   }
 }
 </style>
