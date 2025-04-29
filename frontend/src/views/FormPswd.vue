@@ -62,6 +62,7 @@ export default {
           } else if (response.data.role === 'ortu') {
             router.push('/profil'); // ke ProfilView.vue
           }
+          localStorage.setItem('userName', response.data.name);
         }
       } catch (error) {
         alert('Login gagal. Periksa username dan password.');

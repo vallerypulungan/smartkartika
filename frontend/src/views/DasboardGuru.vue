@@ -100,6 +100,7 @@
 import { ref, onMounted, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import HeaderDashboard from '@/components/HeaderDashboard.vue'
+import axios from 'axios';
 
 import UploadPage from '@/components/AddAct.vue'
 import UploadNewsPage from '@/components/UpNews.vue'
@@ -108,7 +109,8 @@ import ManagePage from '@/components/ManageAct.vue'
 const router = useRouter()
 const route = useRoute()
 
-const userName = 'User'
+const userName = ref(localStorage.getItem('userName') || 'User')
+
 const isMobile = ref(window.innerWidth <= 768)
 const showSidebar = ref(true)
 
@@ -157,14 +159,24 @@ function selectMenu(menu) {
 
 async function logout() {
   try {
-    await axios.post('http://localhost:8000/api/logout');
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('role');
-    router.push('/login'); // redirect ke halaman login
+    const response = await axios.post('http://localhost:8000/api/logout');
+
+    if (response.data.status === 'success') {
+      // Hapus semua data login dari localStorage
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('role');
+      localStorage.removeItem('userName');
+
+      router.push('/login'); // Arahkan ke halaman login
+    } else {
+      alert('Logout gagal dari server.');
+    }
   } catch (error) {
-    alert('Logout gagal.');
+    console.error('Logout error:', error);
+    alert('Logout gagal karena koneksi atau server.');
   }
 }
+
 
 </script>
 
