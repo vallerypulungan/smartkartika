@@ -32,7 +32,50 @@
 </template>
 
 <script>
+import { ref } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
 
+
+export default {
+  setup() {
+    const router = useRouter();
+    const username = ref('');
+    const password = ref('');
+
+    const handleLogin = async () => {
+      try {
+        const response = await axios.post('http://localhost:8000/api/login', {
+          username: username.value,
+          password: password.value
+        });
+
+        if (response.data.status === 'success') {
+          alert(response.data.message);
+
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('role', response.data.role);
+
+          // Cek role untuk menentukan ke mana diarahkan
+          if (response.data.role === 'guru') {
+            router.push('/dashboard-guru');
+          } else if (response.data.role === 'ortu') {
+            router.push('/profil'); // ke ProfilView.vue
+          }
+          localStorage.setItem('userName', response.data.name);
+        }
+      } catch (error) {
+        alert('Login gagal. Periksa username dan password.');
+      }
+    };
+
+    return {
+      username,
+      password,
+      handleLogin
+    };
+  }
+}
 </script>
 
 <style scoped>

@@ -5,36 +5,54 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Teacher;
+use App\Models\ParentModel;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
-    public function showLoginForm()
+    
+    public function loginApi(Request $request)
     {
-        return view('auth.login'); // file blade form login
-    }
-
-    public function login(Request $request)
-    {
-        $credentials = $request->only('email', 'password', 'kode');
-
-        if ($credentials['kode'] === 'guru') {
-            if (Auth::guard('teacher')->attempt(['email' => $credentials['email'], 'password' => $credentials['password']])) {
-                return redirect()->intended('/dashboard-guru');
-            }
+        $credentials = $request->only('username', 'password');
+    
+        // Cek sebagai Guru
+        $guru = Teacher::where('nip', $credentials['username'])->first();
+        if ($guru && $credentials['password'] === $guru->password) {
+            return response()->json([
+                'status' => 'success',
+                'role' => 'guru',
+                'name' => $guru->name,
+                'message' => 'Login Guru berhasil',
+                'redirect' => '/dashboard-guru'
+            ]);
         }
-
-        if ($credentials['kode'] === 'ortu') {
-            if (Auth::guard('parent')->attempt(['email' => $credentials['email'], 'password' => $credentials['password']])) {
-                return redirect()->intended('/dashboard-ortu');
-            }
+    
+        // Cek sebagai Orang Tua
+        $ortu = ParentModel::where('num_telp', $credentials['username'])->first();
+        if ($ortu && $credentials['password'] === $ortu->password) {
+            return response()->json([
+                'status' => 'success',
+                'role' => 'ortu',
+                'name' => $ortu->name,
+                'message' => 'Login Orang Tua berhasil',
+                'redirect' => '/profil'
+            ]);
         }
-
-        return back()->withErrors(['msg' => 'Login gagal. Cek email, password, dan kode.']);
+    
+        return response()->json([
+            'status' => 'fail',
+            'message' => 'Username atau Password salah'
+        ], 401);
     }
-
-    public function logout(Request $request)
+    
+    public function logoutApi(Request $request)
     {
-        Auth::logout();
-        return redirect('/login');
+        // Kalau kamu simpan token nanti, bisa revoke di sini
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Logout berhasil'
+        ]);
     }
+
 }
