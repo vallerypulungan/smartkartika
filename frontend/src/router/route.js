@@ -21,16 +21,9 @@ const routes = [
   { path: '/profil', name: 'profil', component: ProfilView },
   { path: '/dashboard-guru', name: 'dashboardGuru', component: DashboardGuru },
   { path: '/laporan', name: 'laporan', component: ReportForm },
-<<<<<<< HEAD
-  { path: '/dashboard', name: 'dashboard', component: DasboardGuru },
-  { path: '/kelola', name: 'manage', component: ManageAct }, // Kelola Kegiatan
-  { path: '/unggah', name: 'uploadNews', component: UpNews }, // Unggah Berita
-  { path: '/add', name: 'upload', component: AddAct }, // Tambah Kegiatan
-=======
   { path: '/kelola', name: 'manage', component: ManageAct },
   { path: '/unggah', name: 'uploadNews', component: UpNews },
   { path: '/add', name: 'upload', component: AddAct },
->>>>>>> 5844ac506f313ea02259391dd60332658c7ea4e7
   { path: '/edit', name: 'edit', component: EditAct },
   { path: '/edit/:id', name: 'EditKegiatan', component: EditKegiatan },
   { path: '/remove', name: 'remove', component: RemoveAct },
