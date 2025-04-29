@@ -6,9 +6,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-use App\Http\Controllers\Auth\LoginController;
-Route::post('/login', [LoginController::class, 'loginApi'])->middleware('api');
-
 Route::get('/dashboard-guru', function () {
     return 'Selamat datang, Guru!';
 })->middleware('auth:teacher');

@@ -155,9 +155,17 @@ function selectMenu(menu) {
   router.push({ name: menu })
 }
 
-function logout() {
-  console.log('Logout clicked')
+async function logout() {
+  try {
+    await axios.post('http://localhost:8000/api/logout');
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('role');
+    router.push('/login'); // redirect ke halaman login
+  } catch (error) {
+    alert('Logout gagal.');
+  }
 }
+
 </script>
 
 <style scoped>
