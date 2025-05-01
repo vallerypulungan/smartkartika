@@ -13,9 +13,15 @@ import RmAct from '@/components/RmAct.vue'
 import ManageAct from '@/components/ManageAct.vue'
 import MainHome from '@/components/MainHome.vue'
 import CommentTeach from '@/components/CommentTeach.vue'
+import DashboardOrtu from '@/views/DashboardOrtu.vue'
+import CommentOrtu from '@/components/CommentOrtu.vue'
+import LaporanOrtu from '@/components/LaporanOrtu.vue'
+import ProfilOrtu from '@/components/ProfilOrtu.vue'
+import WelcomePage from '@/views/WelcomePage.vue'
 
 const routes = [
-  { path: '/', name: 'auth', component: loginPage },
+  { path: '/', component: WelcomePage },
+  { path: '/auth', name: 'auth', component: loginPage },
   { path: '/berita', name: 'home', component: MainHome },
   { path: '/login', name: 'login', component: FormPswd },
   { path: '/profil', name: 'profil', component: ProfilView },
@@ -28,7 +34,11 @@ const routes = [
   { path: '/edit/:id', name: 'EditKegiatan', component: EditKegiatan },
   { path: '/remove', name: 'remove', component: RemoveAct },
   { path: '/remove/:id', name: 'HapusKegiatan', component: RmAct },
-  { path: '/comment', name: 'comment', component: CommentTeach }
+  { path: '/comment', name: 'comment', component: CommentTeach },
+  { path: '/dashboardortu', component: DashboardOrtu },
+  { path: '/commentp', component: CommentOrtu },
+  { path: '/rapor', component: LaporanOrtu },
+  { path: '/profilp', component: ProfilOrtu },
 ]
 
 const router = createRouter({
