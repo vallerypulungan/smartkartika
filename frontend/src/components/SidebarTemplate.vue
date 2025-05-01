@@ -3,8 +3,8 @@
     <div class="sidebar">
       <!-- Header profile -->
       <div class="profile-header">
-        <label for="profile-upload" class="profile-upload">
-          <img :src="profileImage || defaultImage" alt="User Icon" class="profile-icon" />
+        <label class="profile-upload">
+          <img :src="profileImage" alt="User Icon" class="profile-icon" />
         </label>
         <span class="profile-name">{{ isLoggedIn ? userName : 'Tamu' }}</span>
       </div>
@@ -12,81 +12,56 @@
       <!-- Menu -->
       <div class="sidebar-content">
         <template v-if="!isLoggedIn">
-          <router-link to="/login" class="sidebar-item">
+          <div class="sidebar-item" @click="goTo('/login')">
             <div class="sidebar-text">Log In</div>
-          </router-link>
+          </div>
         </template>
 
         <template v-else>
-          <router-link to="/komentar" class="sidebar-item">
+          <div class="sidebar-item" @click="goTo('/comment')">
             <div class="sidebar-text">Komentar</div>
-          </router-link>
-          <router-link to="/berita" class="sidebar-item">
+          </div>
+          <div class="sidebar-item" @click="goTo('/berita')">
             <div class="sidebar-text">Berita</div>
-          </router-link>
-          <router-link to="/laporan" class="sidebar-item">
+          </div>
+          <div class="sidebar-item" @click="goTo('/laporan')">
             <div class="sidebar-text">Laporan</div>
-          </router-link>
-          <router-link to="/logout" class="sidebar-item logout">
+          </div>
+          <div class="sidebar-item logout" @click="goTo('/logout')">
             <div class="sidebar-text">Logout</div>
-          </router-link>
+          </div>
         </template>
       </div>
     </div>
   </div>
 </template>
 
+<script setup>
+import { useRouter } from 'vue-router'
+import { computed } from 'vue'
+import { useUserStore } from '@/stores/user'
+import defaultImage from '@/assets/profil.jpeg'
+import { defineProps } from 'vue'
 
-<script>
-import { useUserStore } from '@/stores/user';
-import { computed } from 'vue';
-import defaultImage from '@/assets/profil.jpeg';
+const router = useRouter()
+const userStore = useUserStore()
 
-export default {
-  setup() {
-    const userStore = useUserStore();
+const profileImage = computed(() => userStore.photoUrl || defaultImage)
 
-    const profileImage = computed(() => userStore.photoUrl || defaultImage);
+const { isLoggedIn, userName } = defineProps({
+  isLoggedIn: {
+    type: Boolean,
+    required: true,
+  },
+  userName: {
+    type: String,
+    default: '',
+  },
+})
 
-    return {
-      user: userStore,
-      profileImage,
-    };
-  },
-  props: {
-    isLoggedIn: {
-      type: Boolean,
-      required: true,
-    },
-    userName: {
-      type: String,
-      default: '',
-    },
-  },
-  data() {
-    return {
-      showPopup: false,
-    };
-  },
-  methods: {
-    updateProfileImage(event) {
-      const file = event.target.files[0];
-      if (file) {
-        this.profileImage = URL.createObjectURL(file);
-        this.showPopup = true;
-      }
-    },
-    onConfirmChangeImage() {
-      this.profileImage = URL.createObjectURL(this.selectedImageFile);
-      this.showPopup = false;
-      this.selectedImageFile = null;
-    },
-    onCancelChangeImage() {
-      this.showPopup = false;
-      this.selectedImageFile = null;
-  }
-  },
-};
+function goTo(route) {
+  router.push(route)
+}
 </script>
 
 <style scoped>
@@ -102,7 +77,7 @@ export default {
 }
 
 .sidebar {
-  width: 250px;
+  width: 200px;
   height: 100%;
   background-color: #fff;
   display: flex;
@@ -114,7 +89,7 @@ export default {
 }
 
 .profile-header {
-  padding: 20px;
+  padding: 10px;
   background-color: #2f4036;
   display: flex;
   align-items: center;
@@ -127,11 +102,13 @@ export default {
   overflow-y: auto;
 }
 
-.sidebar-wrapper-enter-active, .sidebar-wrapper-leave-active {
+.sidebar-wrapper-enter-active,
+.sidebar-wrapper-leave-active {
   transition: opacity 0.3s ease;
 }
 
-.sidebar-wrapper-enter-from, .sidebar-wrapper-leave-to {
+.sidebar-wrapper-enter-from,
+.sidebar-wrapper-leave-to {
   opacity: 0;
 }
 
@@ -142,7 +119,7 @@ export default {
 
 .profile-icon {
   width: 100%;
-  height: 80px;
+  height: 60px;
   background-color: #ccc;
   border-radius: 50%;
   object-fit: cover;
@@ -158,7 +135,7 @@ export default {
   background-color: #2f4036;
   display: flex;
   align-items: center;
-  padding: 15px 30px;
+  padding: 10px 30px;
   margin: 10px 0;
   text-decoration: none;
   border-radius: 5px;

@@ -12,7 +12,9 @@
     <div v-if="isMobile" :class="['mobile-content', { 'no-background': selectedMenu }]">
       <template v-if="!selectedMenu">
         <div class="greeting">
-          <p>Halo <strong class="user-name">{{ userName }}</strong></p>
+          <p>
+            Halo <strong class="user-name">{{ userName }}</strong>
+          </p>
           <p>Selamat Datang</p>
         </div>
         <div class="menu-grid">
@@ -33,7 +35,11 @@
 
       <template v-else>
         <div class="mobile-component">
-          <component v-if="currentMobileComponent" :is="currentMobileComponent" @back="backToMobileMenu" />
+          <component
+            v-if="currentMobileComponent"
+            :is="currentMobileComponent"
+            @back="backToMobileMenu"
+          />
         </div>
       </template>
     </div>
@@ -41,11 +47,7 @@
     <!-- DESKTOP -->
     <div v-else class="desktop-content">
       <div class="left-panel">
-        <div
-          class="menu"
-          :class="{ active: selectedMenu === 'home' }"
-          @click="selectMenu('home')"
-        >
+        <div class="menu" :class="{ active: selectedMenu === 'home' }" @click="selectMenu('home')">
           <div class="icon-container">
             <img src="@/assets/home-alt.png" alt="Home" />
           </div>
@@ -97,12 +99,10 @@
   </div>
 </template>
 
-
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import HeaderDashboard from '@/components/HeaderDashboard.vue'
-import axios from 'axios';
 
 import HomeContent from '@/components/MainHome.vue'
 import UploadPage from '@/components/ReportForm.vue'
@@ -110,10 +110,8 @@ import UploadNewsPage from '@/components/UpNews.vue'
 import ManagePage from '@/components/ManageAct.vue'
 
 const route = useRoute()
-const router = useRouter()
 
-const userName = ref(localStorage.getItem('userName') || 'User')
-
+const userName = 'User'
 const isMobile = ref(window.innerWidth <= 768)
 const selectedMenu = ref('home') // default halaman utama
 const showMobileMenu = ref(false) // dashboard mobile menu grid
@@ -164,7 +162,7 @@ function handleResize() {
 function selectMenu(menu) {
   selectedMenu.value = menu
   if (isMobile.value) {
-    showMobileMenu.value = false  // Tambahkan ini agar kontennya bisa tampil
+    showMobileMenu.value = false // Tambahkan ini agar kontennya bisa tampil
   }
 }
 
@@ -175,7 +173,7 @@ watch(
     if (newRouteName && !isMobile.value) {
       selectedMenu.value = newRouteName
     }
-  }
+  },
 )
 
 onMounted(() => {
@@ -198,30 +196,10 @@ function backToMobileMenu() {
   showMobileMenu.value = true
 }
 
-async function logout() {
-  try {
-    const response = await axios.post('http://localhost:8000/api/logout');
-
-    if (response.data.status === 'success') {
-      // Hapus semua data login dari localStorage
-      localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('role');
-      localStorage.removeItem('userName');
-
-      router.push('/login'); // Arahkan ke halaman login
-    } else {
-      alert('Logout gagal dari server.');
-    }
-  } catch (error) {
-    console.error('Logout error:', error);
-    alert('Logout gagal karena koneksi atau server.');
-  }
+function logout() {
+  console.log('Logout clicked')
 }
-
-
 </script>
-
-
 
 <style scoped>
 .dashboard-container {
@@ -247,30 +225,30 @@ async function logout() {
 
 .greeting p {
   padding-left: 1rem;
-  color:#2c3930;
+  color: #2c3930;
   margin-top: 0.3rem;
   font-weight: bold;
 }
 
 .greeting .user-name {
   font-weight: bold;
-  font-size: 1.3rem;
+  font-size: 1rem;
 }
 
 .menu-grid {
   display: flex;
   flex-direction: column;
-  margin: 20px;
+  margin: 10px;
   gap: 16px;
 }
 
 .menu-item {
-  width: 90%;
+  width: 70%;
   margin: 0 auto;
   background: #a27b5c;
   color: #fff;
   border-radius: 12px;
-  padding: 20px;
+  padding: 5px;
   text-align: center;
   cursor: pointer;
   transition: background 0.3s;
@@ -281,16 +259,17 @@ async function logout() {
 }
 
 .menu-item img {
-  width: 100px;
-  height: 70px;
+  width: 80px;
+  height: 60px;
   object-fit: contain;
   background-color: #fff;
   border-radius: 8px;
+  padding: 0.5rem;
 }
 
 .menu-item p {
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 
 .mobile-component {
@@ -303,14 +282,14 @@ async function logout() {
 .desktop-content {
   display: flex;
   flex-grow: 1;
-  height: calc(100% - 60px);
+  height: calc(100% - 84px);
   overflow: hidden;
   padding: 0;
   margin: 0;
 }
 
 .left-panel {
-  width: 300px;
+  width: 250px;
   background-color: #fff;
   display: flex;
   flex-direction: column;
@@ -396,12 +375,9 @@ async function logout() {
 }
 
 .right-panel {
-  width: 100%;
-  height: 100vh;
   flex-grow: 1;
   background-color: #f9f9f9;
   overflow-y: auto;
-  min-height: 0;
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
@@ -418,10 +394,10 @@ async function logout() {
 .right-panel > .desktop-component {
   width: 100%;
   max-width: 100%;
-  height: auto;
+  height: 100%;
 }
 
 .desktop-content .right-panel {
-  height: calc(100vh - 60px); /* Menyesuaikan tinggi dengan tinggi layar minus header jika ada */
+  height: calc(100vh - 84px); /* Menyesuaikan tinggi dengan tinggi layar minus header jika ada */
 }
 </style>

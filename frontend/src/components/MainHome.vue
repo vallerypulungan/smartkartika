@@ -5,14 +5,25 @@
     <div v-if="selectedBerita" class="page-header">
       <div class="left">
         <button class="back-button" @click="goBack">
-          <img src="@/assets/arrow-left.png" alt="kembali">
+          <img src="@/assets/arrow-left.png" alt="kembali" />
         </button>
       </div>
       <div class="center">
         <h1 class="app-title">Detail Berita</h1>
       </div>
-      <div class="right">
+      <div class="right"></div>
+    </div>
+
+    <div v-if="!selectedBerita && isMobile" class="page-header">
+      <div class="left">
+        <button class="back-button" @click="goBackToDashboard">
+          <img src="@/assets/arrow-left.png" alt="kembali" />
+        </button>
       </div>
+      <div class="center">
+        <h1 class="app-title">Berita Hari ini</h1>
+      </div>
+      <div class="right"></div>
     </div>
 
     <!-- Main content -->
@@ -25,16 +36,15 @@
           :isLoggedIn="isLoggedIn"
           :userName="userName"
           @close="showSidebar = false"
-          @select="menu => selectedMenu = menu"
+          @select="(menu) => (selectedMenu = menu)"
         />
       </div>
 
       <!-- Konten utama -->
       <div class="content-area">
-
-        <div v-if="!selectedBerita && userRole === 'teacher' && !isMobile" class="greeting-section">
+        <div v-if="!selectedBerita && !isMobile" class="greeting-section">
           <p class="greeting-text">Selamat Datang, {{ userName }}</p>
-          <div class="berita-hari-ini" v-if="userRole === 'teacher'">
+          <div class="berita-hari-ini">
             <h3>Berita hari ini</h3>
           </div>
         </div>
@@ -53,9 +63,7 @@
           </div>
         </div>
 
-
         <div v-else class="berita-detail">
-
           <!-- Kotak Gambar + Judul + Subjudul -->
           <div class="berita-card">
             <img :src="selectedBerita.image" alt="detail" class="detail-image" />
@@ -72,9 +80,7 @@
               <p>{{ selectedBerita.description }}</p>
             </div>
           </div>
-
         </div>
-
       </div>
     </div>
   </div>
@@ -82,19 +88,19 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-//import HeaderDashboard from '@/components/HeaderDashboard.vue'
 import Sidebar from '@/components/SidebarTemplate.vue'
+import { useRouter } from 'vue-router'
 
 // States
 const beritaList = ref([])
 const selectedBerita = ref(null)
+const router = useRouter()
 
 const isMobile = ref(window.innerWidth <= 768)
 const showSidebar = ref(false)
 const isLoggedIn = ref(true)
 const userName = ref('User')
 const selectedMenu = ref('')
-const userRole = ref('teacher')
 
 // Dummy berita
 const dummyBerita = [
@@ -103,22 +109,22 @@ const dummyBerita = [
     title: 'Berita Pertama',
     subtitle: 'Subjudul berita pertama',
     description: 'Deskripsi lengkap berita pertama.',
-    image: 'https://via.placeholder.com/400x200?text=Berita+1'
+    image: 'https://via.placeholder.com/400x200?text=Berita+1',
   },
   {
     id: 2,
     title: 'Berita Kedua',
     subtitle: 'Subjudul berita kedua',
     description: 'Deskripsi lengkap berita kedua.',
-    image: 'https://via.placeholder.com/400x200?text=Berita+2'
+    image: 'https://via.placeholder.com/400x200?text=Berita+2',
   },
   {
     id: 3,
     title: 'Berita Ketiga',
     subtitle: 'Subjudul berita ketiga',
     description: 'Deskripsi lengkap berita ketiga.',
-    image: 'https://via.placeholder.com/400x200?text=Berita+3'
-  }
+    image: 'https://via.placeholder.com/400x200?text=Berita+3',
+  },
 ]
 
 const selectBerita = (berita) => {
@@ -136,6 +142,10 @@ onMounted(() => {
 window.addEventListener('resize', () => {
   isMobile.value = window.innerWidth <= 768
 })
+
+const goBackToDashboard = () => {
+  router.push('/dashboard')
+}
 </script>
 
 <style scoped>
@@ -151,10 +161,12 @@ window.addEventListener('resize', () => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.5rem;
-  padding: 1rem;
+  padding: 0.5rem;
 }
 
-.left, .center, .right {
+.left,
+.center,
+.right {
   flex: 1;
   display: flex;
   align-items: center;
@@ -169,7 +181,7 @@ window.addEventListener('resize', () => {
   justify-content: flex-end;
 }
 
-.back-button img{
+.back-button img {
   width: 24px;
   height: 24px;
   filter: brightness(0) invert(1);
@@ -179,6 +191,7 @@ window.addEventListener('resize', () => {
   font-size: 1.3rem;
   font-weight: bold;
   color: #fff;
+  margin: 0 auto;
 }
 
 /* Main */
@@ -198,6 +211,7 @@ window.addEventListener('resize', () => {
   flex-direction: column;
   background-color: #fff;
   padding: 0;
+  padding: 0.5rem;
 }
 
 /* Welcome Section */
@@ -236,7 +250,6 @@ window.addEventListener('resize', () => {
   margin-left: 11.5rem;
 }
 
-
 /* Berita List */
 .berita-list {
   display: flex;
@@ -249,7 +262,7 @@ window.addEventListener('resize', () => {
   background: #2c3930;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -292,7 +305,7 @@ window.addEventListener('resize', () => {
   background-color: #2c3930;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .detail-image {
@@ -339,12 +352,11 @@ window.addEventListener('resize', () => {
   line-height: 1.5;
 }
 
-
 /* Desktop responsive */
 @media (min-width: 768px) {
-  .dashboard{
+  .dashboard {
     height: 100%;
-    min-height: calc(100vh - 60px);
+    min-height: calc(100vh - 84px);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -359,16 +371,15 @@ window.addEventListener('resize', () => {
   .main-content {
     height: 100%;
     box-sizing: border-box;
-    min-height: calc(100vh - 60px);
+    min-height: calc(100vh - 8px);
     width: 100%;
     max-width: 800%;
     padding: 0;
   }
   .page-header {
     background:
-      linear-gradient(rgba(44, 57, 48, 0.93), rgba(44, 57, 48, 0.93)),
-      url("@/assets/bg.png");
-      background-size: cover;
+      linear-gradient(rgba(44, 57, 48, 0.93), rgba(44, 57, 48, 0.93)), url('@/assets/bg.png');
+    background-size: cover;
     display: flex;
     align-items: center;
     justify-content: space-between;
