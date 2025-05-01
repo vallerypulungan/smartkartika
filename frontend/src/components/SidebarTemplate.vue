@@ -27,7 +27,7 @@
           <div class="sidebar-item" @click="goTo('/laporan')">
             <div class="sidebar-text">Laporan</div>
           </div>
-          <div class="sidebar-item logout" @click="goTo('/logout')">
+          <div class="sidebar-item-logout" @click="goTo('/logout')">
             <div class="sidebar-text">Logout</div>
           </div>
         </template>
@@ -94,6 +94,7 @@ function goTo(route) {
   display: flex;
   align-items: center;
   width: 100%;
+  margin-bottom: 2rem;
 }
 
 .sidebar-content {
@@ -110,11 +111,6 @@ function goTo(route) {
 .sidebar-wrapper-enter-from,
 .sidebar-wrapper-leave-to {
   opacity: 0;
-}
-
-.profile-upload {
-  cursor: pointer;
-  margin-right: 20px;
 }
 
 .profile-icon {
@@ -136,12 +132,26 @@ function goTo(route) {
   display: flex;
   align-items: center;
   padding: 10px 30px;
-  margin: 10px 0;
   text-decoration: none;
-  border-radius: 5px;
+  border-bottom: 2px solid #fff;
+  cursor: pointer;
+}
+
+.sidebar-item-logout {
+  background-color: #2f4036;
+  display: flex;
+  align-items: center;
+  padding: 10px 30px;
+  text-decoration: none;
+  margin-top: 12rem;
+  cursor: pointer;
 }
 
 .sidebar-item:hover {
+  background-color: #3b5546;
+}
+
+.sidebar-item-logout:hover {
   background-color: #3b5546;
 }
 
