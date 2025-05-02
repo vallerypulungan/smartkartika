@@ -103,6 +103,7 @@
 import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import HeaderDashboard from '@/components/HeaderDashboard.vue'
+import axios from 'axios';
 
 import HomeContent from '@/components/MainHome.vue'
 import UploadPage from '@/components/ReportForm.vue'
@@ -111,7 +112,8 @@ import ManagePage from '@/components/ManageAct.vue'
 
 const route = useRoute()
 
-const userName = 'User'
+const userName = ref(localStorage.getItem('userName') || 'User')
+
 const isMobile = ref(window.innerWidth <= 768)
 const selectedMenu = ref('home') // default halaman utama
 const showMobileMenu = ref(false) // dashboard mobile menu grid
@@ -196,9 +198,27 @@ function backToMobileMenu() {
   showMobileMenu.value = true
 }
 
-function logout() {
-  console.log('Logout clicked')
+async function logout() {
+  try {
+    const response = await axios.post('http://localhost:8000/api/logout');
+
+    if (response.data.status === 'success') {
+      // Hapus semua data login dari localStorage
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('role');
+      localStorage.removeItem('userName');
+
+      router.push('/login'); // Arahkan ke halaman login
+    } else {
+      alert('Logout gagal dari server.');
+    }
+  } catch (error) {
+    console.error('Logout error:', error);
+    alert('Logout gagal karena koneksi atau server.');
+  }
 }
+
+
 </script>
 
 <style scoped>
