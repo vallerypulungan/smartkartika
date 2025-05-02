@@ -101,7 +101,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import HeaderDashboard from '@/components/HeaderDashboard.vue'
 import axios from 'axios';
 
@@ -111,6 +111,7 @@ import UploadNewsPage from '@/components/UpNews.vue'
 import ManagePage from '@/components/ManageAct.vue'
 
 const route = useRoute()
+const router = useRouter()
 
 const userName = ref(localStorage.getItem('userName') || 'User')
 
