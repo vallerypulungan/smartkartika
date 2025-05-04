@@ -63,6 +63,8 @@ export default {
             router.push('/profil'); // ke ProfilView.vue
           }
           localStorage.setItem('userName', response.data.name);
+          localStorage.setItem('nip', response.data.nip);
+
         }
       } catch (error) {
         alert('Login gagal. Periksa username dan password.');

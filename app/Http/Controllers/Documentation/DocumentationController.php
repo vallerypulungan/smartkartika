@@ -13,39 +13,43 @@ class DocumentationController extends Controller
 {
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string',
-            'description' => 'required|string',
-            'image' => 'required|image|max:10240', // maks 10MB
-        ]);
+        try {
+            $request->validate([
+                'title' => 'required|string',
+                'description' => 'required|string',
+                'image' => 'required|image|max:10240',
+            ]);
 
-        // Simpan gambar
-        $path = $request->file('image')->store('public/documentations');
-        $fileUrl = Storage::url($path);
+            $path = $request->file('image')->storeAs(
+                'public/documentations',
+                time() . '_' . $request->file('image')->getClientOriginalName()
+            );
+            if ($request->hasFile('file')) {
+                $path = $request->file('file')->store('uploads', 'public');
+                return response()->json(['message' => 'File uploaded successfully', 'path' => $path]);
+            }    
+            $fileUrl = Storage::url($path);
 
-        // Ambil id_teacher dari login
-        $nip = $request->input('nip'); // Dikirim dari frontend (localStorage)
+            $teacher = Teacher::where('nip', $request->input('nip'))->first();
+            if (!$teacher) return response()->json(['error' => 'Guru tidak ditemukan'], 401);
 
-        $teacher = Teacher::where('nip', $nip)->first();
+            $doc = new Documentation();
+            $doc->uploaded_by = $teacher->name;
+            $doc->id_teacher = $teacher->id_teacher;
+            $doc->title = $request->input('title');
+            $doc->description = $request->input('description');
+            $doc->file_url = $fileUrl;
+            $doc->save();
 
-        if (!$teacher) {
-            return response()->json(['error' => 'Guru tidak ditemukan'], 401);
+
+            return response()->json([
+                'message' => 'Dokumentasi berhasil disimpan',
+                'file_url' => $fileUrl
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        // Simpan ke DB
-        $doc = new Documentation();
-        $doc->uploaded_by = $teacher->name;
-        $doc->id_teacher = $teacher->id_teacher;
-        $doc->file_url = $fileUrl;
-        $doc->id_class = 1; // (sementara hardcoded, nanti bisa dinamis)
-        $doc->created_at = now();
-        $doc->updated_at = now();
-        $doc->save();
-
-        return response()->json([
-            'message' => 'Dokumentasi berhasil disimpan',
-            'file_url' => $fileUrl
-        ]);
     }
+
     
 }

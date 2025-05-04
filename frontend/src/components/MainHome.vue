@@ -112,6 +112,7 @@
 </template>
 
 <script setup>
+import axios from 'axios'
 import { ref, onMounted, onUnmounted } from 'vue'
 import Sidebar from '@/components/SidebarTemplate.vue'
 import { useRouter } from 'vue-router'
@@ -125,7 +126,7 @@ const router = useRouter()
 const isMobile = ref(window.innerWidth <= 768)
 const showSidebar = ref(false)
 const isLoggedIn = ref(true)
-const userName = ref('User')
+const userName = ref(localStorage.getItem('userName') || 'User')
 const selectedMenu = ref('')
 const imageInput = ref(null)
 const showConfirm = ref(false)
@@ -176,13 +177,24 @@ const handleScroll = () => {
 }
 
 onMounted(() => {
-  loadMoreBerita()
+  fetchBerita()
   contentArea.value?.addEventListener('scroll', handleScroll)
 })
 
-onUnmounted(() => {
-  contentArea.value?.removeEventListener('scroll', handleScroll)
-})
+const fetchBerita = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/documentations')
+    beritaList.value = response.data.data.map((item) => ({
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      image: `http://localhost:8000/storage/${item.image}`,
+    }))
+  } catch (error) {
+    console.error('Gagal memuat berita:', error)
+  }
+}
+
 
 const selectBerita = (berita) => {
   selectedBerita.value = berita
