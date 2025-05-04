@@ -134,7 +134,7 @@ const currentPageComponent = computed(() => {
 
 // === Komponen mobile ===
 const currentMobileComponent = computed(() => {
-  if (showMobileMenu.value) return null // kalau dashboard mobile aktif, tidak tampil konten menu
+  if (showMobileMenu.value) return null
   return components[selectedMenu.value] || null
 })
 
@@ -165,7 +165,7 @@ function handleResize() {
 function selectMenu(menu) {
   selectedMenu.value = menu
   if (isMobile.value) {
-    showMobileMenu.value = false // Tambahkan ini agar kontennya bisa tampil
+    showMobileMenu.value = false
   }
 }
 

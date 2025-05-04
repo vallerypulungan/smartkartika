@@ -14,7 +14,7 @@
     </div>
 
     <div class="form-upload">
-      <h2 class="title">Unggah Berita</h2>
+      <h2 class="title">UNGGAH BERITA</h2>
 
       <div class="upload-wrapper">
         <!-- Image Upload Area -->
@@ -234,10 +234,13 @@ function confirmBack() {
   justify-content: flex-end;
 }
 
-.back-button img {
-  width: 24px;
-  height: 24px;
-  filter: brightness(0) invert(1);
+.back-button {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 .app-title {
@@ -401,12 +404,10 @@ function confirmBack() {
     min-height: calc(100vh - 84px);
     width: 100%;
     max-width: 800%;
-    padding: 0.5rem;
   }
   .title {
     text-align: start;
-    font-size: 1.3rem;
-    margin-left: 1.5rem;
+    font-size: 1.5rem;
   }
   .submit-button {
     margin-bottom: 1.5rem;
