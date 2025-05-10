@@ -110,6 +110,8 @@
 </template>
 
 <script setup>
+import axios from 'axios'
+
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -129,6 +131,7 @@ const showSuccess = ref(false)
 const showWarningFoto = ref(false)
 const showWarningRincian = ref(false)
 const showWarningTitle = ref(false) // Tambahan jika ingin popup judul kosong
+const nip = localStorage.getItem('nip');
 
 const router = useRouter()
 const emit = defineEmits(['back'])
@@ -159,8 +162,22 @@ function validateBeforeUpload() {
     showConfirmUpload.value = true
   }
 }
+const fetchBerita = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/documentations')
+    beritaList.value = response.data.data.map((item) => ({
+  id: item.id_document,
+  title: item.title,
+  description: item.description,
+  image: `http://localhost:8000${item.file_url}`,
+  }))
+  } catch (error) {
+    console.error('Gagal memuat berita:', error)
+  }
+}
 
 async function submitUpload() {
+  let formData = new FormData();
   showConfirmUpload.value = false
   try {
     await saveToDatabase(previewImage.value, title.value, description.value)
@@ -170,18 +187,30 @@ async function submitUpload() {
   }
 }
 
-function saveToDatabase(imageData, titleText, descriptionText) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log('Mengirim ke database:', {
-        imageData,
-        title: titleText,
-        description: descriptionText,
-      })
-      resolve('success')
-    }, 1500)
-  })
+async function saveToDatabase(imageData, titleText, descriptionText) {
+  const fileInput = document.querySelector('input[type="file"]');
+  const file = fileInput?.files[0];
+
+  if (!file) {
+    alert('File tidak ditemukan');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('image', file);
+  formData.append('title', titleText);
+  formData.append('description', descriptionText);
+  formData.append('nip', nip);
+ // pastikan nip tersimpan
+
+  await axios.post('http://localhost:8000/api/documentations', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
 }
+
+
 
 function resetForm() {
   showSuccess.value = false

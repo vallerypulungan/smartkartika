@@ -24,7 +24,8 @@ class LoginController extends Controller
                 'role' => 'guru',
                 'name' => $guru->name,
                 'message' => 'Login Guru berhasil',
-                'redirect' => '/dashboard-guru'
+                'redirect' => '/dashboard-guru',
+                'nip' => $guru->nip
             ]);
         }
     
