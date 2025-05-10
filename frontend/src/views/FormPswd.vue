@@ -87,17 +87,17 @@ export default {
 
 .mobile-panel {
   flex-direction: column;
-  height: 100vh; /* Menutupi seluruh tinggi layar */
+  height: 100vh;
 }
 
 .mobile-panel .atas {
-  flex: 1; /* Mengisi ruang tersisa */
-  background-size: cover; /* Memastikan gambar latar belakang tetap proporsional */
-  background-position: center; /* Memusatkan gambar */
+  flex: 1;
+  background-size: cover;
+  background-position: center;
 }
 
 .mobile-panel .bawah {
-  flex:1; /* Mengisi ruang tersisa */
+  flex:1;
   background-color: white;
   width: 100%;
   display: flex;
@@ -113,7 +113,7 @@ export default {
 .mobile-panel .bawah h2 {
   font-size: 1.8rem;
   font-weight: 900;
-  color: #000; /* Warna teks */
+  color: #000;
   margin-top: 0;
   margin-bottom: 50px;
   text-align: center;
@@ -125,7 +125,7 @@ export default {
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
-  margin-bottom: 20px; /* Tambahkan jarak antara input dan tombol */
+  margin-bottom: 20px;
 }
 
 .mobile-panel .input-label {
@@ -143,8 +143,8 @@ export default {
 
 .mobile-panel .forgot-password {
   position: absolute;
-  bottom: -20px; /* Jarak dari bawah kotak input */
-  right: 0; /* Posisi kanan */
+  bottom: -20px;
+  right: 0;
   font-size: 12px;
   color: #2c3930;
   text-decoration: none;
@@ -186,7 +186,7 @@ export default {
 @media (min-width: 768px) {
   .container {
     display: flex;
-    flex-direction: row; /* ini yang benar */
+    flex-direction: row;
     height: 100vh;
   }
 

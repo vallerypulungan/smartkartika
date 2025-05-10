@@ -2,12 +2,16 @@
   <div class="profile-container">
     <!-- Header -->
     <div class="profile-header">
-      <button class="back-button" @click="goBack">←</button>
+      <button class="back-button" @click="goBack">
+        <img src="@/assets/arrow-left.png" alt="Back">
+      </button>
 
       <div class="profile-image-wrapper">
         <input type="file" ref="fileInput" @change="onFileChange" style="display: none" />
         <img :src="profileImage" class="profile-image" alt="Profile" />
-        <button class="edit-button" @click="$refs.fileInput.click()">✏️</button>
+        <button class="edit-button" @click="$refs.fileInput.click()">
+          <img src="@/assets/edit-alt.png" alt="Edit">
+        </button>
       </div>
 
       <p class="username">User</p>
@@ -152,8 +156,13 @@ export default {
   background: white;
   border: none;
   border-radius: 50%;
-  padding: 5px;
   cursor: pointer;
+}
+
+.edit-button img {
+  padding: 0.2rem;
+  height: 27px;
+  width: 25px;
 }
 
 .username {
