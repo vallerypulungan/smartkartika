@@ -53,7 +53,7 @@
             class="berita-item"
             @click="selectBerita(berita)"
           >
-            <img :src="berita.image" alt="berita" class="berita-image" loading="lazy" />
+            <img :src="berita.file_url" alt="berita" class="berita-image" loading="lazy" />
             <div class="berita-info">
               <h3 class="berita-title">{{ berita.title }}</h3>
             </div>
@@ -87,6 +87,8 @@
             </div>
           </div>
           <button class="save-button" @click="saveChanges">Simpan Perubahan</button>
+          <button class="delete-button" @click="deleteBerita">Hapus Berita</button>
+
         </div>
       </div>
     </div>
@@ -182,14 +184,15 @@ onMounted(() => {
 })
 
 const fetchBerita = async () => {
+  
   try {
     const response = await axios.get('http://localhost:8000/api/documentations')
     beritaList.value = response.data.data.map((item) => ({
-      id: item.id,
-      title: item.title,
-      description: item.description,
-      image: `http://localhost:8000/storage/${item.image}`,
-    }))
+    id: item.id_document,
+    title: item.title,
+    description: item.description,
+    image: `http://localhost:8000/${encodeURIComponent(item.file_url).replace(/%2F/g, '/')}`,
+  }))
   } catch (error) {
     console.error('Gagal memuat berita:', error)
   }
@@ -197,9 +200,15 @@ const fetchBerita = async () => {
 
 
 const selectBerita = (berita) => {
-  selectedBerita.value = berita
-  editForm.value = { ...berita }
-}
+  selectedBerita.value = berita;
+  editForm.value = {
+    id: berita.id, // penting agar axios.put punya ID!
+    title: berita.title,
+    description: berita.description,
+    image: berita.image,
+  };
+};
+
 
 const goBack = () => {
   selectedBerita.value = null
@@ -233,11 +242,32 @@ window.addEventListener('resize', () => {
   isMobile.value = window.innerWidth <= 768
 })
 
-const handleConfirmSave = () => {
-  Object.assign(selectedBerita.value, editForm.value)
-  showConfirm.value = false
-  showSuccess.value = true
+const deleteBerita = async () => {
+  try {
+    await axios.delete(`http://localhost:8000/api/documentations/${selectedBerita.value.id}`);
+    beritaList.value = beritaList.value.filter(b => b.id !== selectedBerita.value.id);
+    selectedBerita.value = null;
+    alert('Berita berhasil dihapus!');
+  } catch (error) {
+    alert('Gagal menghapus berita');
+    console.error(error);
+  }
 }
+
+const handleConfirmSave = async () => {
+  try {
+    await axios.put(`http://localhost:8000/api/documentations/${selectedBerita.value.id}`, {
+      title: editForm.value.title,
+      description: editForm.value.description
+    });
+    showSuccess.value = true;
+    showConfirm.value = false;
+  } catch (error) {
+    alert('Gagal memperbarui berita');
+  }
+}
+
+
 </script>
 
 <style scoped>

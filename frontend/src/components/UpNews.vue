@@ -162,6 +162,19 @@ function validateBeforeUpload() {
     showConfirmUpload.value = true
   }
 }
+const fetchBerita = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/documentations')
+    beritaList.value = response.data.data.map((item) => ({
+  id: item.id_document,
+  title: item.title,
+  description: item.description,
+  image: `http://localhost:8000${item.file_url}`,
+  }))
+  } catch (error) {
+    console.error('Gagal memuat berita:', error)
+  }
+}
 
 async function submitUpload() {
   let formData = new FormData();
