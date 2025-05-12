@@ -40,7 +40,7 @@
 
       <div class="content-area" ref="contentArea">
         <div v-if="!selectedBerita && !isMobile" class="greeting-section">
-          <p class="greeting-text">Selamat Datang, {{ userName }}</p>
+          <p class="greeting-text">Selamat Datang, <span class="user">{{ userName }}</span></p>
           <div class="berita-hari-ini">
             <h3>Berita hari ini</h3>
           </div>
@@ -305,10 +305,14 @@ const handleConfirmSave = async () => {
   justify-content: flex-end;
 }
 
-.back-button img {
+.back-button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
   width: 24px;
   height: 24px;
-  filter: brightness(0) invert(1);
 }
 
 .app-title {
@@ -428,8 +432,8 @@ const handleConfirmSave = async () => {
   display: flex;
   flex-direction: column;
   height: 70%;
-  padding: 1rem;
-  gap: 5px;
+  padding: 0.5rem;
+  gap: 10px;
 }
 
 .berita-card {
@@ -501,18 +505,17 @@ const handleConfirmSave = async () => {
     background-color 0.3s ease;
 }
 
-.input-descrition {
-  display: block;
-  width: 100%;
+.textarea-description {
   padding: 8px;
   margin-bottom: 8px;
   border-radius: 4px;
   border: 1px solid #8b8b8b;
-  background-color: #dfdfdf;
-  color: white;
+  background-color: #cdcdcd;
+  color: black;
   transition:
     border-color 0.3s ease,
     background-color 0.3s ease;
+  width: 100%;
 }
 
 .input-title:focus,
@@ -531,7 +534,7 @@ const handleConfirmSave = async () => {
   padding: 10px 16px;
   border-radius: 8px;
   cursor: pointer;
-  width: 50%;
+  width: 40%;
   margin: 0 auto;
   margin-top: 2rem;
 }
@@ -548,6 +551,21 @@ const handleConfirmSave = async () => {
     flex-direction: column;
     overflow: hidden;
   }
+  .page-header {
+    background: none;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    margin-bottom: 0;
+  }
+  .back-button {
+    filter: invert(1);
+  }
+  .app-title {
+    color: #2c3930;
+  }
   .berita-item {
     width: 50%;
     margin: 0 auto;
@@ -560,16 +578,6 @@ const handleConfirmSave = async () => {
     max-width: 800%;
     padding: 0;
   }
-  .page-header {
-    background:
-      linear-gradient(rgba(44, 57, 48, 0.93), rgba(44, 57, 48, 0.93)), url('@/assets/bg.png');
-    background-size: cover;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 100%;
-    margin-bottom: 0;
-  }
   .input-title {
     font-size: 1rem;
   }
@@ -577,7 +585,8 @@ const handleConfirmSave = async () => {
     width: 40%;
   }
   .save-button {
-    margin-top: 0.5rem;
+    margin-top: 1rem;
+    width: 30%;
   }
 }
 </style>
