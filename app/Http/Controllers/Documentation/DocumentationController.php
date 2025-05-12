@@ -39,7 +39,10 @@ class DocumentationController extends Controller
 
             $originalName = $request->file('image')->getClientOriginalName();
             $cleanedName = time() . '_' . preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalName);
-            $path = $request->file('image')->storeAs('public/documentations', $cleanedName);
+            $path = $request->file('image')->storeAs(
+            'public/documentations',
+            $cleanedName
+            );
             $doc->file_url = 'storage/documentations/' . $cleanedName;
         }
 
@@ -67,41 +70,40 @@ class DocumentationController extends Controller
 
 
     public function store(Request $request)
-    {
-        try {
-            $request->validate([
-                'title' => 'required|string',
-                'description' => 'required|string',
-                'image' => 'required|image|max:10240',
-            ]);
+{
+    try {
+        $request->validate([
+            'title' => 'required|string',
+            'description' => 'required|string',
+            'image' => 'required|image|max:10240',
+        ]);
 
-            $originalName = $request->file('image')->getClientOriginalName();
-            $cleanedName = time() . '_' . preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalName); // Hapus karakter aneh
-            $path = $request->file('image')->storeAs('public/documentations', $cleanedName);
-            $fileUrl = 'storage/documentations/' . $cleanedName;
-            
-            $fileUrl = Storage::url($path);
+        $originalName = $request->file('image')->getClientOriginalName();
+        $cleanedName = time() . '_' . preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalName);
 
-            $teacher = Teacher::where('nip', $request->input('nip'))->first();
-            if (!$teacher) return response()->json(['error' => 'Guru tidak ditemukan'], 401);
+        $path = $request->file('image')->storeAs('documentations', $cleanedName, 'public');
+        // Gunakan path URL yang cocok dengan public/storage
+        $fileUrl = url(Storage::url($path)); 
+        $teacher = Teacher::where('nip', $request->input('nip'))->first();
+        if (!$teacher) return response()->json(['error' => 'Guru tidak ditemukan'], 401);
 
-            $doc = new Documentation();
-            $doc->uploaded_by = $teacher->name;
-            $doc->id_teacher = $teacher->id_teacher;
-            $doc->title = $request->input('title');
-            $doc->description = $request->input('description');
-            $doc->file_url = $fileUrl;
-            $doc->save();
+        $doc = new Documentation();
+        $doc->uploaded_by = $teacher->name;
+        $doc->id_teacher = $teacher->id_teacher;
+        $doc->title = $request->input('title');
+        $doc->description = $request->input('description');
+        $doc->file_url = $fileUrl;
+        $doc->save();
 
-
-            return response()->json([
-                'message' => 'Dokumentasi berhasil disimpan',
-                'file_url' => $fileUrl
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+        return response()->json([
+            'message' => 'Dokumentasi berhasil disimpan',
+            'file_url' => $fileUrl
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
     }
+}
+
 
     
 }

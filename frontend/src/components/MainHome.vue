@@ -53,7 +53,7 @@
             class="berita-item"
             @click="selectBerita(berita)"
           >
-            <img :src="berita.file_url" alt="berita" class="berita-image" loading="lazy" />
+            <img :src="berita.image" alt="berita" class="berita-image" loading="lazy" />
             <div class="berita-info">
               <h3 class="berita-title">{{ berita.title }}</h3>
             </div>
@@ -184,19 +184,19 @@ onMounted(() => {
 })
 
 const fetchBerita = async () => {
-  
   try {
-    const response = await axios.get('http://localhost:8000/api/documentations')
+    const response = await axios.get('http://localhost:8000/api/documentations');
     beritaList.value = response.data.data.map((item) => ({
-    id: item.id_document,
-    title: item.title,
-    description: item.description,
-    image: `http://localhost:8000/${encodeURIComponent(item.file_url).replace(/%2F/g, '/')}`,
-  }))
+      id: item.id_document,
+      title: item.title,
+      description: item.description,
+      image: item.file_url, // URL dari backend
+    }));
+    console.log(beritaList.value); // Log data untuk memastikan URL benar
   } catch (error) {
-    console.error('Gagal memuat berita:', error)
+    console.error('Gagal memuat berita:', error);
   }
-}
+};
 
 
 const selectBerita = (berita) => {
