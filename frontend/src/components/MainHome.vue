@@ -184,7 +184,7 @@ onMounted(() => {
 })
 
 const fetchBerita = async () => {
-  
+
   try {
     const response = await axios.get('http://localhost:8000/api/documentations')
     beritaList.value = response.data.data.map((item) => ({
@@ -215,7 +215,7 @@ const goBack = () => {
 }
 
 const goBackToDashboard = () => {
-  router.push('/dashboard')
+  router.push('/dashboard-guru')
 }
 
 const saveChanges = () => {
