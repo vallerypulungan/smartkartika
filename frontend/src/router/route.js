@@ -17,6 +17,8 @@ import LaporanOrtu from '@/components/LaporanOrtu.vue'
 import ProfilOrtu from '@/components/ProfilOrtu.vue'
 import WelcomePage from '@/views/WelcomePage.vue'
 import LaporanView from '@/components/LaporanView.vue'
+import RegisterParent from '@/views/RegisterParent.vue'
+import RegisterTeacher from '@/views/RegisterTeacher.vue'
 
 const routes = [
   { path: '/', component: WelcomePage },
@@ -36,7 +38,9 @@ const routes = [
   { path: '/commentp', component: CommentOrtu },
   { path: '/rapor', component: LaporanOrtu },
   { path: '/profilp', component: ProfilOrtu },
-  { path: '/listlaporan', component: LaporanView}
+  { path: '/listlaporan', component: LaporanView},
+  { path: '/registerteach', component: RegisterTeacher },
+  { path: '/registerparent', component: RegisterParent },
 ]
 
 const router = createRouter({

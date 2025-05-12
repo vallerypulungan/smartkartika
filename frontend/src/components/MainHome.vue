@@ -115,7 +115,7 @@
 
 <script setup>
 import axios from 'axios'
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import Sidebar from '@/components/SidebarTemplate.vue'
 import { useRouter } from 'vue-router'
 

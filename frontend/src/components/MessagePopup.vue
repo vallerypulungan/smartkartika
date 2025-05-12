@@ -41,6 +41,7 @@ export default {
 .popup-container h2 {
   margin-bottom: 15px;
   font-weight: bold;
+  font-size: 1rem;
 }
 
 .popup-button {
