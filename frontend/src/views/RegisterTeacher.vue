@@ -19,6 +19,12 @@
         <div class="login-wrapper">
           <button @click="validateAndRegister" class="login-button">Daftar</button>
         </div>
+        <div class="login-redirect">
+          <span
+            >Sudah punya akun?
+            <router-link to="/login" class="login-link">Masuk di sini</router-link></span
+          >
+        </div>
       </div>
     </div>
     <Popup v-if="showPopup" :title="popupMessage" @close="showPopup = false" />
@@ -145,6 +151,23 @@ onMounted(() => {
 
 .login-button:hover {
   background-color: #1f2922;
+}
+
+.login-redirect {
+  margin-top: 1.2rem;
+  text-align: center;
+  font-size: 14px;
+  color: #000;
+}
+
+.login-link {
+  color: #2c3930;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.login-link:hover {
+  text-decoration: underline;
 }
 
 @media (min-width: 768px) {
