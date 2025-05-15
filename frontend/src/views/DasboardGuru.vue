@@ -106,7 +106,7 @@ import HeaderDashboard from '@/components/HeaderDashboard.vue'
 import axios from 'axios';
 
 import HomeContent from '@/components/MainHome.vue'
-import UploadPage from '@/components/ReportForm.vue'
+import UploadPage from '@/components/LaporanView.vue'
 import UploadNewsPage from '@/components/UpNews.vue'
 import ManagePage from '@/components/ManageAct.vue'
 

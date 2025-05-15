@@ -333,6 +333,10 @@ const showErrorPopup = (title) => {
   color: #666;
   margin-bottom: 0.5rem;
 }
+.upload-text {
+  text-align: center;
+  font-size: 0.7rem;
+}
 
 .submit-button {
   width: 50%;
@@ -351,10 +355,6 @@ const showErrorPopup = (title) => {
   background-color: #4d4d4d;
 }
 
-.upload-text {
-  text-align: center;
-  font-size: 0.7rem;
-}
 .file-note {
   margin-top: 1rem;
   text-align: center;
