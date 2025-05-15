@@ -101,7 +101,7 @@ import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 
 import HeaderDashboard from '@/components/HeaderDashboard.vue'
-import axios from 'axios';
+
 
 import HomeContent from '@/components/MainHome.vue'
 import UploadPage from '@/components/LaporanView.vue'
