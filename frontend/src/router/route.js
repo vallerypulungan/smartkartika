@@ -19,6 +19,7 @@ import WelcomePage from '@/views/WelcomePage.vue'
 import LaporanView from '@/components/LaporanView.vue'
 import RegisterParent from '@/views/RegisterParent.vue'
 import RegisterTeacher from '@/views/RegisterTeacher.vue'
+import KelolaKegiatan from '@/components/KelolaKegiatan.vue'
 
 const routes = [
   { path: '/', component: WelcomePage },
@@ -41,6 +42,7 @@ const routes = [
   { path: '/listlaporan', component: LaporanView},
   { path: '/registerteach', component: RegisterTeacher },
   { path: '/registerparent', component: RegisterParent },
+  { path: '/manage', component: KelolaKegiatan}
 ]
 
 const router = createRouter({
