@@ -36,10 +36,12 @@
                 accept="image/*"
               />
             </div>
-            <button class="laporan-button save" type="submit">
-              {{ isEditing ? 'Update' : 'Simpan' }}
-            </button>
-            <button class="laporan-button batal" type="button" @click="cancelForm">Batal</button>
+            <div class="modal-actions">
+              <button class="laporan-button save" type="submit">
+                {{ isEditing ? 'Update' : 'Simpan' }}
+              </button>
+              <button class="laporan-button batal" type="button" @click="cancelForm">Batal</button>
+            </div>
           </form>
         </div>
       </div>

@@ -412,8 +412,8 @@ const handleConfirmSave = async () => {
 
 .berita-image {
   width: 100%;
-  height: 200px;
-  max-height: 200px;
+  height: 350px;
+  max-height: 350px;
 }
 
 .berita-info {
@@ -539,8 +539,24 @@ const handleConfirmSave = async () => {
   margin-top: 2rem;
 }
 
+.delete-button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 40%;
+  margin: 0 auto;
+  margin-top: 1rem;
+}
+
 .save-button:hover {
   background-color: #1e2a22;
+}
+
+.delete-button:hover {
+  background-color: #d32f2f;
 }
 /* Desktop responsive */
 @media (min-width: 768px) {
