@@ -87,43 +87,17 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import axios from 'axios'
 import Sidebar from '@/components/SideOrtu.vue'
 import HeaderDashboard from '@/components/HeaderOrangTua.vue'
 
-// States
 const beritaList = ref([])
 const selectedBerita = ref(null)
-
 const isMobile = ref(window.innerWidth <= 768)
 const showSidebar = ref(false)
 const isLoggedIn = ref(true)
 const userName = ref('User')
 const selectedMenu = ref('')
-
-// Dummy berita
-const dummyBerita = [
-  {
-    id: 1,
-    title: 'Berita Pertama',
-    subtitle: 'Subjudul berita pertama',
-    description: 'Deskripsi lengkap berita pertama.',
-    image: 'https://via.placeholder.com/400x200?text=Berita+1',
-  },
-  {
-    id: 2,
-    title: 'Berita Kedua',
-    subtitle: 'Subjudul berita kedua',
-    description: 'Deskripsi lengkap berita kedua.',
-    image: 'https://via.placeholder.com/400x200?text=Berita+2',
-  },
-  {
-    id: 3,
-    title: 'Berita Ketiga',
-    subtitle: 'Subjudul berita ketiga',
-    description: 'Deskripsi lengkap berita ketiga.',
-    image: 'https://via.placeholder.com/400x200?text=Berita+3',
-  },
-]
 
 const selectBerita = (berita) => {
   selectedBerita.value = berita
@@ -133,8 +107,24 @@ const goBack = () => {
   selectedBerita.value = null
 }
 
+// Fetch berita dari API, sama seperti MainHome
+const fetchBerita = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/documentations');
+    beritaList.value = response.data.data.map((item) => ({
+      id: item.id_document,
+      title: item.title,
+      subtitle: '', // Jika tidak ada subtitle di backend, bisa dikosongkan
+      description: item.description,
+      image: item.file_url,
+    }));
+  } catch (error) {
+    console.error('Gagal memuat berita:', error);
+  }
+}
+
 onMounted(() => {
-  beritaList.value = dummyBerita
+  fetchBerita()
 })
 
 window.addEventListener('resize', () => {
