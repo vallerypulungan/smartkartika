@@ -422,7 +422,13 @@ const goBack = () => {
   margin: 0.2rem;
 }
 
-.laporan-button.add,
+.laporan-button.add {
+  background-color: #4caf50;
+  padding: 0.6rem;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
 .laporan-button.save {
   background-color: #4caf50;
 }

@@ -280,11 +280,10 @@ function confirmBack() {
 }
 
 .form-upload {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   background-color: #fff;
+  gap: 1rem;
   padding: 1rem;
   border-radius: 20px 20px 0 0;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
