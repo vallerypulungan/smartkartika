@@ -37,7 +37,7 @@ class LoginController extends Controller
                 'role' => 'ortu',
                 'name' => $ortu->name,
                 'message' => 'Login Orang Tua berhasil',
-                'redirect' => '/profil'
+                'redirect' => '/dashboardortu'
             ]);
         }
     

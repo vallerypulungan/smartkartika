@@ -11,3 +11,9 @@ Route::get('/documentations', [DocumentationController::class, 'index']);
 Route::put('/documentations/{id}', [DocumentationController::class, 'update']);
 Route::delete('/documentations/{id}', [DocumentationController::class, 'destroy']);
 
+use App\Http\Controllers\ActivityController;
+
+Route::get('/activities', [ActivityController::class, 'index']);
+Route::post('/activities', [ActivityController::class, 'store']);
+Route::put('/activities/{id}', [ActivityController::class, 'update']);
+Route::delete('/activities/{id}', [ActivityController::class, 'destroy']);

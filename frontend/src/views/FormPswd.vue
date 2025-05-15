@@ -60,10 +60,11 @@ export default {
           if (response.data.role === 'guru') {
             router.push('/dashboard-guru');
           } else if (response.data.role === 'ortu') {
-            router.push('/profil'); // ke ProfilView.vue
+            router.push('/dashboardortu'); // ke ProfilView.vue
           }
           localStorage.setItem('userName', response.data.name);
           localStorage.setItem('nip', response.data.nip);
+          localStorage.setItem('id_teacher', response.data.id_teacher)
 
         }
       } catch (error) {

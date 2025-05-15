@@ -35,6 +35,12 @@
                 @change="handleImageUpload"
                 accept="image/*"
               />
+              <div v-if="formItem.imageName || formItem.imageUrl" class="file-name">
+                <span v-if="formItem.imageName">{{ formItem.imageName }}</span>
+                <span v-else-if="formItem.imageUrl">
+                  File sebelumnya: {{ formItem.imageUrl.split('/').pop() }}
+                </span>
+              </div>
             </div>
             <button class="laporan-button save" type="submit">
               {{ isEditing ? 'Update' : 'Simpan' }}
@@ -84,7 +90,7 @@
     />
 
     <div class="popup-wrapper" :style="{ zIndex: 9999 }">
-      <PopupSuccess
+      <PopupGagal
         v-if="showAlert"
         :title="'HARAP ISI SEMUA KOLOM TERLEBIH DAHULU'"
         @close="cancelMessage"
@@ -112,11 +118,27 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import axios from 'axios'
+import { ref, reactive, onMounted } from 'vue'
 import PopupConfirm from '@/components/BlokPopup.vue'
 import PopupSuccess from '@/components/MessagePopup.vue'
 
 const items = ref([])
+
+async function fetchActivities() {
+  const res = await axios.get('http://localhost:8000/api/activities')
+  // Mapping data dari backend ke field yang dipakai di tabel
+  items.value = res.data.data.map(item => ({
+    id_activity: item.id_activity,
+    judul: item.activity_tittle,
+    tanggal: item.date,
+    deskripsi: item.description,
+    imageName: item.image_url ? item.image_url.split('/').pop() : '',
+    imageUrl: item.image_url
+  }))
+}
+
+onMounted(fetchActivities)
 
 const formVisible = ref(false)
 const isEditing = ref(false)
@@ -127,12 +149,14 @@ const showSuccessDelete = ref(false)
 const showSuccessEdit = ref(false)
 const showAlert = ref(false)
 const indexToDelete = ref(null)
+const nip = localStorage.getItem('nip');
 
 const formItem = reactive({
   judul: '',
   tanggal: '',
   deskripsi: '',
   imageName: '',
+  imageUrl: '', // tambahkan ini
 })
 
 function showForm(editMode) {
@@ -153,21 +177,39 @@ function cancelForm() {
   editedIndex.value = null
 }
 
-function submitForm() {
-  if (!formItem.judul.trim() || !formItem.tanggal.trim() || !formItem.deskripsi.trim()) {
-    showAlert.value = true
-    return
+async function submitForm() {
+  const formData = new FormData();
+  formData.append('activity_tittle', formItem.judul);
+  formData.append('description', formItem.deskripsi);
+  formData.append('date', formItem.tanggal);
+  formData.append('nip', nip);
+
+  // File upload
+  const fileInput = document.querySelector('#fileInput');
+  if (fileInput && fileInput.files[0]) {
+    formData.append('image', fileInput.files[0]);
   }
 
-  if (isEditing.value && editedIndex.value !== null) {
-    items.value[editedIndex.value] = { ...formItem }
-    showSuccessEdit.value = true // <--- Tambahkan ini
-  } else {
-    items.value.push({ ...formItem })
-    showSuccess.value = true
+  try {
+    if (isEditing.value && editedIndex.value !== null) {
+      // Edit mode
+      const id = items.value[editedIndex.value].id_activity;
+      await axios.post(`http://localhost:8000/api/activities/${id}?_method=PUT`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      showSuccessEdit.value = true;
+    } else {
+      // Tambah baru
+      await axios.post('http://localhost:8000/api/activities', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      showSuccess.value = true;
+    }
+    await fetchActivities(); // Refresh data dari backend
+    formVisible.value = false;
+  } catch (error) {
+    showAlert.value = true;
   }
-
-  cancelForm()
 }
 
 function handleImageUpload(event) {
@@ -177,12 +219,20 @@ function handleImageUpload(event) {
   }
 }
 
-function saveActivity() {
+async function saveActivity() {
   if (indexToDelete.value !== null) {
-    items.value.splice(indexToDelete.value, 1)
-    indexToDelete.value = null
-    showSaveConfirm.value = false
-    showSuccessDelete.value = true
+    try {
+      // Ambil id dari items
+      const id = items.value[indexToDelete.value].id_activity;
+      await axios.delete(`http://localhost:8000/api/activities/${id}`);
+      await fetchActivities(); // Refresh data dari backend
+      showSuccessDelete.value = true;
+    } catch (error) {
+      showAlert.value = true;
+    } finally {
+      indexToDelete.value = null;
+      showSaveConfirm.value = false;
+    }
   }
 }
 
@@ -203,7 +253,8 @@ function editItem(index) {
   formItem.judul = item.judul
   formItem.tanggal = item.tanggal
   formItem.deskripsi = item.deskripsi
-  formItem.imageName = item.imageName
+  formItem.imageName = '' // kosongkan, karena input file tidak bisa diisi
+  formItem.imageUrl = item.imageUrl // simpan url gambar lama
   editedIndex.value = index
   showForm(true)
 }

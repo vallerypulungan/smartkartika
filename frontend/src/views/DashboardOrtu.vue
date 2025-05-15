@@ -96,7 +96,7 @@ const selectedBerita = ref(null)
 const isMobile = ref(window.innerWidth <= 768)
 const showSidebar = ref(false)
 const isLoggedIn = ref(true)
-const userName = ref('User')
+const userName = ref(localStorage.getItem('userName') || 'User')
 const selectedMenu = ref('')
 
 const selectBerita = (berita) => {

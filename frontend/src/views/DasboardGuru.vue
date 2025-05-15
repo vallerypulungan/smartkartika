@@ -108,7 +108,7 @@ import axios from 'axios';
 import HomeContent from '@/components/MainHome.vue'
 import UploadPage from '@/components/LaporanView.vue'
 import UploadNewsPage from '@/components/UpNews.vue'
-import ManagePage from '@/components/ManageAct.vue'
+import ManagePage from '@/components/KelolaKegiatan.vue'
 
 const route = useRoute()
 const router = useRouter()

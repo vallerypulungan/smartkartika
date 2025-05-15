@@ -29,6 +29,9 @@ class DocumentationController extends Controller
             'image' => 'nullable|image|max:10240',
         ]);
 
+        $teacher = Teacher::where('nip', $request->input('nip'))->first();
+        if (!$teacher) return response()->json(['error' => 'Guru tidak ditemukan'], 401);
+
         $doc = Documentation::findOrFail($id);
 
         if ($request->hasFile('image')) {

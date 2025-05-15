@@ -13,14 +13,13 @@ return new class extends Migration
     {
         Schema::create('activities', function (Blueprint $table) {
             $table->id('id_activity');
-            $table->unsignedBigInteger('id_class');
             $table->unsignedBigInteger('id_teacher');
             
             $table->string('activity_tittle');
             $table->text('description');
             $table->date('date');
+            $table->string('image_url')->nullable();
             
-            $table->foreign('id_class')->references('id_class')->on('classes')->onDelete('cascade');
             $table->foreign('id_teacher')->references('id_teacher')->on('teachers')->onDelete('cascade');
             $table->timestamps();
         });
