@@ -56,8 +56,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
 
 const router = useRouter()
 const isMobile = ref(window.innerWidth <= 768)
@@ -66,52 +67,13 @@ const currentPage = ref(0)
 const previousIsMobile = ref(isMobile.value)
 const selectedArticleIndex = ref(0)
 
-const mainArticle = computed(() => allArticles[selectedArticleIndex.value])
+const allArticles = ref([])
 
-const allArticles = [
-  {
-    image: 'https://source.unsplash.com/100x100/?restaurant',
-    title: '10 Must-Try London Markets',
-    date: 'May 8, 2025',
-    description: 'Explore hidden gems and delicious treats from famous London street food markets.',
-  },
-  {
-    image: 'https://source.unsplash.com/100x100/?cafe',
-    title: 'Co-working Cafes in Seoul',
-    date: 'May 7, 2025',
-    description:
-      'Find the best coffee shops in Seoul where you can work, chill, and enjoy local brews.',
-  },
-  {
-    image: 'https://source.unsplash.com/100x100/?bakery',
-    title: 'Cheap Eats in Bangkok',
-    date: 'May 5, 2025',
-    description:
-      'Discover the most affordable and tasty places to eat in Bangkok without breaking your wallet.',
-  },
-  {
-    image: 'https://source.unsplash.com/100x100/?pizza',
-    title: 'Best Pizza Places in New York',
-    date: 'May 3, 2025',
-    description: 'Find the top pizza joints to satisfy your cravings in NYC.',
-  },
-  {
-    image: 'https://source.unsplash.com/100x100/?sushi',
-    title: 'Top Sushi Bars in Tokyo',
-    date: 'May 1, 2025',
-    description: 'Experience the freshest sushi in the heart of Tokyo.',
-  },
-  {
-    image: 'https://source.unsplash.com/100x100/?burger',
-    title: 'Burger Spots You Can’t Miss',
-    date: 'April 30, 2025',
-    description: 'Juicy and delicious burgers from around the world.',
-  },
-]
+const mainArticle = computed(() => allArticles.value[selectedArticleIndex.value] || {})
 
 const sideArticles = computed(() => {
   const start = currentPage.value * articlesPerPage.value
-  return allArticles.slice(start, start + articlesPerPage.value)
+  return allArticles.value.slice(start, start + articlesPerPage.value)
 })
 
 function switchMainArticle(index) {
@@ -119,7 +81,7 @@ function switchMainArticle(index) {
 }
 
 function nextPageMobile() {
-  if ((currentPage.value + 1) * articlesPerPage.value < allArticles.length) {
+  if ((currentPage.value + 1) * articlesPerPage.value < allArticles.value.length) {
     currentPage.value++
     selectedArticleIndex.value = currentPage.value * articlesPerPage.value
   }
@@ -135,31 +97,29 @@ function prevPageMobile() {
 function handleResize() {
   const wasMobile = previousIsMobile.value
   isMobile.value = window.innerWidth <= 768
-
-  // Update articlesPerPage sesuai layar
   articlesPerPage.value = isMobile.value ? 1 : 3
-
   if (wasMobile !== isMobile.value) {
-    // Hitung halaman baru berdasarkan selectedArticleIndex dan articlesPerPage terbaru
     const newPage = Math.floor(selectedArticleIndex.value / articlesPerPage.value)
     currentPage.value = newPage
-    // Jangan ubah selectedArticleIndex agar tetap di artikel yang sama
   }
-
   previousIsMobile.value = isMobile.value
 }
 
-onMounted(() => {
+onMounted(async () => {
   handleResize()
   window.addEventListener('resize', handleResize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
+  // Fetch kegiatan dari backend
+  const res = await axios.get('http://localhost:8000/api/activities')
+  allArticles.value = res.data.data.map(item => ({
+    image: item.image_url,
+    title: item.activity_tittle,
+    date: item.date,
+    description: item.description,
+  }))
 })
 
 function nextPage() {
-  if ((currentPage.value + 1) * articlesPerPage.value < allArticles.length) {
+  if ((currentPage.value + 1) * articlesPerPage.value < allArticles.value.length) {
     currentPage.value++
   }
 }
@@ -171,7 +131,7 @@ function prevPage() {
 }
 
 const isNextDisabled = computed(() => {
-  return (currentPage.value + 1) * articlesPerPage.value >= allArticles.length
+  return (currentPage.value + 1) * articlesPerPage.value >= allArticles.value.length
 })
 
 const isPrevDisabled = computed(() => {

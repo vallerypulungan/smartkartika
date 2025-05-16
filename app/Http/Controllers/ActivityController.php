@@ -40,8 +40,9 @@ class ActivityController extends Controller
             if ($request->hasFile('image')) {
                 $originalName = $request->file('image')->getClientOriginalName();
                 $cleanedName = time() . '_' . preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalName);
-                $path = $request->file('image')->storeAs('public/activities', $cleanedName);
-                $activity->image_url = 'storage/activities/' . $cleanedName;
+                $path = $request->file('image')->storeAs('activities', $cleanedName, 'public');
+                // Simpan URL lengkap seperti di DocumentationController
+                $activity->image_url = url(Storage::url($path));
             }
 
             $activity->save();
@@ -72,15 +73,14 @@ class ActivityController extends Controller
         $activity->date = $request->date;
 
         if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
-            if ($activity->image_url && Storage::exists(str_replace('storage/', 'public/', $activity->image_url))) {
-                Storage::delete(str_replace('storage/', 'public/', $activity->image_url));
+            if ($activity->image_url && Storage::exists(str_replace(url('storage/'), 'public/', $activity->image_url))) {
+                Storage::delete(str_replace(url('storage/'), 'public/', $activity->image_url));
             }
             $originalName = $request->file('image')->getClientOriginalName();
             $cleanedName = time() . '_' . preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalName);
-            $path = $request->file('image')->storeAs('public/activities', $cleanedName);
-            $activity->image_url = 'storage/activities/' . $cleanedName;
-        }
+            $path = $request->file('image')->storeAs('activities', $cleanedName, 'public');
+            $activity->image_url = url(Storage::url($path));
+            }
 
         $activity->save();
 

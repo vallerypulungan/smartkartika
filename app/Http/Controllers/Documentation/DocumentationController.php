@@ -42,10 +42,7 @@ class DocumentationController extends Controller
 
             $originalName = $request->file('image')->getClientOriginalName();
             $cleanedName = time() . '_' . preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalName);
-            $path = $request->file('image')->storeAs(
-            'public/documentations',
-            $cleanedName
-            );
+            $path = $request->file('image')->storeAs('public/documentations',$cleanedName);
             $doc->file_url = 'storage/documentations/' . $cleanedName;
         }
 

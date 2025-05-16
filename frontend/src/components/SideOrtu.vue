@@ -27,7 +27,7 @@
           <div class="sidebar-item" @click="goTo('/rapor')">
             <div class="sidebar-text">Rapor</div>
           </div>
-          <div class="sidebar-item-logout" @click="goTo('/logout')">
+          <div class="sidebar-item-logout" @click="logout">
             <div class="sidebar-text">Logout</div>
           </div>
         </template>
@@ -42,6 +42,7 @@ import { computed } from 'vue'
 import { useUserStore } from '@/stores/user'
 import defaultImage from '@/assets/profil.jpeg'
 import { defineProps } from 'vue'
+import axios from 'axios'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -58,6 +59,22 @@ const { isLoggedIn, userName } = defineProps({
     default: '',
   },
 })
+async function logout() {
+  try {
+    const response = await axios.post('http://localhost:8000/api/logout')
+    if (response.data.status === 'success') {
+      localStorage.removeItem('isLoggedIn')
+      localStorage.removeItem('role')
+      localStorage.removeItem('userName')
+      router.push('/login')
+    } else {
+      alert('Logout gagal dari server.')
+    }
+  } catch (error) {
+    console.error('Logout error:', error)
+    alert('Logout gagal karena koneksi atau server.')
+  }
+}
 
 function goTo(route) {
   router.push(route)
