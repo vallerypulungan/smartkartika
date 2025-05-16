@@ -20,6 +20,7 @@ import LaporanView from '@/components/LaporanView.vue'
 import RegisterParent from '@/views/RegisterParent.vue'
 import RegisterTeacher from '@/views/RegisterTeacher.vue'
 import KelolaKegiatan from '@/components/KelolaKegiatan.vue'
+import ViewKegiatan from '@/components/ViewKegiatan.vue'
 
 const routes = [
   { path: '/', component: WelcomePage },
@@ -50,6 +51,7 @@ const routes = [
   //{ path: '/listlaporan', component: LaporanView},
   { path: '/registerteach', component: RegisterTeacher },
   { path: '/registerparent', component: RegisterParent },
+   { path: '/viewkegiatan', component: ViewKegiatan },
   //{ path: '/manage', component: KelolaKegiatan}
 ]
 

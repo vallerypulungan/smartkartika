@@ -21,8 +21,8 @@
           <div class="sidebar-item" @click="goTo('/profilp')">
             <div class="sidebar-text">Profil</div>
           </div>
-          <div class="sidebar-item" @click="goTo('/commentp')">
-            <div class="sidebar-text">Komentar</div>
+          <div class="sidebar-item" @click="goTo('/viewkegiatan')">
+            <div class="sidebar-text">Kegiatan</div>
           </div>
           <div class="sidebar-item" @click="goTo('/rapor')">
             <div class="sidebar-text">Rapor</div>
