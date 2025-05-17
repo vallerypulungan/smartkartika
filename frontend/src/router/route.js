@@ -21,6 +21,7 @@ import RegisterParent from '@/views/RegisterParent.vue'
 import RegisterTeacher from '@/views/RegisterTeacher.vue'
 import KelolaKegiatan from '@/components/KelolaKegiatan.vue'
 import ViewKegiatan from '@/components/ViewKegiatan.vue'
+import TabelKelas from '@/components/TabelKelas.vue'
 
 const routes = [
   { path: '/', component: WelcomePage },
@@ -35,6 +36,7 @@ const routes = [
       { path: 'upload', name: 'upload', component: LaporanView },
       { path: 'ulpoadNews', name: 'uploadNews', component: UpNews },
       { path: 'manage', name: 'manage', component: KelolaKegiatan },
+      { path: 'kelas', name: 'kelas', component: TabelKelas}
     ],
    },
   { path: '/laporan', name: 'laporan', component: ReportForm },
