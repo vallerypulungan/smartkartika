@@ -112,12 +112,6 @@ import axios from 'axios'
 
 import HeaderDashboard from '@/components/HeaderDashboard.vue'
 
-
-import HomeContent from '@/components/MainHome.vue'
-import UploadPage from '@/components/LaporanView.vue'
-import UploadNewsPage from '@/components/UpNews.vue'
-import ManagePage from '@/components/ManageAct.vue'
-
 const route = useRoute()
 const router = useRouter()
 
