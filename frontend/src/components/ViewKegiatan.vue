@@ -238,6 +238,8 @@ const goBack = () => {
 .main-description {
   font-size: 0.8rem;
   color: #555;
+  max-height: 150px;
+  overflow-y: auto;
 }
 
 .side-articles {
