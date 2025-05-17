@@ -438,7 +438,7 @@ function confirmBack() {
     font-size: 1.5rem;
   }
   .submit-button {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
   }
 }
 </style>
