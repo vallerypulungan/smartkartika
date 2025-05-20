@@ -22,6 +22,7 @@ import RegisterTeacher from '@/views/RegisterTeacher.vue'
 import KelolaKegiatan from '@/components/KelolaKegiatan.vue'
 import ViewKegiatan from '@/components/ViewKegiatan.vue'
 import TabelKelas from '@/components/TabelKelas.vue'
+import InformasiSiswa from '@/components/InformasiSiswa.vue'
 
 const routes = [
   { path: '/', component: WelcomePage },
@@ -54,6 +55,7 @@ const routes = [
   { path: '/registerteach', component: RegisterTeacher },
   { path: '/registerparent', component: RegisterParent },
    { path: '/viewkegiatan', component: ViewKegiatan },
+   {path : '/infosiswa', component: InformasiSiswa}
   //{ path: '/manage', component: KelolaKegiatan}
 ]
 
