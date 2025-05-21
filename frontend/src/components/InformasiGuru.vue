@@ -103,10 +103,10 @@
           <tbody>
             <tr v-for="(teacher, index) in filteredData" :key="index">
               <td>{{ index + 1 }}</td>
-              <td>{{ teacher.nama }}</td>
+              <td>{{ teacher.name }}</td>
               <td>{{ teacher.nip }}</td>
               <td>{{ teacher.email }}</td>
-              <td>{{ teacher.telepon }}</td>
+              <td>{{ teacher.num_telp }}</td>
               <td>
                 <button @click="editStudent(teacher, index)" class="btn-aksi edit">Edit</button>
                 <button @click="deleteStudent(index)" class="btn-aksi delete">Hapus</button>
@@ -174,12 +174,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
 import PopupConfirm from '@/components/BlokPopup.vue'
 import PopupMessage from '@/components/MessagePopup.vue'
-import eye from '@/assets/eye.png'
-import eyeOff from '@/assets/eye-off.png'
+// import eye from '@/assets/eye.png'
+// import eyeOff from '@/assets/eye-off.png'
 
 const router = useRouter()
 
@@ -219,15 +220,15 @@ function submitForm() {
 }
 
 const filteredData = computed(() => {
-  let data = classData.value[activeTab.value] || []
+  let data = classData.value['Daftar Guru'] || [];
 
   if (searchQuery.value) {
     data = data.filter((teacher) =>
-      teacher.nama.toLowerCase().includes(searchQuery.value.toLowerCase()),
-    )
+      teacher.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    );
   }
-  return data
-})
+  return data;
+});
 
 function switchTab(kolom) {
   if (editingIndex.value !== null && kolom !== 'Registrasi') {
@@ -245,32 +246,42 @@ const sortedTabs = computed(() => {
   return tabs
 })
 
-function saveActivity() {
-  const teacherBaru = {
-    nama: form.value.nama,
-    nip: form.value.nip,
-    email: form.value.email,
-    telepon: form.value.telepon,
-    kode: form.value.kode,
-  }
+async function saveActivity() {
+  try {
+    const response = await axios.post('http://localhost:8000/api/teachers', {
+      name: form.value.nama,
+      nip: form.value.nip,
+      email: form.value.email,
+      num_telp: form.value.telepon,
+      password: form.value.kode,
+    });
 
-  // Menyimpan ke daftar "Daftar Guru"
-  if (!classData.value['Daftar Guru']) {
-    classData.value['Daftar Guru'] = []
+    classData.value['Daftar Guru'].push(response.data.data);
+    alert(response.data.message);
+    resetForm();
+    showSuccesAdd.value = true;
+    setTimeout(() => {
+      showSuccesAdd.value = false;
+    }, 2000);
+  } catch (error) {
+    console.error('Gagal menambahkan guru:', error);
   }
-  classData.value['Daftar Guru'].push(teacherBaru)
+}
 
-  // Reset form
-  form.value = {
-    nama: '',
-    nip: '',
-    email: '',
-    telepon: '',
-    kode: '',
+async function fetchTeachers() {
+  try {
+    const response = await axios.get('http://localhost:8000/api/teachers');
+    classData.value['Daftar Guru'] = response.data.data.map((teacher) => ({
+      id: teacher.id_teacher,
+      name: teacher.name,
+      nip: teacher.nip,
+      email: teacher.email,
+      num_telp: teacher.num_telp,
+    }));
+    console.log('Data guru:', classData.value['Daftar Guru']); // Debugging
+  } catch (error) {
+    console.error('Gagal mengambil data guru:', error);
   }
-
-  showConfirmPromote.value = false
-  showSuccesAdd.value = true
 }
 
 function editStudent(teacher, index) {
@@ -298,28 +309,26 @@ function confirmChangeTab() {
   }
 }
 
-function saveEdit() {
-  if (editingIndex.value !== null && editingTab.value) {
-    classData.value[editingTab.value][editingIndex.value] = {
-      nama: form.value.nama,
+async function saveEdit() {
+  try {
+    const teacherId = classData.value['Daftar Guru'][editingIndex.value].id;
+
+    const response = await axios.put(`http://localhost:8000/api/teachers/${teacherId}`, {
+      name: form.value.nama,
       nip: form.value.nip,
       email: form.value.email,
-      telepon: form.value.telepon,
-      kode: form.value.kode,
-    }
-    showConfirmEdit.value = false
-    editingIndex.value = null
-    editingTab.value = null
-    activeTab.value = 'Daftar Guru'
-    showSuccesEdit.value = true
-  }
+      num_telp: form.value.telepon,
+    });
 
-  form.value = {
-    nama: '',
-    nip: '',
-    email: '',
-    telepon: '',
-    kode: '',
+    classData.value['Daftar Guru'][editingIndex.value] = response.data.data;
+    alert(response.data.message);
+    resetForm();
+    showSuccesEdit.value = true; // Tampilkan notifikasi
+    setTimeout(() => {
+      showSuccesEdit.value = false;
+    }, 2000);
+  } catch (error) {
+    console.error('Gagal mengedit guru:', error);
   }
 }
 
@@ -328,12 +337,17 @@ function deleteStudent(index) {
   showConfirmDelete.value = true
 }
 
-function confirmDelete() {
-  if (deletingIndex.value !== null) {
-    classData.value[activeTab.value].splice(deletingIndex.value, 1)
-    showConfirmDelete.value = false
-    deletingIndex.value = null
-    showSuccesDelete.value = true
+async function confirmDelete() {
+  try {
+    const teacherId = classData.value['Daftar Guru'][deletingIndex.value].id;
+    
+
+    await axios.delete(`http://localhost:8000/api/teachers/${teacherId}`);
+    classData.value['Daftar Guru'].splice(deletingIndex.value, 1);
+    showSuccesDelete.value = true;
+    alert(response.data.message);
+  } catch (error) {
+    console.error('Gagal menghapus guru:', error);
   }
 }
 
@@ -353,6 +367,10 @@ function cancelSave() {
 const goBack = () => {
   router.back()
 }
+
+onMounted(() => {
+  fetchTeachers();
+});
 </script>
 
 <style scoped>

@@ -21,7 +21,7 @@ class DocumentationController extends Controller
         return response()->json(['data' => $docs]);
     }
     public function update(Request $request, $id)
-{
+    {
     try {
         $request->validate([
             'title' => 'required|string',
@@ -29,7 +29,12 @@ class DocumentationController extends Controller
             'image' => 'nullable|image|max:10240',
         ]);
 
-        $teacher = Teacher::where('nip', $request->input('nip'))->first();
+        // Ambil data dari JSON jika tidak ditemukan di form-data
+        $title = $request->input('title', $request->json('title'));
+        $description = $request->input('description', $request->json('description'));
+        $nip = $request->input('nip', $request->json('nip'));
+
+        $teacher = Teacher::where('nip', $nip)->first();
         if (!$teacher) return response()->json(['error' => 'Guru tidak ditemukan'], 401);
 
         $doc = Documentation::findOrFail($id);
@@ -46,8 +51,8 @@ class DocumentationController extends Controller
             $doc->file_url = 'storage/documentations/' . $cleanedName;
         }
 
-        $doc->title = $request->title;
-        $doc->description = $request->description;
+        $doc->title = $title;
+        $doc->description = $description;
         $doc->save();
 
         return response()->json(['message' => 'Berhasil diupdate']);
@@ -78,20 +83,25 @@ class DocumentationController extends Controller
             'image' => 'required|image|max:10240',
         ]);
 
+        // Ambil data dari JSON jika tidak ditemukan di form-data
+        $title = $request->input('title', $request->json('title'));
+        $description = $request->input('description', $request->json('description'));
+        $nip = $request->input('nip', $request->json('nip'));
+
         $originalName = $request->file('image')->getClientOriginalName();
         $cleanedName = time() . '_' . preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalName);
 
         $path = $request->file('image')->storeAs('documentations', $cleanedName, 'public');
         // Gunakan path URL yang cocok dengan public/storage
         $fileUrl = url(Storage::url($path)); 
-        $teacher = Teacher::where('nip', $request->input('nip'))->first();
+        $teacher = Teacher::where('nip', $nip)->first();
         if (!$teacher) return response()->json(['error' => 'Guru tidak ditemukan'], 401);
 
         $doc = new Documentation();
         $doc->uploaded_by = $teacher->name;
         $doc->id_teacher = $teacher->id_teacher;
-        $doc->title = $request->input('title');
-        $doc->description = $request->input('description');
+        $doc->title = $title;
+        $doc->description = $description;
         $doc->file_url = $fileUrl;
         $doc->save();
 

@@ -252,9 +252,8 @@ import axios from 'axios'
 import { useRouter } from 'vue-router'
 import PopupConfirm from '@/components/BlokPopup.vue'
 import PopupMessage from '@/components/MessagePopup.vue'
-import eye from '@/assets/eye.png'
-import eyeOff from '@/assets/eye-off.png'
-const daftarKelas = ref([])
+// import eye from '@/assets/eye.png'
+// import eyeOff from '@/assets/eye-off.png'
 
 const router = useRouter()
 
@@ -278,6 +277,7 @@ const showSuccesDelete = ref(false)
 const originalForm = ref(null)
 const pendingTab = ref(null)
 const showConfirmChangeTab = ref(false)
+const daftarKelas = ref([])
 const form = ref({
   nama: '',
   nis: '',

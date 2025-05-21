@@ -17,3 +17,11 @@ Route::get('/activities', [ActivityController::class, 'index']);
 Route::post('/activities', [ActivityController::class, 'store']);
 Route::put('/activities/{id}', [ActivityController::class, 'update']);
 Route::delete('/activities/{id}', [ActivityController::class, 'destroy']);
+
+use App\Http\Controllers\TeacherController;
+
+Route::get('/teachers', [TeacherController::class, 'index']); // Menampilkan daftar guru
+Route::post('/teachers', [TeacherController::class, 'store']); // Menyimpan data guru baru
+Route::put('/teachers/{id}', [TeacherController::class, 'update']); // Mengupdate data guru
+Route::delete('/teachers/{id}', [TeacherController::class, 'destroy']);
+
