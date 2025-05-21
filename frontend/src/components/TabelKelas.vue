@@ -21,12 +21,12 @@
 
       <div class="tabs">
         <button
-          v-for="kelas in sortedTabs"
-          :key="kelas"
-          :class="['tab-button', { active: activeTab === kelas }]"
-          @click="() => switchTab(kelas)"
+          v-for="kelas in classList"
+          :key="kelas.id_class"
+          :class="['tab-button', { active: activeTab === kelas.class }]"
+          @click="() => switchTab(kelas.class)"
         >
-          {{ kelas }}
+          {{ kelas.class }}
         </button>
       </div>
 
@@ -102,7 +102,7 @@
         <button
           class="delete-class-button"
           @click="showDeleteClass = true"
-          :disabled="Object.keys(classData).length <= 1"
+          :disabled="activeTab === 'Lulus Tk' || classList.length <= 1"
         >
           🗑 Hapus Kelas Ini
         </button>
@@ -144,30 +144,40 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
 import PopupConfirm from '@/components/BlokPopup.vue'
 
 const router = useRouter()
 
-const classData = ref({
-  'Kelas A': Array.from({ length: 23 }, (_, i) => ({
-    nama: `Siswa ${i + 1}`,
-    nis: `00${i + 1}`,
-    tahunAjaran: '2024/2025',
-    gender: i % 2 === 0 ? 'Laki-laki' : 'Perempuan',
-  })),
-  'Kelas B': [
-    { nama: 'Citra', nis: '003', tahunAjaran: '2024/2025', gender: 'Perempuan' },
-    { nama: 'Dewi', nis: '004', tahunAjaran: '2024/2025', gender: 'Perempuan' },
-  ],
-  'Lulus TK': [
-    { nama: 'Citra', nis: '003', tahunAjaran: '2024/2025', gender: 'Perempuan' },
-    { nama: 'Dewi', nis: '004', tahunAjaran: '2024/2025', gender: 'Perempuan' },
-  ],
+const classList = ref([]) // Data kelas dari database
+const activeTab = ref('')
+const classData = ref({}) // Data siswa per kelas
+
+onMounted(async () => {
+  await fetchClasses()
+  if (classList.value.length > 0) {
+    activeTab.value = classList.value[0].class
+  }
+  // TODO: fetch data siswa per kelas dari API jika sudah ada endpoint-nya
 })
 
-const activeTab = ref('Kelas A')
+async function fetchClasses() {
+  try {
+    const response = await axios.get('http://localhost:8000/api/classes')
+    classList.value = response.data.data
+    // Inisialisasi classData kosong per kelas
+    classList.value.forEach(kls => {
+      if (!classData.value[kls.class]) {
+        classData.value[kls.class] = []
+      }
+    })
+  } catch (error) {
+    console.error('Gagal mengambil data kelas:', error)
+  }
+}
+
 const searchQuery = ref('')
 const selectedTahunAjaran = ref('Semua')
 const selectedStudents = ref([])
@@ -195,12 +205,12 @@ const filteredData = computed(() => {
 })
 
 function promoteStudents() {
-  const allKelas = sortedTabs.value.filter((k) => k !== 'Lulus TK')
+  const allKelas = sortedTabs.value.filter((k) => k !== 'Lulus Tk')
   const currentIndex = allKelas.indexOf(activeTab.value)
   const nextKelas =
     currentIndex !== -1 && currentIndex < allKelas.length - 1
       ? allKelas[currentIndex + 1]
-      : 'Lulus TK'
+      : 'Lulus Tk'
 
   if (!classData.value[nextKelas]) {
     classData.value[nextKelas] = []
@@ -215,11 +225,11 @@ function promoteStudents() {
 }
 
 const isLastRegularClass = computed(() => {
-  const regularClasses = sortedTabs.value.filter((k) => k !== 'Lulus TK')
+  const regularClasses = sortedTabs.value.filter((k) => k !== 'Lulus Tk')
   return activeTab.value === regularClasses[regularClasses.length - 1]
 })
 
-const isLulusTab = computed(() => activeTab.value === 'Lulus TK')
+const isLulusTab = computed(() => activeTab.value === 'Lulus Tk')
 
 function toggleAll(event) {
   if (event.target.checked) {
@@ -235,13 +245,13 @@ function switchTab(kelas) {
 
 const sortedTabs = computed(() => {
   const keys = Object.keys(classData.value)
-  const special = keys.filter((k) => k === 'Lulus TK')
-  const regular = keys.filter((k) => k !== 'Lulus TK').sort((a, b) => a.localeCompare(b))
+  const special = keys.filter((k) => k === 'Lulus Tk')
+  const regular = keys.filter((k) => k !== 'Lulus Tk').sort((a, b) => a.localeCompare(b))
   return [...regular, ...special]
 })
 
 function addClass() {
-  const existing = Object.keys(classData.value).filter((k) => k !== 'Lulus TK')
+  const existing = Object.keys(classData.value).filter((k) => k !== 'Lulus Tk')
   let nextCharCode = 67 // 'C'
   while (existing.includes(`Kelas ${String.fromCharCode(nextCharCode)}`)) {
     nextCharCode++
@@ -252,6 +262,7 @@ function addClass() {
 }
 
 function deleteClass() {
+  if (activeTab.value === 'Lulus Tk') return // Tidak bisa hapus Lulus TK
   const current = activeTab.value
   const keys = Object.keys(classData.value)
   if (keys.length <= 1) return

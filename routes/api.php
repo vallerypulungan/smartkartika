@@ -25,3 +25,7 @@ Route::post('/teachers', [TeacherController::class, 'store']); // Menyimpan data
 Route::put('/teachers/{id}', [TeacherController::class, 'update']); // Mengupdate data guru
 Route::delete('/teachers/{id}', [TeacherController::class, 'destroy']);
 
+use App\Http\Controllers\ClassController;
+
+Route::get('/classes', [ClassController::class, 'index']);
+

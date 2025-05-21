@@ -33,7 +33,6 @@ class DocumentationController extends Controller
         $title = $request->input('title', $request->json('title'));
         $description = $request->input('description', $request->json('description'));
         $nip = $request->input('nip', $request->json('nip'));
-
         $teacher = Teacher::where('nip', $nip)->first();
         if (!$teacher) return response()->json(['error' => 'Guru tidak ditemukan'], 401);
 
@@ -87,6 +86,8 @@ class DocumentationController extends Controller
         $title = $request->input('title', $request->json('title'));
         $description = $request->input('description', $request->json('description'));
         $nip = $request->input('nip', $request->json('nip'));
+        $teacher = Teacher::where('nip', $nip)->first();
+        if (!$teacher) return response()->json(['error' => 'Guru tidak ditemukan'], 401);
 
         $originalName = $request->file('image')->getClientOriginalName();
         $cleanedName = time() . '_' . preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalName);
@@ -94,8 +95,6 @@ class DocumentationController extends Controller
         $path = $request->file('image')->storeAs('documentations', $cleanedName, 'public');
         // Gunakan path URL yang cocok dengan public/storage
         $fileUrl = url(Storage::url($path)); 
-        $teacher = Teacher::where('nip', $nip)->first();
-        if (!$teacher) return response()->json(['error' => 'Guru tidak ditemukan'], 401);
 
         $doc = new Documentation();
         $doc->uploaded_by = $teacher->name;

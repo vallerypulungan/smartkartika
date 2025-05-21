@@ -145,6 +145,8 @@ const editForm = ref({
   image: '',
 })
 
+const nipGuru = localStorage.getItem('nip');
+
 const dummyBerita = Array.from({ length: 15 }, (_, i) => ({
   id: i + 1,
   title: `Berita ${i + 1}`,
@@ -258,7 +260,8 @@ const handleConfirmSave = async () => {
   try {
     await axios.put(`http://localhost:8000/api/documentations/${selectedBerita.value.id}`, {
       title: editForm.value.title,
-      description: editForm.value.description
+      description: editForm.value.description,
+      nip: nipGuru // tambahkan variabel nip di sini
     });
     showSuccess.value = true;
     showConfirm.value = false;
