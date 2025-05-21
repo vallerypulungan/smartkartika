@@ -69,17 +69,47 @@
           <div class="form-row">
             <div class="form-group">
               <label>Tahun Ajaran</label>
-              <select v-model="form.tahunAjaran" required>
+              <select
+                v-model="form.tahunAjaran"
+                :key="daftarTahunAjaran.length"
+                @change="handleTahunAjaranChange"
+                required
+              >
                 <option disabled value="">Pilih Tahun Ajaran</option>
                 <option v-for="tahun in daftarTahunAjaran" :key="tahun.id" :value="tahun.nama">
                   {{ tahun.nama }}
                 </option>
+                <option value="Tambah">+ Tambah Tahun Ajaran</option>
               </select>
+
+              <div v-if="showTambahTahunModal" class="modal-overlay">
+                <div class="modal-box">
+                  <h2>Tambah Tahun Ajaran</h2>
+                  <div class="form-row modal">
+                    <div class="form-group">
+                      <label>Tahun Awal</label>
+                      <input v-model="tahunAwal" type="number" placeholder="2024" />
+                    </div>
+                    <div class="form-group">
+                      <label>Tahun Akhir</label>
+                      <input v-model="tahunAkhir" type="number" placeholder="2025" />
+                    </div>
+                  </div>
+                  <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" @click="batalTambahTahun">
+                      Batal
+                    </button>
+                    <button type="button" class="btn-save" @click="simpanTahunAjaran">
+                      Simpan
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="form-group">
-              <label>Gender</label>
+              <label>Jenis Kelamin</label>
               <select v-model="form.gender" required>
-                <option disabled value="">Pilih Gender</option>
+                <option disabled value="">Pilih Jenis Kelamin</option>
                 <option>Laki-laki</option>
                 <option>Perempuan</option>
               </select>
@@ -123,12 +153,12 @@
               <input v-model="form.username" type="text" placeholder="Username" required />
             </div>
             <div class="form-group">
-              <label>Kode</label>
+              <label>Password</label>
               <div class="password-wrapper">
                 <input
                   v-model="form.kode"
                   :type="showPassword ? 'text' : 'password'"
-                  placeholder="Kode"
+                  placeholder="Password"
                   required
                 />
                 <button type="button" class="toggle-password" @click="showPassword = !showPassword">
@@ -165,7 +195,7 @@
               <th>NIS</th>
               <th>Kelas</th>
               <th>Tahun Ajaran</th>
-              <th>Gender</th>
+              <th>Jenis Kelamin</th>
               <th>Aksi</th>
             </tr>
           </thead>
@@ -242,6 +272,12 @@
         :title="'Berhasil menghapus informasi siswa'"
         @close="cancelSave"
       />
+      <PopupMessage
+        v-if="showAlertTahunAjaran"
+        :title="'Mohon isi kedua tahun ajaran dahulu'"
+        @close="cancelSave"
+      />
+      <PopupMessage v-if="showAlertTahun" :title="'Tahun ajaran sudah ada'" @close="cancelSave" />
     </div>
   </div>
 </template>
@@ -252,15 +288,11 @@ import axios from 'axios'
 import { useRouter } from 'vue-router'
 import PopupConfirm from '@/components/BlokPopup.vue'
 import PopupMessage from '@/components/MessagePopup.vue'
-// import eye from '@/assets/eye.png'
-// import eyeOff from '@/assets/eye-off.png'
+import eye from '@/assets/eye.png'
+import eyeOff from '@/assets/eye-off.png'
 
+const daftarKelas = ref([])
 const router = useRouter()
-
-const classData = ref({
-  'Daftar Siswa': [],
-})
-
 const daftarTahunAjaran = ref([])
 const activeTab = ref('Registrasi')
 const searchQuery = ref('')
@@ -277,7 +309,15 @@ const showSuccesDelete = ref(false)
 const originalForm = ref(null)
 const pendingTab = ref(null)
 const showConfirmChangeTab = ref(false)
-const daftarKelas = ref([])
+const showTambahTahunModal = ref(false)
+const tahunAwal = ref('')
+const tahunAkhir = ref('')
+const showAlertTahunAjaran = ref(false)
+const showAlertTahun = ref(false)
+
+const classData = ref({
+  'Daftar Siswa': [],
+})
 const form = ref({
   nama: '',
   nis: '',
@@ -295,18 +335,13 @@ const form = ref({
 })
 
 onMounted(() => {
-  fetchTahunAjaran()
   fetchKelas()
-})
 
-async function fetchTahunAjaran() {
-  try {
-    const response = await axios.get('/api/tahun-ajaran') // Ganti URL sesuai backend kamu
-    daftarTahunAjaran.value = response.data
-  } catch (error) {
-    console.error('Gagal mengambil data tahun ajaran:', error)
-  }
-}
+  daftarTahunAjaran.value = [
+    { id: 1, nama: '2023/2024' },
+    { id: 2, nama: '2024/2025' },
+  ]
+})
 
 async function fetchKelas() {
   try {
@@ -321,6 +356,34 @@ function formatDate(dateStr) {
   if (!dateStr) return '-'
   const options = { day: '2-digit', month: 'long', year: 'numeric' }
   return new Date(dateStr).toLocaleDateString('id-ID', options)
+}
+
+function handleTahunAjaranChange(event) {
+  const selected = event.target.value
+  if (selected === 'Tambah') {
+    form.value.tahunAjaran = ''
+    showTambahTahunModal.value = true
+  }
+}
+
+function simpanTahunAjaran() {
+  if (!tahunAwal.value || !tahunAkhir.value) {
+    showAlertTahunAjaran.value = true
+    return
+  }
+  const tahunBaru = `${tahunAwal.value}/${tahunAkhir.value}`
+  const duplikat = daftarTahunAjaran.value.some((t) => t.nama === tahunBaru)
+  if (duplikat) {
+    showAlertTahun.value = true
+    return
+  }
+
+  daftarTahunAjaran.value = [...daftarTahunAjaran.value, { id: Date.now(), nama: tahunBaru }]
+
+  form.value.tahunAjaran = tahunBaru
+  tahunAwal.value = ''
+  tahunAkhir.value = ''
+  showTambahTahunModal.value = false
 }
 
 function submitForm() {
@@ -423,7 +486,6 @@ function confirmChangeTab() {
   originalForm.value = null
   showConfirmChangeTab.value = false
 
-  // Reset form agar tidak tertinggal
   form.value = {
     nama: '',
     nis: '',
@@ -502,6 +564,12 @@ function confirmDelete() {
   }
 }
 
+function batalTambahTahun() {
+  tahunAwal.value = ''
+  tahunAkhir.value = ''
+  showTambahTahunModal.value = false
+}
+
 function cancelSave() {
   showConfirmPromote.value = false
   showConfirmEdit.value = false
@@ -512,6 +580,8 @@ function cancelSave() {
   showSuccesEdit.value = false
   showSuccesDelete.value = false
   showConfirmChangeTab.value = false
+  showAlertTahun.value = false
+  showAlertTahunAjaran.value = false
   pendingTab.value = null
 }
 
@@ -553,7 +623,7 @@ const goBack = () => {
 
 .top-bar h1 {
   margin: 0;
-  color: #2c3930;
+  color: #000;
   font-size: 1.3rem;
   font-weight: 600;
 }
@@ -573,18 +643,17 @@ const goBack = () => {
   cursor: pointer;
   font-weight: bold;
   font-size: 16px;
-  color: #666;
+  color: #000;
   transition: all 0.2s;
 }
 
 .tab-button:hover {
-  background-color: #d8e3f3;
+  background-color: #e5e5e5;
 }
 
 .tab-button.active {
-  border-bottom: 3px solid #3f8efc;
-  color: #3f8efc;
-  background-color: #e5e5e5;
+  border-bottom: 3px solid #27c04d;
+  color: #27c04d;
 }
 
 .filter-bar {
@@ -611,14 +680,13 @@ const goBack = () => {
   overflow-y: auto;
   padding-right: 8px;
   background: #fff;
-  padding: 12px;
   color: #2c3930;
 }
 
 .form-registrasi h2 {
   color: #2c3930;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .form-registrasi input,
@@ -629,6 +697,21 @@ const goBack = () => {
   box-sizing: border-box;
 }
 
+.form-section {
+  flex-basis: 100%;
+  border-top: 2px solid #ccc;
+  padding-top: 3rem;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-section:first-child {
+  margin-top: 1rem;
+}
+
 .form-row {
   display: flex;
   flex-wrap: wrap;
@@ -637,35 +720,40 @@ const goBack = () => {
   margin: 0 auto;
 }
 
-.form-group {
-  flex: 1 1 30%;
-  display: flex;
-  flex-direction: column;
+.form-row.modal {
+  gap: 16px;
+  margin: 0;
+  width: 100%;
+  flex: 1;
 }
 
-.form-section {
-  flex-basis: 100%;
-  border-top: 2px solid #ccc;
-  padding-top: 10px;
-  text-align: center;
-  font-size: 1.1rem;
-  font-weight: 600;
+.form-group {
+  flex: 1 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-group label {
   display: flex;
   flex-direction: column;
-  font-weight: 500;
+  font-weight: 400;
   margin-bottom: 6px;
+  font-size: 0.8rem;
 }
 
 .ttl-wrapper {
   display: flex;
-  gap: 1rem;
+  gap: 8px;
+  width: 100%;
+  flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .ttl-wrapper input {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .form-group input:focus::placeholder {
@@ -713,6 +801,76 @@ const goBack = () => {
 }
 
 .btn-submit:hover {
+  background-color: #27c04d;
+}
+
+/* Overlay latar belakang */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Kotak modal */
+.modal-box {
+  background-color: #fff;
+  width: 100%;
+  max-width: 320px;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Judul modal */
+.modal-box h2 {
+  margin-bottom: 16px;
+  font-size: 18px;
+  text-align: center;
+  color: #000;
+}
+
+/* Input */
+.modal-box input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+/* Tombol */
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.modal-buttons button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.modal-buttons .btn-cancel {
+  background-color: #a59f9f;
+}
+
+.modal-buttons .btn-save {
+  background-color: #31d249;
+  color: white;
+}
+
+.modal-buttons .btn-save:hover {
   background-color: #27c04d;
 }
 
@@ -858,6 +1016,10 @@ const goBack = () => {
     width: 50%;
   }
 
+  .form-section {
+    text-align: start;
+  }
+
   .form-row {
     gap: 16px;
     width: 50%;
@@ -870,7 +1032,7 @@ const goBack = () => {
 
   .form-group label {
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   .form-button {
