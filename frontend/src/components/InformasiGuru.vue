@@ -257,8 +257,12 @@ async function saveActivity() {
     });
 
     classData.value['Daftar Guru'].push(response.data.data);
+    alert(response.data.message);
     resetForm();
     showSuccesAdd.value = true;
+    setTimeout(() => {
+      showSuccesAdd.value = false;
+    }, 2000);
   } catch (error) {
     console.error('Gagal menambahkan guru:', error);
   }
@@ -317,8 +321,12 @@ async function saveEdit() {
     });
 
     classData.value['Daftar Guru'][editingIndex.value] = response.data.data;
+    alert(response.data.message);
     resetForm();
-    showSuccesEdit.value = true;
+    showSuccesEdit.value = true; // Tampilkan notifikasi
+    setTimeout(() => {
+      showSuccesEdit.value = false;
+    }, 2000);
   } catch (error) {
     console.error('Gagal mengedit guru:', error);
   }
@@ -332,10 +340,12 @@ function deleteStudent(index) {
 async function confirmDelete() {
   try {
     const teacherId = classData.value['Daftar Guru'][deletingIndex.value].id;
+    
 
     await axios.delete(`http://localhost:8000/api/teachers/${teacherId}`);
     classData.value['Daftar Guru'].splice(deletingIndex.value, 1);
     showSuccesDelete.value = true;
+    alert(response.data.message);
   } catch (error) {
     console.error('Gagal menghapus guru:', error);
   }

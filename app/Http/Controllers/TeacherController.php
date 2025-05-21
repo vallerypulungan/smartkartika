@@ -21,7 +21,7 @@ class TeacherController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:30',
             'nip' => 'required|string|unique:teachers,nip',
             'email' => 'required|email|unique:teachers,email',
             'num_telp' => 'required|string',
@@ -33,7 +33,7 @@ class TeacherController extends Controller
             'nip' => $request->nip,
             'email' => $request->email,
             'num_telp' => $request->num_telp,
-            'password' => bcrypt($request->password),
+            'password' => $request->password,
         ]);
 
         return response()->json(['message' => 'Guru berhasil ditambahkan', 'data' => $teacher]);
@@ -46,17 +46,21 @@ class TeacherController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'nip' => 'required|string|unique:teachers,nip,' . $teacher->id_teacher,
-            'email' => 'required|email|unique:teachers,email,' . $teacher->id_teacher,
+            'nip' => 'required|string|unique:teachers,nip,' . $teacher->id_teacher . ',id_teacher',
+            'email' => 'required|email|unique:teachers,email,' . $teacher->id_teacher . ',id_teacher',
             'num_telp' => 'required|string',
         ]);
 
-        $teacher->update([
+        $updateData = [
             'name' => $request->name,
             'nip' => $request->nip,
             'email' => $request->email,
             'num_telp' => $request->num_telp,
-        ]);
+        ];
+        if ($request->filled('password')) {
+            $updateData['password'] = $request->password;
+        }
+        $teacher->update($updateData);
 
         return response()->json(['message' => 'Guru berhasil diupdate', 'data' => $teacher]);
     }
