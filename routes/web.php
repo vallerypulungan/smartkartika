@@ -14,3 +14,6 @@ Route::get('/dashboard-ortu', function () {
     return 'Selamat datang, Orang Tua!';
 })->middleware('auth:parent');
 
+
+
+
