@@ -15,7 +15,7 @@
 
     <div class="class-table-container">
       <div class="top-bar">
-        <h1>Informasi Siswa</h1>
+        <h1>Informasi Guru</h1>
       </div>
 
       <div class="tabs">
@@ -25,128 +25,66 @@
           :class="['tab-button', { active: activeTab === kolom }]"
           @click="switchTab(kolom)"
         >
-          {{ kolom === 'Registrasi' && editingIndex !== null ? 'Edit Data Siswa' : kolom }}
+          {{ kolom === 'Registrasi' && editingIndex !== null ? 'Edit Data Guru' : kolom }}
         </button>
       </div>
 
       <!-- Form Registrasi -->
       <div v-if="activeTab === 'Registrasi'" class="form-registrasi">
-        <h2>{{ editingIndex !== null ? 'Form Edit Data Siswa' : 'Form Registrasi Siswa' }}</h2>
+        <h2>{{ editingIndex !== null ? 'Form Edit Data Guru' : 'Form Registrasi Guru' }}</h2>
         <form @submit.prevent="submitForm">
-          <!-- Data Siswa -->
-          <h3 class="form-section">Data Siswa</h3>
+          <!-- Data Guru -->
+          <h3 class="form-section">Data Guru</h3>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label>Nama Siswa</label>
-              <input v-model="form.nama" type="text" placeholder="Nama Siswa" required />
-            </div>
-            <div class="form-group">
-              <label>Tempat & Tanggal Lahir</label>
-              <div class="ttl-wrapper">
-                <input v-model="form.tempatLahir" type="text" placeholder="Tempat Lahir" required />
-                <input v-model="form.tanggalLahir" type="date" required />
-              </div>
-            </div>
+          <div class="form-group-row">
+            <label>Nama Guru</label>
+            <input v-model="form.nama" type="text" placeholder="Nama Guru" required />
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label>NIS</label>
-              <input v-model="form.nis" type="text" placeholder="NIS" required />
-            </div>
-            <div class="form-group">
-              <label>Kelas</label>
-              <input v-model="form.kelas" type="text" placeholder="Kelas" required />
-            </div>
+          <div class="form-group-row">
+            <label>NIP</label>
+            <input v-model="form.nip" type="text" placeholder="NIP" required />
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label>Tahun Ajaran</label>
-              <select v-model="form.tahunAjaran" required>
-                <option disabled value="">Pilih Tahun Ajaran</option>
-                <option v-for="tahun in daftarTahunAjaran" :key="tahun.id" :value="tahun.nama">
-                  {{ tahun.nama }}
-                </option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Gender</label>
-              <select v-model="form.gender" required>
-                <option disabled value="">Pilih Gender</option>
-                <option>Laki-laki</option>
-                <option>Perempuan</option>
-              </select>
-            </div>
+          <div class="form-group-row">
+            <label>Email</label>
+            <input v-model="form.email" type="text" placeholder="admin@gmail.com" required />
           </div>
 
-          <!-- Data Orang Tua -->
-          <h3 class="form-section">Data Orang Tua</h3>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Nama Wali</label>
-              <input v-model="form.wali" type="text" placeholder="Nama Ayah atau Ibu" required />
-            </div>
-            <div class="form-group">
-              <label>Email</label>
+          <div class="form-group-row">
+            <label>No Telepon</label>
+            <input v-model="form.telepon" type="text" placeholder="08xxx" required />
+          </div>
+
+          <div class="form-group-row">
+            <label>Password</label>
+            <div class="password-wrapper">
               <input
-                v-model="form.email"
-                type="text"
-                placeholder="Contoh: admin@gmail.com"
+                v-model="form.kode"
+                :type="showPassword ? 'text' : 'password'"
+                placeholder="Password"
                 required
               />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>No Telepon</label>
-              <input v-model="form.telepon" type="text" placeholder="08xxxxxxx" required />
-            </div>
-            <div class="form-group">
-              <label>Alamat</label>
-              <input v-model="form.alamat" type="text" placeholder="Alamat" required />
-            </div>
-          </div>
-
-          <!-- Akun Smartkartika -->
-          <h3 class="form-section">Akun Smartkartika</h3>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Username</label>
-              <input v-model="form.username" type="text" placeholder="Username" required />
-            </div>
-            <div class="form-group">
-              <label>Kode</label>
-              <div class="password-wrapper">
-                <input
-                  v-model="form.kode"
-                  :type="showPassword ? 'text' : 'password'"
-                  placeholder="Kode"
-                  required
-                />
-                <button type="button" class="toggle-password" @click="showPassword = !showPassword">
-                  <img :src="showPassword ? eyeOff : eye" alt="Toggle Password" />
-                </button>
-              </div>
+              <button type="button" class="toggle-password" @click="showPassword = !showPassword">
+                <img :src="showPassword ? eyeOff : eye" alt="Toggle Password" />
+              </button>
             </div>
           </div>
           <div class="form-button">
             <label></label>
             <button type="submit" class="btn-submit">
-              {{ editingIndex !== null ? 'Simpan Perubahan' : 'Tambah Siswa' }}
+              {{ editingIndex !== null ? 'Simpan Perubahan' : 'Tambah Guru' }}
             </button>
           </div>
         </form>
       </div>
 
-      <!-- Daftar Siswa -->
-      <div class="table-section" v-if="activeTab === 'Daftar Siswa'">
+      <!-- Daftar Guru -->
+      <div class="table-section" v-if="activeTab === 'Daftar Guru'">
         <div class="filter-bar">
           <input
             type="text"
-            placeholder="Cari nama siswa..."
+            placeholder="Cari nama guru..."
             v-model="searchQuery"
             class="search-input"
           />
@@ -156,27 +94,21 @@
             <tr>
               <th>No</th>
               <th>Nama</th>
-              <th>Tanggal Lahir</th>
-              <th>NIS</th>
-              <th>Kelas</th>
-              <th>Tahun Ajaran</th>
-              <th>Gender</th>
+              <th>NIP</th>
+              <th>Email</th>
+              <th>No Telepon</th>
               <th>Aksi</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(student, index) in filteredData" :key="index">
+            <tr v-for="(teacher, index) in filteredData" :key="index">
               <td>{{ index + 1 }}</td>
-              <td>{{ student.nama }}</td>
+              <td>{{ teacher.nama }}</td>
+              <td>{{ teacher.nip }}</td>
+              <td>{{ teacher.email }}</td>
+              <td>{{ teacher.telepon }}</td>
               <td>
-                {{ student.ttl?.tempatLahir || '-' }}, {{ formatDate(student.ttl?.tanggalLahir) }}
-              </td>
-              <td>{{ student.nis }}</td>
-              <td>{{ student.kelas }}</td>
-              <td>{{ student.tahunAjaran }}</td>
-              <td>{{ student.gender }}</td>
-              <td>
-                <button @click="editStudent(student, index)" class="btn-aksi edit">Edit</button>
+                <button @click="editStudent(teacher, index)" class="btn-aksi edit">Edit</button>
                 <button @click="deleteStudent(index)" class="btn-aksi delete">Hapus</button>
               </td>
             </tr>
@@ -188,8 +120,8 @@
     <div class="popup-wrapper" :style="{ zIndex: 9999 }">
       <PopupConfirm
         v-if="showConfirmPromote"
-        :title="'MENDAFTARKAN SISWA'"
-        :message="'Apakah anda yakin untuk mendaftarkan siswa ini?'"
+        :title="'MENAMBAHKAN DATA GURU'"
+        :message="'Apakah anda yakin untuk menambahkan data guru?'"
         :konfirmasi="'IYA'"
         :batalkan="'BATAL'"
         @confirm="saveActivity"
@@ -197,8 +129,8 @@
       />
       <PopupConfirm
         v-if="showConfirmEdit"
-        :title="'EDIT INFORMASI SISWA'"
-        :message="'Apakah anda yakin untuk menyimpan perubahan informasi siswa ini?'"
+        :title="'EDIT INFORMASI GURU'"
+        :message="'Apakah anda yakin untuk menyimpan perubahan informasi guru ini?'"
         :konfirmasi="'IYA'"
         :batalkan="'BATAL'"
         @confirm="saveEdit"
@@ -206,8 +138,8 @@
       />
       <PopupConfirm
         v-if="showConfirmDelete"
-        :title="'MENGHAPUS INFORMASI SISWA'"
-        :message="'Apakah anda yakin untuk menghapus informasi siswa ini?'"
+        :title="'MENGHAPUS INFORMASI GURU'"
+        :message="'Apakah anda yakin untuk menghapus data guru ini?'"
         :konfirmasi="'IYA'"
         :batalkan="'BATAL'"
         @confirm="confirmDelete"
@@ -224,17 +156,17 @@
       />
       <PopupMessage
         v-if="showSuccesAdd"
-        :title="'Berhasil menambahkan informasi siswa'"
+        :title="'Berhasil menambahkan data guru'"
         @close="cancelSave"
       />
       <PopupMessage
         v-if="showSuccesEdit"
-        :title="'Berhasil mengubah informasi siswa'"
+        :title="'Berhasil mengubah data guru'"
         @close="cancelSave"
       />
       <PopupMessage
         v-if="showSuccesDelete"
-        :title="'Berhasil menghapus informasi siswa'"
+        :title="'Berhasil menghapus data guru'"
         @close="cancelSave"
       />
     </div>
@@ -242,21 +174,19 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import axios from 'axios'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import PopupConfirm from '@/components/BlokPopup.vue'
 import PopupMessage from '@/components/MessagePopup.vue'
-// import eye from '@/assets/eye.png'
-// import eyeOff from '@/assets/eye-off.png'
+import eye from '@/assets/eye.png'
+import eyeOff from '@/assets/eye-off.png'
 
 const router = useRouter()
 
 const classData = ref({
-  'Daftar Siswa': [],
+  'Daftar Guru': [],
 })
 
-const daftarTahunAjaran = ref([])
 const activeTab = ref('Registrasi')
 const searchQuery = ref('')
 const showConfirmPromote = ref(false)
@@ -274,38 +204,11 @@ const pendingTab = ref(null)
 const showConfirmChangeTab = ref(false)
 const form = ref({
   nama: '',
-  nis: '',
-  tempatLahir: '',
-  tanggalLahir: '',
-  gender: '',
-  kelas: '',
-  tahunAjaran: '',
-  namaWali: '',
+  nip: '',
   email: '',
-  alamat: '',
   telepon: '',
-  username: '',
   kode: '',
 })
-
-onMounted(() => {
-  fetchTahunAjaran()
-})
-
-async function fetchTahunAjaran() {
-  try {
-    const response = await axios.get('/api/tahun-ajaran') // Ganti URL sesuai backend kamu
-    daftarTahunAjaran.value = response.data
-  } catch (error) {
-    console.error('Gagal mengambil data tahun ajaran:', error)
-  }
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return '-'
-  const options = { day: '2-digit', month: 'long', year: 'numeric' }
-  return new Date(dateStr).toLocaleDateString('id-ID', options)
-}
 
 function submitForm() {
   if (editingIndex.value !== null) {
@@ -319,8 +222,8 @@ const filteredData = computed(() => {
   let data = classData.value[activeTab.value] || []
 
   if (searchQuery.value) {
-    data = data.filter((siswa) =>
-      siswa.nama.toLowerCase().includes(searchQuery.value.toLowerCase()),
+    data = data.filter((teacher) =>
+      teacher.nama.toLowerCase().includes(searchQuery.value.toLowerCase()),
     )
   }
   return data
@@ -343,48 +246,26 @@ const sortedTabs = computed(() => {
 })
 
 function saveActivity() {
-  const siswaBaru = {
+  const teacherBaru = {
     nama: form.value.nama,
-    nis: form.value.nis,
-    tahunAjaran: form.value.tahunAjaran || '2024/2025',
-    gender: form.value.gender,
-    ttl: {
-      tempatLahir: form.value.tempatLahir,
-      tanggalLahir: form.value.tanggalLahir,
-    },
-    kelas: form.value.kelas,
-    orangTua: {
-      wali: form.value.namaWali,
-      email: form.value.email,
-      alamat: form.value.alamat,
-      telepon: form.value.telepon,
-    },
-    akun: {
-      username: form.value.username,
-      kode: form.value.kode,
-    },
+    nip: form.value.nip,
+    email: form.value.email,
+    telepon: form.value.telepon,
+    kode: form.value.kode,
   }
 
-  // Menyimpan ke daftar "Daftar Siswa"
-  if (!classData.value['Daftar Siswa']) {
-    classData.value['Daftar Siswa'] = []
+  // Menyimpan ke daftar "Daftar Guru"
+  if (!classData.value['Daftar Guru']) {
+    classData.value['Daftar Guru'] = []
   }
-  classData.value['Daftar Siswa'].push(siswaBaru)
+  classData.value['Daftar Guru'].push(teacherBaru)
 
   // Reset form
   form.value = {
     nama: '',
-    nis: '',
-    tempatLahir: '',
-    tanggalLahir: '',
-    gender: '',
-    kelas: '',
-    tahunAjaran: '',
-    namaWali: '',
+    nip: '',
     email: '',
-    alamat: '',
     telepon: '',
-    username: '',
     kode: '',
   }
 
@@ -392,8 +273,8 @@ function saveActivity() {
   showSuccesAdd.value = true
 }
 
-function editStudent(student, index) {
-  const combinedForm = { ...student, ...student.ttl, ...student.orangTua, ...student.akun }
+function editStudent(teacher, index) {
+  const combinedForm = { ...teacher }
   form.value = combinedForm
   originalForm.value = JSON.parse(JSON.stringify(combinedForm)) // Simpan data awal
   editingIndex.value = index
@@ -410,17 +291,9 @@ function confirmChangeTab() {
   // Reset form agar tidak tertinggal
   form.value = {
     nama: '',
-    nis: '',
-    tempatLahir: '',
-    tanggalLahir: '',
-    gender: '',
-    kelas: '',
-    tahunAjaran: '',
-    namaWali: '',
+    nip: '',
     email: '',
-    alamat: '',
     telepon: '',
-    username: '',
     kode: '',
   }
 }
@@ -429,45 +302,23 @@ function saveEdit() {
   if (editingIndex.value !== null && editingTab.value) {
     classData.value[editingTab.value][editingIndex.value] = {
       nama: form.value.nama,
-      nis: form.value.nis,
-      ttl: {
-        tempatLahir: form.value.tempatLahir,
-        tanggalLahir: form.value.tanggalLahir,
-      },
-      gender: form.value.gender,
-      kelas: form.value.kelas,
-      tahunAjaran: form.value.tahunAjaran,
-      orangTua: {
-        wali: form.value.namaWali,
-        email: form.value.email,
-        alamat: form.value.alamat,
-        telepon: form.value.telepon,
-      },
-      akun: {
-        username: form.value.username,
-        kode: form.value.kode,
-      },
+      nip: form.value.nip,
+      email: form.value.email,
+      telepon: form.value.telepon,
+      kode: form.value.kode,
     }
     showConfirmEdit.value = false
     editingIndex.value = null
     editingTab.value = null
-    activeTab.value = 'Daftar Siswa'
+    activeTab.value = 'Daftar Guru'
     showSuccesEdit.value = true
   }
 
   form.value = {
     nama: '',
-    nis: '',
-    tempatLahir: '',
-    tanggalLahir: '',
-    gender: '',
-    kelas: '',
-    tahunAjaran: '',
-    namaWali: '',
+    nip: '',
     email: '',
-    alamat: '',
     telepon: '',
-    username: '',
     kode: '',
   }
 }
@@ -508,7 +359,6 @@ const goBack = () => {
 .container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
   margin: 0;
   padding: 0;
   overflow-y: auto;
@@ -523,8 +373,7 @@ const goBack = () => {
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   max-width: 100%;
-  display: flex;
-  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* Top Bar */
@@ -591,7 +440,8 @@ const goBack = () => {
 .form-registrasi form {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 6px;
+  max-height: 100%;
   overflow-y: auto;
   padding-right: 8px;
   background: #fff;
@@ -604,6 +454,14 @@ const goBack = () => {
   font-weight: 700;
   font-size: 1.1rem;
 }
+.form-section {
+  flex-basis: 100%;
+  border-top: 2px solid #ccc;
+  padding-top: 10px;
+  text-align: start;
+  font-size: 1rem;
+  font-weight: 600;
+}
 
 .form-registrasi input,
 .form-registrasi select {
@@ -613,43 +471,27 @@ const goBack = () => {
   box-sizing: border-box;
 }
 
-.form-row {
+.form-group-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 5rem;
-  width: 70%;
-  margin: 0 auto;
+  align-items: center;
+  margin-bottom: 16px;
+  width: 100%;
+  max-width: 600px;
+  margin-left: 10rem;
+  margin-right: auto;
 }
 
-.form-group {
-  flex: 1 1 30%;
-  display: flex;
-  flex-direction: column;
-}
-
-.form-section {
-  flex-basis: 100%;
-  border-top: 2px solid #ccc;
-  padding-top: 10px;
-  text-align: center;
-  font-size: 1.1rem;
+.form-group-row label {
+  width: 150px;
   font-weight: 600;
+  text-align: left;
 }
 
-.form-group label {
-  display: flex;
-  flex-direction: column;
-  font-weight: 500;
-  margin-bottom: 6px;
-}
-
-.ttl-wrapper {
-  display: flex;
-  gap: 1rem;
-}
-
-.ttl-wrapper input {
+.form-group-row input,
+.form-group-row .password-wrapper {
   flex: 1;
+  display: flex;
+  align-items: center;
 }
 
 .form-group input:focus::placeholder {
@@ -685,6 +527,7 @@ const goBack = () => {
   display: flex;
   justify-content: flex-end;
   width: 100%;
+  margin-bottom: 1rem;
 }
 
 .btn-submit {
@@ -704,6 +547,7 @@ const goBack = () => {
 .table-section {
   overflow-x: auto;
   flex-grow: 1;
+  height: 100%;
 }
 
 .styled-table {
@@ -748,17 +592,17 @@ const goBack = () => {
 
 .styled-table th:nth-child(3),
 .styled-table td:nth-child(3) {
-  width: 15%;
+  width: 17%;
 }
 
 .styled-table th:nth-child(4),
 .styled-table td:nth-child(4) {
-  width: 10%;
+  width: 20%;
 }
 
-.styled-table th:nth-child(6),
-.styled-table td:nth-child(6) {
-  width: 10%;
+.styled-table th:nth-child(5),
+.styled-table td:nth-child(5) {
+  width: 15%;
 }
 
 .styled-table tbody tr:hover {
@@ -827,27 +671,21 @@ const goBack = () => {
     color: #fff;
   }
 
-  .search-input {
-    width: 50%;
+  .form-registrasi form {
+    gap: 16px;
   }
 
-  .form-row {
-    gap: 16px;
-    width: 50%;
+  .form-group-row {
     margin: 0;
   }
 
-  .form-group {
-    flex: 1 1 100%;
-  }
-
-  .form-group label {
-    font-size: 0.8rem;
+  .form-group-row label {
+    font-size: 0.9rem;
     font-weight: 600;
   }
 
-  .form-button {
-    margin-bottom: 0;
+  .btn-submit {
+    margin-top: 1rem;
   }
 }
 </style>
