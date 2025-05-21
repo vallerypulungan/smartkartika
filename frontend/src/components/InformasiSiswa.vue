@@ -57,7 +57,12 @@
             </div>
             <div class="form-group">
               <label>Kelas</label>
-              <input v-model="form.kelas" type="text" placeholder="Kelas" required />
+              <select v-model="form.kelas" required>
+                <option disabled value="">Pilih Kelas</option>
+                <option v-for="kelas in daftarKelas" :key="kelas.id" :value="kelas.nama">
+                  {{ kelas.nama }}
+                </option>
+              </select>
             </div>
           </div>
 
@@ -249,6 +254,7 @@ import PopupConfirm from '@/components/BlokPopup.vue'
 import PopupMessage from '@/components/MessagePopup.vue'
 import eye from '@/assets/eye.png'
 import eyeOff from '@/assets/eye-off.png'
+const daftarKelas = ref([])
 
 const router = useRouter()
 
@@ -290,6 +296,7 @@ const form = ref({
 
 onMounted(() => {
   fetchTahunAjaran()
+  fetchKelas()
 })
 
 async function fetchTahunAjaran() {
@@ -298,6 +305,15 @@ async function fetchTahunAjaran() {
     daftarTahunAjaran.value = response.data
   } catch (error) {
     console.error('Gagal mengambil data tahun ajaran:', error)
+  }
+}
+
+async function fetchKelas() {
+  try {
+    const response = await axios.get('/api/kelas') // Ganti dengan endpoint backend yang sesuai
+    daftarKelas.value = response.data
+  } catch (error) {
+    console.error('Gagal mengambil data kelas:', error)
   }
 }
 
@@ -508,7 +524,7 @@ const goBack = () => {
 .container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: calc(100vh - 64px);
   margin: 0;
   padding: 0;
   overflow-y: auto;
@@ -730,6 +746,7 @@ const goBack = () => {
 
 .styled-table th {
   font-weight: 600;
+  font-size: 0.8rem;
 }
 
 .styled-table td {
@@ -738,7 +755,7 @@ const goBack = () => {
 
 .styled-table th:nth-child(1),
 .styled-table td:nth-child(1) {
-  width: 3%;
+  width: 1%;
 }
 
 .styled-table th:nth-child(2),
@@ -748,7 +765,7 @@ const goBack = () => {
 
 .styled-table th:nth-child(3),
 .styled-table td:nth-child(3) {
-  width: 15%;
+  width: 18%;
 }
 
 .styled-table th:nth-child(4),
@@ -756,9 +773,19 @@ const goBack = () => {
   width: 10%;
 }
 
+.styled-table th:nth-child(5),
+.styled-table td:nth-child(5) {
+  width: 6%;
+}
+
 .styled-table th:nth-child(6),
 .styled-table td:nth-child(6) {
-  width: 10%;
+  width: 13%;
+}
+
+.styled-table th:nth-child(7),
+.styled-table td:nth-child(7) {
+  width: 15%;
 }
 
 .styled-table tbody tr:hover {
