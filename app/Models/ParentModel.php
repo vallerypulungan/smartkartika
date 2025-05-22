@@ -14,7 +14,7 @@ class ParentModel extends Model
     public $incrementing = true;
     protected $keyType = 'int';
 
-    protected $fillable = ['name', 'email', 'password', 'num_telp'];
+    protected $fillable = ['name', 'email', 'password', 'num_telp', 'alamat', 'username'];
 
     public function children()
     {

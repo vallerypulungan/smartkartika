@@ -29,3 +29,14 @@ use App\Http\Controllers\ClassController;
 
 Route::get('/classes', [ClassController::class, 'index']);
 
+use App\Http\Controllers\ChildController;
+use App\Http\Controllers\TahunAjaranController;
+
+Route::get('/children', [ChildController::class, 'index']);      // GET: daftar siswa
+Route::post('/children', [ChildController::class, 'store']);     // POST: tambah siswa
+Route::put('/children/{id}', [ChildController::class, 'update']); // PUT: edit siswa
+Route::delete('/children/{id}', [ChildController::class, 'destroy']); // DELETE: hapus siswa
+
+Route::post('/tahun-ajaran', [TahunAjaranController::class, 'store']);
+Route::get('/tahun-ajaran', [TahunAjaranController::class, 'index']);
+

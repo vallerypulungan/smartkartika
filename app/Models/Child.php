@@ -13,7 +13,9 @@ class Child extends Model
     public $incrementing = true;
     protected $keyType = 'int';
 
-    protected $fillable = ['name', 'id_class', 'id_parent'];
+    protected $fillable = [
+        'name', 'id_class', 'id_parent', 'tempat_lahir', 'tanggal_lahir', 'nis', 'gender', 'id_tahun_ajaran'
+    ];
 
     public function parent()
     {
@@ -23,5 +25,10 @@ class Child extends Model
     public function class()
     {
         return $this->belongsTo(ClassModel::class, 'id_class');
+    }
+
+    public function tahunAjaran()
+    {
+        return $this->belongsTo(\App\Models\TahunAjaran::class, 'id_tahun_ajaran');
     }
 }

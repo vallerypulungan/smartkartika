@@ -38,15 +38,14 @@
           class="search-input"
         />
         <select
-          :value="selectedTahunAjaran"
-          @change="handleTahunAjaranChange"
+          v-model="selectedTahunAjaran"
+          @change="fetchSiswaByKelasTahun"
           class="tahun-dropdown"
         >
           <option value="Semua">Semua Tahun Ajaran</option>
-          <option v-for="tahun in tahunAjaranOptions" :key="tahun" :value="tahun">
-            {{ tahun }}
+          <option v-for="tahun in tahunAjaranOptions" :key="tahun.id" :value="tahun.id">
+            {{ tahun.nama }}
           </option>
-          <option value="Tambah">+ Tambah Tahun Ajaran</option>
         </select>
         <!-- Modal Tambah Tahun Ajaran -->
         <div v-if="showTambahTahunModal" class="modal-overlay">
@@ -89,9 +88,11 @@
                 <input type="checkbox" :value="student" v-model="selectedStudents" />
               </td>
               <td>{{ index + 1 }}</td>
-              <td>{{ student.nama }}</td>
+              <td>{{ student.name }}</td>
               <td>{{ student.nis }}</td>
-              <td>{{ student.tahunAjaran }}</td>
+              <td>
+                {{ student.tahunAjaran ? student.tahunAjaran.nama : '-' }}
+              </td>
               <td>{{ student.gender }}</td>
             </tr>
           </tbody>
@@ -144,7 +145,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import PopupConfirm from '@/components/BlokPopup.vue'
@@ -157,6 +158,7 @@ const classData = ref({}) // Data siswa per kelas
 
 onMounted(async () => {
   await fetchClasses()
+  await fetchTahunAjaran()
   if (classList.value.length > 0) {
     activeTab.value = classList.value[0].class
   }
@@ -178,13 +180,39 @@ async function fetchClasses() {
   }
 }
 
+const fetchTahunAjaran = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/tahun-ajaran')
+    tahunAjaranOptions.value = response.data.data // [{id, nama}, ...]
+  } catch (error) {
+    console.error('Gagal mengambil tahun ajaran:', error)
+  }
+}
+
+const fetchSiswaByKelasTahun = async () => {
+  try {
+    const kelasObj = classList.value.find(k => k.class === activeTab.value)
+    const id_class = kelasObj ? kelasObj.id_class : null
+
+    const params = {}
+    if (id_class) params.kelas = id_class
+    if (selectedTahunAjaran.value !== 'Semua') params.tahun = selectedTahunAjaran.value
+
+    const response = await axios.get('http://localhost:8000/api/children', { params })
+    // Simpan hanya untuk kelas aktif
+    classData.value[activeTab.value] = response.data.data
+  } catch (error) {
+    console.error('Gagal mengambil data siswa:', error)
+  }
+}
+
 const searchQuery = ref('')
 const selectedTahunAjaran = ref('Semua')
 const selectedStudents = ref([])
 const showConfirmPromote = ref(false)
 const showConfirmLulus = ref(false)
 const showDeleteClass = ref(false)
-const tahunAjaranOptions = ref(['2024/2025', '2023/2024'])
+const tahunAjaranOptions = ref([])
 const showTambahTahunModal = ref(false)
 const newTahunAjaran = ref('')
 
@@ -204,7 +232,7 @@ const filteredData = computed(() => {
   return data
 })
 
-function promoteStudents() {
+async function promoteStudents() {
   const allKelas = sortedTabs.value.filter((k) => k !== 'Lulus Tk')
   const currentIndex = allKelas.indexOf(activeTab.value)
   const nextKelas =
@@ -212,15 +240,29 @@ function promoteStudents() {
       ? allKelas[currentIndex + 1]
       : 'Lulus Tk'
 
-  if (!classData.value[nextKelas]) {
-    classData.value[nextKelas] = []
+  // Ambil id_class tujuan
+  const nextKelasObj = classList.value.find(k => k.class === nextKelas)
+  const nextKelasId = nextKelasObj ? nextKelasObj.id_class : null
+
+  for (const siswa of selectedStudents.value) {
+    await axios.put(`http://localhost:8000/api/children/${siswa.id_child}`, {
+      nama: siswa.name,
+      nis: siswa.nis,
+      tempatLahir: siswa.tempat_lahir,        // dari snake_case ke camelCase
+      tanggalLahir: siswa.tanggal_lahir,
+      gender: siswa.gender,
+      kelas: nextKelasId,
+      tahunAjaran: siswa.id_tahun_ajaran,     // dari id_tahun_ajaran ke tahunAjaran
+      namaWali: siswa.parent?.name ?? '',
+      email: siswa.parent?.email ?? '',
+      alamat: siswa.parent?.alamat ?? '',
+      telepon: siswa.parent?.num_telp ?? '',
+      username: siswa.parent?.username ?? '',
+      kode: siswa.parent?.password ?? '',
+    })
   }
 
-  classData.value[nextKelas].push(...selectedStudents.value)
-  classData.value[activeTab.value] = classData.value[activeTab.value].filter(
-    (siswa) => !selectedStudents.value.includes(siswa),
-  )
-
+  await fetchSiswaByKelasTahun()
   selectedStudents.value = []
 }
 
@@ -326,6 +368,10 @@ function deleteActivity() {
 const goBack = () => {
   router.back()
 }
+
+watch([activeTab, selectedTahunAjaran], () => {
+  fetchSiswaByKelasTahun()
+})
 </script>
 
 <style scoped>

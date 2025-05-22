@@ -59,7 +59,7 @@
               <label>Kelas</label>
               <select v-model="form.kelas" required>
                 <option disabled value="">Pilih Kelas</option>
-                <option v-for="kelas in daftarKelas" :key="kelas.id" :value="kelas.nama">
+                <option v-for="kelas in daftarKelas" :key="kelas.id" :value="kelas.id">
                   {{ kelas.nama }}
                 </option>
               </select>
@@ -69,14 +69,9 @@
           <div class="form-row">
             <div class="form-group">
               <label>Tahun Ajaran</label>
-              <select
-                v-model="form.tahunAjaran"
-                :key="daftarTahunAjaran.length"
-                @change="handleTahunAjaranChange"
-                required
-              >
+              <select v-model="form.tahunAjaran" @change="handleTahunAjaranChange" required>
                 <option disabled value="">Pilih Tahun Ajaran</option>
-                <option v-for="tahun in daftarTahunAjaran" :key="tahun.id" :value="tahun.nama">
+                <option v-for="tahun in daftarTahunAjaran" :key="tahun.id" :value="tahun.id">
                   {{ tahun.nama }}
                 </option>
                 <option value="Tambah">+ Tambah Tahun Ajaran</option>
@@ -121,7 +116,7 @@
           <div class="form-row">
             <div class="form-group">
               <label>Nama Wali</label>
-              <input v-model="form.wali" type="text" placeholder="Nama Ayah atau Ibu" required />
+              <input v-model="form.namaWali" type="text" placeholder="Nama Ayah atau Ibu" required />
             </div>
             <div class="form-group">
               <label>Email</label>
@@ -288,8 +283,8 @@ import axios from 'axios'
 import { useRouter } from 'vue-router'
 import PopupConfirm from '@/components/BlokPopup.vue'
 import PopupMessage from '@/components/MessagePopup.vue'
-import eye from '@/assets/eye.png'
-import eyeOff from '@/assets/eye-off.png'
+// import eye from '@/assets/eye.png'
+// import eyeOff from '@/assets/eye-off.png'
 
 const daftarKelas = ref([])
 const router = useRouter()
@@ -336,19 +331,63 @@ const form = ref({
 
 onMounted(() => {
   fetchKelas()
-
-  daftarTahunAjaran.value = [
-    { id: 1, nama: '2023/2024' },
-    { id: 2, nama: '2024/2025' },
-  ]
+  fetchTahunAjaran()
+  fetchSiswa()
 })
 
 async function fetchKelas() {
   try {
-    const response = await axios.get('/api/kelas') // Ganti dengan endpoint backend yang sesuai
-    daftarKelas.value = response.data
+    const response = await axios.get('http://localhost:8000/api/classes')
+    // Sesuaikan dengan struktur data dari backend
+    daftarKelas.value = response.data.data.map(k => ({
+      id: k.id_class,
+      nama: k.class
+    }))
   } catch (error) {
     console.error('Gagal mengambil data kelas:', error)
+  }
+}
+
+async function fetchTahunAjaran() {
+  try {
+    const response = await axios.get('http://localhost:8000/api/tahun-ajaran')
+    daftarTahunAjaran.value = response.data.data.map(t => ({
+      id: t.id,
+      nama: t.nama
+    }))
+  } catch (error) {
+    console.error('Gagal mengambil tahun ajaran:', error)
+  }
+}
+
+const fetchSiswa = async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/api/children')
+    // Asumsikan response.data.data adalah array siswa
+    classData.value['Daftar Siswa'] = response.data.data.map(siswa => ({
+      id: siswa.id_child,
+      nama: siswa.name,
+      nis: siswa.nis,
+      ttl: {
+        tempatLahir: siswa.tempat_lahir,
+        tanggalLahir: siswa.tanggal_lahir,
+      },
+      gender: siswa.gender,
+      kelas: siswa.class?.class ?? '-', // relasi ke model Class
+      tahunAjaran: siswa.tahunAjaran?.nama ?? '-', // relasi ke model TahunAjaran
+      orangTua: {
+        wali: siswa.parent?.name ?? '-',
+        email: siswa.parent?.email ?? '-',
+        alamat: siswa.parent?.alamat ?? '-',
+        telepon: siswa.parent?.num_telp ?? '-',
+      },
+      akun: {
+        username: siswa.parent?.username ?? '-',
+        kode: siswa.parent?.password ?? '-',
+      },
+    }))
+  } catch (error) {
+    console.error('Gagal mengambil data siswa:', error)
   }
 }
 
@@ -359,31 +398,26 @@ function formatDate(dateStr) {
 }
 
 function handleTahunAjaranChange(event) {
-  const selected = event.target.value
-  if (selected === 'Tambah') {
+  if (event.target.value === 'Tambah') {
     form.value.tahunAjaran = ''
     showTambahTahunModal.value = true
   }
 }
 
-function simpanTahunAjaran() {
-  if (!tahunAwal.value || !tahunAkhir.value) {
-    showAlertTahunAjaran.value = true
-    return
-  }
+async function simpanTahunAjaran() {
+  if (!tahunAwal.value || !tahunAkhir.value) return
   const tahunBaru = `${tahunAwal.value}/${tahunAkhir.value}`
-  const duplikat = daftarTahunAjaran.value.some((t) => t.nama === tahunBaru)
-  if (duplikat) {
-    showAlertTahun.value = true
-    return
+  try {
+    const response = await axios.post('http://localhost:8000/api/tahun-ajaran', { nama: tahunBaru })
+    await fetchTahunAjaran()
+    // Pilih tahun ajaran yang baru saja ditambahkan
+    form.value.tahunAjaran = response.data.data.id
+    showTambahTahunModal.value = false
+    tahunAwal.value = ''
+    tahunAkhir.value = ''
+  } catch (error) {
+    alert('Tahun ajaran sudah ada atau gagal menambah')
   }
-
-  daftarTahunAjaran.value = [...daftarTahunAjaran.value, { id: Date.now(), nama: tahunBaru }]
-
-  form.value.tahunAjaran = tahunBaru
-  tahunAwal.value = ''
-  tahunAkhir.value = ''
-  showTambahTahunModal.value = false
 }
 
 function submitForm() {
@@ -421,60 +455,74 @@ const sortedTabs = computed(() => {
   return tabs
 })
 
-function saveActivity() {
-  const siswaBaru = {
-    nama: form.value.nama,
-    nis: form.value.nis,
-    tahunAjaran: form.value.tahunAjaran || '2024/2025',
-    gender: form.value.gender,
-    ttl: {
+async function saveActivity() {
+  try {
+    const siswaBaru = {
+      nama: form.value.nama,
+      nis: form.value.nis,
       tempatLahir: form.value.tempatLahir,
       tanggalLahir: form.value.tanggalLahir,
-    },
-    kelas: form.value.kelas,
-    orangTua: {
-      wali: form.value.namaWali,
+      gender: form.value.gender,
+      kelas: form.value.kelas, // id_class
+      tahunAjaran: form.value.tahunAjaran, // id_tahun_ajaran
+      namaWali: form.value.namaWali,
       email: form.value.email,
       alamat: form.value.alamat,
       telepon: form.value.telepon,
-    },
-    akun: {
       username: form.value.username,
       kode: form.value.kode,
-    },
-  }
+    };
 
-  // Menyimpan ke daftar "Daftar Siswa"
-  if (!classData.value['Daftar Siswa']) {
-    classData.value['Daftar Siswa'] = []
-  }
-  classData.value['Daftar Siswa'].push(siswaBaru)
+    // Kirim ke backend
+    const response = await axios.post('http://localhost:8000/api/children', siswaBaru);
 
-  // Reset form
-  form.value = {
-    nama: '',
-    nis: '',
-    tempatLahir: '',
-    tanggalLahir: '',
-    gender: '',
-    kelas: '',
-    tahunAjaran: '',
-    namaWali: '',
-    email: '',
-    alamat: '',
-    telepon: '',
-    username: '',
-    kode: '',
-  }
+    // Tambahkan ke array lokal jika ingin langsung tampil
+    if (!classData.value['Daftar Siswa']) {
+      classData.value['Daftar Siswa'] = [];
+    }
+    classData.value['Daftar Siswa'].push(response.data.data);
 
-  showConfirmPromote.value = false
-  showSuccesAdd.value = true
+    // Reset form
+    form.value = {
+      nama: '',
+      nis: '',
+      tempatLahir: '',
+      tanggalLahir: '',
+      gender: '',
+      kelas: '',
+      tahunAjaran: '',
+      namaWali: '',
+      email: '',
+      alamat: '',
+      telepon: '',
+      username: '',
+      kode: '',
+    };
+
+    showConfirmPromote.value = false;
+    showSuccesAdd.value = true;
+  } catch (error) {
+    alert('Gagal menambahkan siswa: ' + (error.response?.data?.message || error.message));
+  }
 }
 
 function editStudent(student, index) {
-  const combinedForm = { ...student, ...student.ttl, ...student.orangTua, ...student.akun }
-  form.value = combinedForm
-  originalForm.value = JSON.parse(JSON.stringify(combinedForm)) // Simpan data awal
+  form.value = {
+    nama: student.nama,
+    nis: student.nis,
+    tempatLahir: student.ttl?.tempatLahir || '',
+    tanggalLahir: student.ttl?.tanggalLahir || '',
+    gender: student.gender || '',
+    kelas: daftarKelas.value.find(k => k.nama === student.kelas)?.id || '', // cari id dari nama kelas
+    tahunAjaran: daftarTahunAjaran.value.find(t => t.nama === student.tahunAjaran)?.id || '', // cari id dari nama tahun ajaran
+    namaWali: student.orangTua?.wali || '',
+    email: student.orangTua?.email || '',
+    alamat: student.orangTua?.alamat || '',
+    telepon: student.orangTua?.telepon || '',
+    username: student.akun?.username || '',
+    kode: student.akun?.kode || '',
+  }
+  originalForm.value = JSON.parse(JSON.stringify(form.value))
   editingIndex.value = index
   editingTab.value = activeTab.value
   activeTab.value = 'Registrasi'
@@ -503,36 +551,36 @@ function confirmChangeTab() {
   }
 }
 
-function saveEdit() {
+async function saveEdit() {
   if (editingIndex.value !== null && editingTab.value) {
-    classData.value[editingTab.value][editingIndex.value] = {
-      nama: form.value.nama,
-      nis: form.value.nis,
-      ttl: {
+    const siswa = classData.value[editingTab.value][editingIndex.value]
+    try {
+      await axios.put(`http://localhost:8000/api/children/${siswa.id}`, {
+        nama: form.value.nama,
+        nis: form.value.nis,
         tempatLahir: form.value.tempatLahir,
         tanggalLahir: form.value.tanggalLahir,
-      },
-      gender: form.value.gender,
-      kelas: form.value.kelas,
-      tahunAjaran: form.value.tahunAjaran,
-      orangTua: {
-        wali: form.value.namaWali,
+        gender: form.value.gender,
+        kelas: form.value.kelas,
+        tahunAjaran: form.value.tahunAjaran,
+        namaWali: form.value.namaWali,
         email: form.value.email,
         alamat: form.value.alamat,
         telepon: form.value.telepon,
-      },
-      akun: {
-        username: form.value.username,
         kode: form.value.kode,
-      },
+        username: form.value.username,
+      })
+      await fetchSiswa()
+      showSuccesEdit.value = true
+    } catch (error) {
+      alert('Gagal mengedit siswa: ' + (error.response?.data?.message || error.message))
     }
     showConfirmEdit.value = false
     editingIndex.value = null
     editingTab.value = null
     activeTab.value = 'Daftar Siswa'
-    showSuccesEdit.value = true
   }
-
+  // Reset form
   form.value = {
     nama: '',
     nis: '',
@@ -550,17 +598,18 @@ function saveEdit() {
   }
 }
 
-function deleteStudent(index) {
-  deletingIndex.value = index
-  showConfirmDelete.value = true
-}
-
-function confirmDelete() {
+async function confirmDelete() {
   if (deletingIndex.value !== null) {
-    classData.value[activeTab.value].splice(deletingIndex.value, 1)
+    const siswa = classData.value[activeTab.value][deletingIndex.value]
+    try {
+      await axios.delete(`http://localhost:8000/api/children/${siswa.id}`)
+      await fetchSiswa()
+      showSuccesDelete.value = true
+    } catch (error) {
+      alert('Gagal menghapus siswa: ' + (error.response?.data?.message || error.message))
+    }
     showConfirmDelete.value = false
     deletingIndex.value = null
-    showSuccesDelete.value = true
   }
 }
 
