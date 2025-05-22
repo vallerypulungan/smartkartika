@@ -337,12 +337,17 @@ onMounted(() => {
 
 async function fetchKelas() {
   try {
+<<<<<<< HEAD
     const response = await axios.get('http://localhost:8000/api/classes')
     // Sesuaikan dengan struktur data dari backend
     daftarKelas.value = response.data.data.map(k => ({
       id: k.id_class,
       nama: k.class
     }))
+=======
+    const response = await axios.get('/api/kelas')
+    daftarKelas.value = response.data
+>>>>>>> d5b73afc299ef797d29e501f9077e43ecf0a6d2a
   } catch (error) {
     console.error('Gagal mengambil data kelas:', error)
   }
@@ -729,11 +734,11 @@ const goBack = () => {
   overflow-y: auto;
   padding-right: 8px;
   background: #fff;
-  color: #2c3930;
+  color: #000;
 }
 
 .form-registrasi h2 {
-  color: #2c3930;
+  color: #000;
   font-weight: 700;
   font-size: 1rem;
 }
@@ -817,7 +822,7 @@ const goBack = () => {
 
 .password-wrapper input {
   flex: 1;
-  padding-right: 40px; /* ruang untuk tombol mata */
+  padding-right: 40px;
 }
 
 .toggle-password {
