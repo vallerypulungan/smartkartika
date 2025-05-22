@@ -340,7 +340,7 @@ function deleteStudent(index) {
 async function confirmDelete() {
   try {
     const teacherId = classData.value['Daftar Guru'][deletingIndex.value].id;
-    
+
 
     await axios.delete(`http://localhost:8000/api/teachers/${teacherId}`);
     classData.value['Daftar Guru'].splice(deletingIndex.value, 1);
@@ -381,6 +381,7 @@ onMounted(() => {
   padding: 0;
   overflow-y: auto;
   background-color: #ffffff;
+  min-height: calc(100vh - 64px);
 }
 .page-header {
   display: none;
@@ -391,7 +392,6 @@ onMounted(() => {
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   max-width: 100%;
-  min-height: 100vh;
 }
 
 /* Top Bar */
@@ -404,7 +404,7 @@ onMounted(() => {
 
 .top-bar h1 {
   margin: 0;
-  color: #2c3930;
+  color: #000;
   font-size: 1.3rem;
   font-weight: 600;
 }
@@ -424,18 +424,17 @@ onMounted(() => {
   cursor: pointer;
   font-weight: bold;
   font-size: 16px;
-  color: #666;
+  color: #000;
   transition: all 0.2s;
 }
 
 .tab-button:hover {
-  background-color: #d8e3f3;
+  background-color: #e5e5e5;
 }
 
 .tab-button.active {
-  border-bottom: 3px solid #3f8efc;
-  color: #3f8efc;
-  background-color: #e5e5e5;
+  border-bottom: 3px solid #27c04d;
+  color: #27c04d;
 }
 
 .filter-bar {
@@ -458,19 +457,19 @@ onMounted(() => {
 .form-registrasi form {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 12px;
   max-height: 100%;
   overflow-y: auto;
   padding-right: 8px;
   background: #fff;
   padding: 12px;
-  color: #2c3930;
+  color: #000;
 }
 
 .form-registrasi h2 {
-  color: #2c3930;
+  color: #000;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 .form-section {
   flex-basis: 100%;
@@ -493,16 +492,15 @@ onMounted(() => {
   display: flex;
   align-items: center;
   margin-bottom: 16px;
-  width: 100%;
-  max-width: 600px;
+  width: 50%;
   margin-left: 10rem;
-  margin-right: auto;
 }
 
 .form-group-row label {
   width: 150px;
-  font-weight: 600;
+  font-weight: 500;
   text-align: left;
+  font-size: 0.9rem;
 }
 
 .form-group-row input,
@@ -524,7 +522,6 @@ onMounted(() => {
 
 .password-wrapper input {
   flex: 1;
-  padding-right: 40px; /* ruang untuk tombol mata */
 }
 
 .toggle-password {
@@ -623,6 +620,11 @@ onMounted(() => {
   width: 15%;
 }
 
+.styled-table th:nth-child(6),
+.styled-table td:nth-child(6) {
+  width: 15%;
+}
+
 .styled-table tbody tr:hover {
   background-color: #f9fafb;
   transition: background-color 0.2s;
@@ -689,17 +691,56 @@ onMounted(() => {
     color: #fff;
   }
 
+  .search-input {
+    width: 50%;
+  }
+
   .form-registrasi form {
-    gap: 16px;
+    gap: 12px;
+  }
+
+  .form-section {
+    font-size: 0.9rem;
   }
 
   .form-group-row {
     margin: 0;
+    width: 90%;
   }
 
   .form-group-row label {
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .styled-table th:nth-child(1),
+  .styled-table td:nth-child(1) {
+    width: 3%;
+  }
+
+  .styled-table th:nth-child(2),
+  .styled-table td:nth-child(2) {
+    width: 30%;
+  }
+
+  .styled-table th:nth-child(3),
+  .styled-table td:nth-child(3) {
+    width: 17%;
+  }
+
+  .styled-table th:nth-child(4),
+  .styled-table td:nth-child(4) {
+    width: 20%;
+  }
+
+  .styled-table th:nth-child(5),
+  .styled-table td:nth-child(5) {
+    width: 15%;
+  }
+
+  .styled-table th:nth-child(6),
+  .styled-table td:nth-child(6) {
+    width: 15%;
   }
 
   .btn-submit {
