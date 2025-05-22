@@ -337,17 +337,12 @@ onMounted(() => {
 
 async function fetchKelas() {
   try {
-<<<<<<< HEAD
     const response = await axios.get('http://localhost:8000/api/classes')
     // Sesuaikan dengan struktur data dari backend
     daftarKelas.value = response.data.data.map(k => ({
       id: k.id_class,
       nama: k.class
     }))
-=======
-    const response = await axios.get('/api/kelas')
-    daftarKelas.value = response.data
->>>>>>> d5b73afc299ef797d29e501f9077e43ecf0a6d2a
   } catch (error) {
     console.error('Gagal mengambil data kelas:', error)
   }
