@@ -40,3 +40,10 @@ Route::delete('/children/{id}', [ChildController::class, 'destroy']); // DELETE:
 Route::post('/tahun-ajaran', [TahunAjaranController::class, 'store']);
 Route::get('/tahun-ajaran', [TahunAjaranController::class, 'index']);
 
+use App\Http\Controllers\LaporanController;
+
+Route::post('/laporan', [LaporanController::class, 'store']);
+Route::get('/laporan', [LaporanController::class, 'index']); // opsional: untuk list semua laporan
+Route::get('/laporan/anak/{id_child}', [LaporanController::class, 'byChild']); // laporan per anak
+Route::get('/laporan/ortu/{id_parent}', [LaporanController::class, 'byParent']); // laporan per ortu
+

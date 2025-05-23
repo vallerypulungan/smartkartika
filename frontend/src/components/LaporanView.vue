@@ -24,31 +24,33 @@
         <div class="modal-content">
           <h3 class="modal-title">{{ isEditing ? 'Edit Laporan' : 'Tambah Laporan' }}</h3>
           <form @submit.prevent="submitForm" class="modal-form">
-            <select v-model="formData.tahunAjaran" name="tahunAjaran" required>
+            <select v-model="selectedTahunAjaran" required>
               <option value="" disabled>Pilih Tahun Ajaran</option>
-              <option v-for="tahun in tahunAjaranOptions" :key="tahun" :value="tahun">
-                {{ tahun }}
+              <option v-for="tahun in tahunAjaranOptions" :key="tahun.id" :value="tahun.id">
+                {{ tahun.nama }}
               </option>
             </select>
 
-            <select
-              v-model="formData.kelas"
-              name="kelas"
-              required
-              :disabled="!formData.tahunAjaran"
-            >
-              <option value="" disabled>Pilih Kelas</option>
-              <option v-for="kelas in kelasOptions" :key="kelas" :value="kelas">
-                {{ kelas }}
-              </option>
-            </select>
+            <div>
+              <select
+                v-model="selectedKelas"
+                required
+                :disabled="!selectedTahunAjaran"
+              >
+                <option value="" disabled>Pilih Kelas</option>
+                <option v-for="kelas in kelasOptionsRaw" :key="kelas.id_class" :value="kelas.id_class">
+                  {{ kelas.class }}
+                </option>
+              </select>
+            
+              <select v-model="selectedSiswa" required :disabled="!selectedKelas">
+                <option value="" disabled>Pilih Siswa</option>
+                <option v-for="siswa in siswaOptions" :key="siswa.id_child" :value="siswa.id_child">
+                  {{ siswa.name }} ({{ siswa.nis }})
+                </option>
+              </select>
+            </div>
 
-            <select v-model="formData.nama" name="nama" required :disabled="!formData.kelas">
-              <option value="" disabled>Pilih Nama Siswa</option>
-              <option v-for="nama in namaOptions" :key="nama" :value="nama">
-                {{ nama }}
-              </option>
-            </select>
             <label class="custom-file-upload" :class="{ 'file-selected': formData.file }">
               <div class="upload-content">
                 <template v-if="!formData.file">
@@ -97,7 +99,7 @@
               <td>
                 <a
                   v-if="laporan.file"
-                  :href="getFileUrl(laporan.file)"
+                  :href="laporan.file"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -130,9 +132,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import ConfirmModal from '@/components/BlokPopup.vue'
+import axios from 'axios'
 
 const router = useRouter()
 const daftarLaporan = ref([])
@@ -150,30 +153,39 @@ const formData = ref({
   fileName: '',
 })
 
-const dataSiswa = ref({
-  '2022/2023': {
-    'Kelas 1A': [
-      { nama: 'Ani', nis: '001' },
-      { nama: 'Budi', nis: '002' },
-    ],
-    'Kelas 1B': [
-      { nama: 'Citra', nis: '003' },
-      { nama: 'Dedi', nis: '004' },
-    ],
-  },
-  '2023/2024': {
-    'Kelas 2A': [
-      { nama: 'Eka', nis: '005' },
-      { nama: 'Fajar', nis: '006' },
-    ],
-    'Kelas 2B': [
-      { nama: 'Gita', nis: '007' },
-      { nama: 'Hadi', nis: '008' },
-    ],
-  },
+const tahunAjaranOptions = ref([])
+const kelasOptionsRaw = ref([])
+const siswaOptions = ref([])
+
+const selectedTahunAjaran = ref('')
+const selectedKelas = ref('')
+const selectedSiswa = ref('')
+const file = ref(null)
+
+// Ambil tahun ajaran saat mounted
+onMounted(async () => {
+  const tahunRes = await axios.get('http://localhost:8000/api/tahun-ajaran')
+  tahunAjaranOptions.value = tahunRes.data.data // [{id, nama}, ...]
+
+  // Jika ingin langsung ambil kelas
+  const kelasRes = await axios.get('http://localhost:8000/api/classes')
+  kelasOptionsRaw.value = kelasRes.data.data // [{id_class, class, ...}]
 })
 
-const tahunAjaranOptions = computed(() => Object.keys(dataSiswa.value))
+// Ambil siswa berdasarkan filter
+watch([selectedTahunAjaran, selectedKelas], async () => {
+  if (selectedTahunAjaran.value && selectedKelas.value) {
+    const res = await axios.get('http://localhost:8000/api/children', {
+      params: {
+        kelas: selectedKelas.value,
+        tahun: selectedTahunAjaran.value,
+      }
+    })
+    siswaOptions.value = res.data.data // [{id_child, name, nis, id_parent, ...}]
+  } else {
+    siswaOptions.value = []
+  }
+})
 
 const kelasOptions = computed(() => {
   const tahun = formData.value.tahunAjaran
@@ -233,23 +245,29 @@ const handleFile = (e) => {
 
 const fileNameDisplay = computed(() => formData.value.file?.name || 'Pilih File')
 
-const submitForm = () => {
-  const laporan = {
-    nama: formData.value.nama,
-    nis: formData.value.nis,
-    kelas: formData.value.kelas,
-    tahunAjaran: formData.value.tahunAjaran,
-    file: formData.value.file,
-    fileName: formData.value.file?.name || '',
+const submitForm = async () => {
+  try {
+    const siswa = siswaOptions.value.find(s => s.id_child == selectedSiswa.value)
+    // Ambil id_teacher dari NIP
+    const idTeacher = await getTeacherIdByNip(selectedNip.value)
+    if (!idTeacher) {
+      alert('Guru dengan NIP tersebut tidak ditemukan!')
+      return
+    }
+    const form = new FormData()
+    form.append('id_teacher', idTeacher)
+    form.append('id_class', selectedKelas.value)
+    form.append('id_parent', siswa?.id_parent)
+    form.append('id_child', selectedSiswa.value)
+    form.append('file', formData.value.file)
+    await axios.post('http://localhost:8000/api/laporan', form)
+    alert('Laporan berhasil diunggah!')
+    formVisible.value = false
+    resetForm()
+  } catch (err) {
+    console.error('Gagal upload laporan:', err)
+    alert('Gagal upload laporan: ' + (err.response?.data?.message || err.message))
   }
-
-  if (isEditing.value) {
-    daftarLaporan.value[editingIndex.value] = laporan
-  } else {
-    daftarLaporan.value.push(laporan)
-  }
-
-  cancelForm()
 }
 
 const getFileUrl = (file) => {
@@ -309,6 +327,16 @@ const konfirmasiHapus = () => {
 
 const goBack = () => {
   router.back()
+}
+
+const user = JSON.parse(localStorage.getItem('user') || '{}')
+const selectedNip = ref(user.nip || '')
+const teacherName = ref(user.name || '')
+
+const getTeacherIdByNip = async (nip) => {
+  const res = await axios.get('http://localhost:8000/api/teachers', { params: { nip } })
+  // Pastikan endpoint ini mengembalikan array guru, ambil id_teacher pertama yang cocok
+  return res.data.data[0]?.id_teacher || ''
 }
 </script>
 

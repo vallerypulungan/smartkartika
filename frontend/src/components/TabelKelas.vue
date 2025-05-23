@@ -200,7 +200,10 @@ const fetchSiswaByKelasTahun = async () => {
 
     const response = await axios.get('http://localhost:8000/api/children', { params })
     // Simpan hanya untuk kelas aktif
-    classData.value[activeTab.value] = response.data.data
+    classData.value[activeTab.value] = response.data.data.map(siswa => ({
+      ...siswa,
+      tahunAjaran: siswa.tahun_ajaran, // mapping ke objek tahun_ajaran
+    }))
   } catch (error) {
     console.error('Gagal mengambil data siswa:', error)
   }
@@ -226,7 +229,9 @@ const filteredData = computed(() => {
   }
 
   if (selectedTahunAjaran.value !== 'Semua') {
-    data = data.filter((siswa) => siswa.tahunAjaran === selectedTahunAjaran.value)
+    data = data.filter((siswa) => 
+      (siswa.tahunAjaran?.id || siswa.tahun_ajaran?.id) == selectedTahunAjaran.value
+    )
   }
 
   return data

@@ -41,7 +41,7 @@
         </div>
         <div class="menu" :class="{ active: route.name === 'kelas' }" @click="goTo('kelas')">
           <div class="icon-container">
-            <img src="@/assets/graduation-cap.png" alt="Kelas" />
+            <img src="" alt="Kelas" />
           </div>
           <span>Kelas</span>
         </div>

@@ -9,20 +9,20 @@ class Report extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['report_content', 'id_activity', 'id_teacher', 'id_document'];
+    protected $fillable = [
+        'id_teacher', 'id_class', 'id_parent', 'id_child', 'file'
+    ];
 
-    public function activity()
-    {
-        return $this->belongsTo(Activity::class, 'id_activity');
-    }
-
-    public function teacher()
-    {
+    public function teacher() {
         return $this->belongsTo(Teacher::class, 'id_teacher');
     }
-
-    public function documentation()
-    {
-        return $this->belongsTo(Documentation::class, 'id_document');
+    public function class() {
+        return $this->belongsTo(ClassModel::class, 'id_class');
+    }
+    public function parent() {
+        return $this->belongsTo(ParentModel::class, 'id_parent');
+    }
+    public function child() {
+        return $this->belongsTo(Child::class, 'id_child');
     }
 }

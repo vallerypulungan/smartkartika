@@ -41,7 +41,7 @@
           </div>
           <div class="sidebar-item" @click="goTo('kelas')">
             <div class="icon-container">
-              <img src="@/assets/graduation-cap.png" alt="" class="icon-img" />
+              <img src="" alt="" class="icon-img" />
             </div>
             <div class="sidebar-text">Kelas</div>
           </div>
