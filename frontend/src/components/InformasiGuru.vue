@@ -179,8 +179,8 @@ import { useRouter } from 'vue-router'
 import axios from 'axios'
 import PopupConfirm from '@/components/BlokPopup.vue'
 import PopupMessage from '@/components/MessagePopup.vue'
-// import eye from '@/assets/eye.png'
-// import eyeOff from '@/assets/eye-off.png'
+import eye from '@/assets/eye.png'
+import eyeOff from '@/assets/eye-off.png'
 
 const router = useRouter()
 
@@ -299,7 +299,6 @@ function confirmChangeTab() {
   originalForm.value = null
   showConfirmChangeTab.value = false
 
-  // Reset form agar tidak tertinggal
   form.value = {
     nama: '',
     nip: '',

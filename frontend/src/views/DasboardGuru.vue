@@ -41,7 +41,7 @@
         </div>
         <div class="menu" :class="{ active: route.name === 'kelas' }" @click="goTo('kelas')">
           <div class="icon-container">
-            <img src="" alt="Kelas" />
+            <img src="@/assets/graduation-cap.png" alt="Kelas" />
           </div>
           <span>Kelas</span>
         </div>
@@ -113,16 +113,8 @@ function handleResize() {
   isMobile.value = window.innerWidth <= 768
 
   if (wasMobile !== isMobile.value) {
-    if (isMobile.value) {
-      // Dari desktop → mobile
-      if (route.name === 'home') {
-        router.replace({ name: 'home' })
-      }
-    } else {
-      // Dari mobile → desktop
-      if (route.name === 'dashboardRoot' || route.name === null) {
-        router.replace({ name: 'home' })
-      }
+    if (!route.name) {
+      router.replace({ name: 'home' })
     }
   }
 }
@@ -156,12 +148,13 @@ async function logout() {
 onMounted(() => {
   window.addEventListener('resize', handleResize)
 
-  // Redirect awal
-  if (isMobile.value && route.name === 'home') {
-    router.replace({ name: 'home' })
-  } else if (!isMobile.value && (route.name === null || route.name === 'dashboardRoot')) {
+  if (!route.name) {
     router.replace({ name: 'home' })
   }
+
+  setTimeout(() => {
+    router.replace({ name: 'home' })
+  }, 10)
 })
 
 onBeforeUnmount(() => {

@@ -283,8 +283,8 @@ import axios from 'axios'
 import { useRouter } from 'vue-router'
 import PopupConfirm from '@/components/BlokPopup.vue'
 import PopupMessage from '@/components/MessagePopup.vue'
-// import eye from '@/assets/eye.png'
-// import eyeOff from '@/assets/eye-off.png'
+import eye from '@/assets/eye.png'
+import eyeOff from '@/assets/eye-off.png'
 
 const daftarKelas = ref([])
 const router = useRouter()
@@ -338,7 +338,7 @@ onMounted(() => {
 async function fetchKelas() {
   try {
     const response = await axios.get('http://localhost:8000/api/classes')
-    // Sesuaikan dengan struktur data dari backend
+
     daftarKelas.value = response.data.data.map(k => ({
       id: k.id_class,
       nama: k.class
@@ -363,7 +363,7 @@ async function fetchTahunAjaran() {
 const fetchSiswa = async () => {
   try {
     const response = await axios.get('http://localhost:8000/api/children')
-    // Asumsikan response.data.data adalah array siswa
+
     classData.value['Daftar Siswa'] = response.data.data.map(siswa => ({
       id: siswa.id_child,
       nama: siswa.name,
