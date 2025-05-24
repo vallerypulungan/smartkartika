@@ -71,7 +71,7 @@
               <td>{{ item.judul }}</td>
               <td>{{ item.tanggal }}</td>
               <td>{{ item.imageName }}</td>
-              <td>{{ item.deskripsi }}</td>
+              <td v-html="formatNewlines(item.deskripsi)"></td>
               <td>
                 <button class="laporan-button edit" @click="editItem(index)">Edit</button>
                 <button class="laporan-button delete" @click="deleteItem(index)">Hapus</button>
@@ -124,8 +124,10 @@ import axios from 'axios'
 import { ref, reactive, onMounted } from 'vue'
 import PopupConfirm from '@/components/BlokPopup.vue'
 import PopupSuccess from '@/components/MessagePopup.vue'
+import { useRouter } from 'vue-router'
 
 const items = ref([])
+const router = useRouter()
 
 async function fetchActivities() {
   const res = await axios.get('http://localhost:8000/api/activities')
@@ -265,6 +267,14 @@ function deleteItem(index) {
   indexToDelete.value = index
   showSaveConfirm.value = true
 }
+
+function formatNewlines(text) {
+  return text.replace(/\n/g, '<br>')
+}
+
+const goBack = () => {
+  router.push('home')
+}
 </script>
 
 <style scoped>
@@ -331,9 +341,9 @@ function deleteItem(index) {
 .title {
   text-align: center;
   font-weight: bold;
-  color: #1f3a2d;
+  color: #000;
   font-size: 1.3rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .table-wrapper {
@@ -346,8 +356,6 @@ function deleteItem(index) {
   background: #fff;
   font-size: 0.7rem;
   table-layout: fixed;
-  width: 100%;
-  border-collapse: collapse;
 }
 
 .laporan-table th,
@@ -399,7 +407,7 @@ function deleteItem(index) {
 .laporan-button {
   padding: 6px 12px;
   font-size: 0.8rem;
-  background-color: #7d726a;
+  background-color: #a59f9f;
   color: white;
   border: none;
   border-radius: 6px;
@@ -409,21 +417,21 @@ function deleteItem(index) {
 }
 
 .laporan-button.add {
-  background-color: #4caf50;
-  padding: 0.6rem;
-  font-size: 1rem;
+  background-color: #31d249;
+  padding: 0.4rem;
+  font-size: 0.8rem;
   margin-bottom: 0.5rem;
 }
 .laporan-button.save {
-  background-color: #4caf50;
+  background-color: #31d249;
 }
 .laporan-button.add:hover,
 .laporan-button.save:hover {
-  background-color: #45a049;
+  background-color: #27c04d;
 }
 
 .laporan-button:hover {
-  background-color: #b39779;
+  background-color: #bdbdbd;
 }
 
 .laporan-button.edit {
@@ -435,7 +443,7 @@ function deleteItem(index) {
 }
 
 .laporan-button.delete {
-  background-color: #f44336;
+  background-color: #e74c3c;
 }
 
 .laporan-button.delete:hover {
@@ -644,7 +652,7 @@ textarea {
   }
 
   .laporan-table {
-    min-width: 900px; /* naikkan minimal width tabel */
+    min-width: 900px;
   }
 
   .table-wrapper {

@@ -134,7 +134,6 @@ const showWarningTitle = ref(false) // Tambahan jika ingin popup judul kosong
 const nip = localStorage.getItem('nip');
 
 const router = useRouter()
-const emit = defineEmits(['back'])
 
 function handleFileUpload(event) {
   const file = event.target.files[0]
@@ -210,8 +209,6 @@ async function saveToDatabase(imageData, titleText, descriptionText) {
   });
 }
 
-
-
 function resetForm() {
   showSuccess.value = false
   previewImage.value = null
@@ -220,12 +217,12 @@ function resetForm() {
 }
 
 const goBack = () => {
-  emit('back')
+  router.push('home')
 }
 
 function confirmBack() {
   showConfirmBack.value = false
-  router.push('/dashboard')
+  router.push('home')
 }
 </script>
 
@@ -287,8 +284,9 @@ function confirmBack() {
   padding: 1rem;
   border-radius: 20px 20px 0 0;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  height: 100%;
-  width: 100vw;
+  height: 100vh;
+  width: 100%;
+  overflow-y: auto;
   box-sizing: border-box;
 }
 
@@ -312,14 +310,14 @@ function confirmBack() {
   background: #c5c5c5;
   text-align: center;
   cursor: pointer;
-  width: 60%;
+  width: 40%;
   margin: 0 auto;
   position: relative;
 }
 
 .upload-box {
   width: 100%;
-  height: 100px;
+  height: auto;
   border-radius: 8px;
   overflow: hidden;
   display: flex;
@@ -352,7 +350,8 @@ function confirmBack() {
 
 .preview-image {
   width: 100%;
-  height: 100px;
+  height: 350px;
+  object-fit: cover;
 }
 
 .title-wrapper {
@@ -427,18 +426,16 @@ function confirmBack() {
     display: none;
   }
   .form-upload {
-    height: 100%;
     box-sizing: border-box;
-    min-height: calc(100vh - 84px);
     width: 100%;
-    max-width: 800%;
   }
   .title {
     text-align: start;
     font-size: 1.5rem;
   }
   .submit-button {
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
+    width: 25%;
   }
 }
 </style>

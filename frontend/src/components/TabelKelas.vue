@@ -229,7 +229,7 @@ const filteredData = computed(() => {
   }
 
   if (selectedTahunAjaran.value !== 'Semua') {
-    data = data.filter((siswa) => 
+    data = data.filter((siswa) =>
       (siswa.tahunAjaran?.id || siswa.tahun_ajaran?.id) == selectedTahunAjaran.value
     )
   }
@@ -371,7 +371,7 @@ function deleteActivity() {
 }
 
 const goBack = () => {
-  router.back()
+  router.push('home')
 }
 
 watch([activeTab, selectedTahunAjaran], () => {
@@ -412,12 +412,13 @@ watch([activeTab, selectedTahunAjaran], () => {
 
 .top-bar h1 {
   margin: 0;
-  color: #2c3930;
-  font-size: 1.5rem;
+  color: #000;
+  font-size: 1.3rem;
+  font-weight: bold;
 }
 
 .add-class-button {
-  background-color: #31ce63;
+  background-color: #31d249;
   color: white;
   border: none;
   padding: 8px 16px;
@@ -427,7 +428,7 @@ watch([activeTab, selectedTahunAjaran], () => {
 }
 
 .add-class-button:hover {
-  background-color: #1ae04c;
+  background-color: #27c04d;
 }
 
 /* Tabs */
@@ -445,18 +446,17 @@ watch([activeTab, selectedTahunAjaran], () => {
   cursor: pointer;
   font-weight: bold;
   font-size: 16px;
-  color: #666;
+  color: #000;
   transition: all 0.2s;
 }
 
 .tab-button:hover {
-  background-color: #d8e3f3;
+  background-color: #e5e5e5;
 }
 
 .tab-button.active {
-  border-bottom: 3px solid #3f8efc;
-  color: #3f8efc;
-  background-color: #e5e5e5;
+  border-bottom: 3px solid #27c04d;
+  color: #27c04d;
 }
 
 .filter-bar {
@@ -544,12 +544,12 @@ watch([activeTab, selectedTahunAjaran], () => {
 }
 
 .modal-buttons .btn-save {
-  background-color: #31ce63;
+  background-color: #31d249;
   color: white;
 }
 
 .modal-buttons .btn-save:hover {
-  background-color: #1ae04c;
+  background-color: #27c04d;
 }
 
 .promote-button {

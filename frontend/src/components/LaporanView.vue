@@ -42,7 +42,7 @@
                   {{ kelas.class }}
                 </option>
               </select>
-            
+
               <select v-model="selectedSiswa" required :disabled="!selectedKelas">
                 <option value="" disabled>Pilih Siswa</option>
                 <option v-for="siswa in siswaOptions" :key="siswa.id_child" :value="siswa.id_child">
@@ -69,7 +69,7 @@
               <button type="submit" class="laporan-button save" :disabled="!formData.file">
                 {{ isEditing ? 'Simpan Perubahan' : 'Unggah' }}
               </button>
-              <button type="button" class="laporan-button delete" @click="cancelForm">Batal</button>
+              <button type="button" class="laporan-button" @click="cancelForm">Batal</button>
             </div>
           </form>
         </div>
@@ -109,7 +109,7 @@
               </td>
 
               <td>
-                <button class="laporan-button">Unduh</button>
+                <button class="laporan-button unduh">Unduh</button>
                 <button class="laporan-button edit" @click="editLaporan(index)">Edit</button>
                 <button class="laporan-button delete" @click="hapusLaporan(index)">Hapus</button>
               </td>
@@ -286,7 +286,7 @@ const submitForm = async () => {
     if (isEditing.value && editingIndex.value !== null) {
       // Edit laporan (PUT)
       const laporan = daftarLaporan.value[editingIndex.value]
-      form.append('_method', 'PUT') 
+      form.append('_method', 'PUT')
       await axios.post(`http://localhost:8000/api/laporan/${laporan.id}`, form, {} )
       alert('Laporan berhasil diupdate!')
     } else {
@@ -372,7 +372,7 @@ const konfirmasiHapus = () => {
 }
 
 const goBack = () => {
-  router.back()
+  router.back('home')
 }
 
 const user = JSON.parse(localStorage.getItem('user') || '{}')
@@ -450,29 +450,73 @@ const getTeacherIdByNip = async (nip) => {
 .title {
   text-align: center;
   font-weight: bold;
-  color: #1f3a2d;
+  color: #000;
   font-size: 1.3rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .table-wrapper {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .laporan-table {
   width: 100%;
   border-collapse: collapse;
   background: #fff;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  table-layout: fixed;
+  min-width: 1000px;
+  color: #000;
 }
 
 .laporan-table th,
 .laporan-table td {
-  padding: 0.75rem;
+  border: 1px solid #ccc;
+  padding: 6px 8px;
   text-align: left;
-  border-bottom: 1px solid #e0e0e0;
-  color: #000;
+  word-break: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
 }
+
+.laporan-table th:nth-child(1),
+.laporan-table td:nth-child(1) {
+  width: 5%;
+}
+
+.laporan-table th:nth-child(2),
+.laporan-table td:nth-child(2) {
+  width: 25%;
+}
+
+.laporan-table th:nth-child(3),
+.laporan-table td:nth-child(3) {
+  width: 15%;
+}
+
+.laporan-table th:nth-child(4),
+.laporan-table td:nth-child(4) {
+  width: 12%;
+}
+
+.laporan-table th:nth-child(5),
+.laporan-table td:nth-child(5) {
+  width: 15%;
+}
+
+.laporan-table th:nth-child(6),
+.laporan-table td:nth-child(6) {
+  width: 20%;
+}
+
+.laporan-table th:nth-child(7),
+.laporan-table td:nth-child(7) {
+  width: 25%;
+}
+
 
 .laporan-table th {
   background-color: #f2f2f2;
@@ -487,7 +531,7 @@ const getTeacherIdByNip = async (nip) => {
 .laporan-button {
   padding: 6px 12px;
   font-size: 0.8rem;
-  background-color: #7d726a;
+  background-color: #a59f9f;
   color: white;
   border: none;
   border-radius: 6px;
@@ -497,22 +541,24 @@ const getTeacherIdByNip = async (nip) => {
 }
 
 .laporan-button.add {
-  background-color: #4caf50;
-  padding: 0.6rem;
-  font-size: 1rem;
+  padding: 0.4rem;
+  font-size: 0.8rem;
   margin-bottom: 0.5rem;
 }
 
-.laporan-button.save {
-  background-color: #4caf50;
+.laporan-button.add,
+.laporan-button.save,
+.laporan-button.unduh {
+  background-color: #31d249;
 }
 .laporan-button.add:hover,
-.laporan-button.save:hover {
-  background-color: #45a049;
+.laporan-button.save:hover,
+.laporan-button.unduh {
+  background-color: #27c04d;
 }
 
 .laporan-button:hover {
-  background-color: #b39779;
+  background-color: #bdbdbd;
 }
 
 .laporan-button.edit {
@@ -524,7 +570,7 @@ const getTeacherIdByNip = async (nip) => {
 }
 
 .laporan-button.delete {
-  background-color: #f44336;
+  background-color: #e74c3c;
 }
 
 .laporan-button.delete:hover {
@@ -659,7 +705,37 @@ const getTeacherIdByNip = async (nip) => {
 
   .title {
     text-align: start;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+  }
+
+  .laporan-table th:nth-child(1),
+  .laporan-table td:nth-child(1) {
+    width: 3%;
+  }
+
+  .laporan-table th:nth-child(2),
+  .laporan-table td:nth-child(2) {
+    width: 20%;
+  }
+
+  .laporan-table th:nth-child(3),
+  .laporan-table td:nth-child(3) {
+    width: 10%;
+  }
+
+  .laporan-table th:nth-child(4),
+  .laporan-table td:nth-child(4) {
+    width: 8%;
+  }
+
+  .laporan-table th:nth-child(5),
+  .laporan-table td:nth-child(5) {
+    width: 10%;
+  }
+
+  .laporan-table th:nth-child(7),
+  .laporan-table td:nth-child(7) {
+    width: 20%;
   }
 }
 </style>

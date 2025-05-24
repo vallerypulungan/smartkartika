@@ -29,7 +29,7 @@ const routes = [
       children: [
       { path: 'home', name: 'home', component: MainHome },
       { path: 'upload', name: 'upload', component: LaporanView },
-      { path: 'ulpoadNews', name: 'uploadNews', component: UpNews },
+      { path: 'upberita', name: 'upberita', component: UpNews },
       { path: 'manage', name: 'manage', component: KelolaKegiatan },
       { path: 'kelas', name: 'kelas', component: TabelKelas},
       { path : 'infosiswa', name: 'infosiswa', component: InformasiSiswa},
