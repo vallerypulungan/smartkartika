@@ -46,4 +46,6 @@ Route::post('/laporan', [LaporanController::class, 'store']);
 Route::get('/laporan', [LaporanController::class, 'index']); // opsional: untuk list semua laporan
 Route::get('/laporan/anak/{id_child}', [LaporanController::class, 'byChild']); // laporan per anak
 Route::get('/laporan/ortu/{id_parent}', [LaporanController::class, 'byParent']); // laporan per ortu
+Route::put('/laporan/{id}', [LaporanController::class, 'update']); // Edit laporan
+Route::delete('/laporan/{id}', [LaporanController::class, 'destroy']); // Hapus laporan
 

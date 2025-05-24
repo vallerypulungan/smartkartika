@@ -66,7 +66,7 @@
               <input type="file" name="file" @change="handleFile" accept="application/pdf" />
             </label>
             <div class="modal-actions">
-              <button type="submit" class="laporan-button save">
+              <button type="submit" class="laporan-button save" :disabled="!formData.file">
                 {{ isEditing ? 'Simpan Perubahan' : 'Unggah' }}
               </button>
               <button type="button" class="laporan-button delete" @click="cancelForm">Batal</button>
@@ -145,10 +145,14 @@ async function fetchLaporan() {
     const res = await axios.get('http://localhost:8000/api/laporan')
     // Mapping agar tabel mudah dibaca
     daftarLaporan.value = res.data.data.map(laporan => ({
-      nama: laporan.child?.name || '-', // Nama anak
+      id: laporan.id,
+      nama: laporan.child?.name || '-',
       nis: laporan.child?.nis || '-',
       kelas: laporan.class?.class || '-',
-      tahunAjaran: laporan.child?.id_tahun_ajaran || '-', // Tampilkan id tahun ajaran (atau mapping manual ke nama)
+      kelas_id: laporan.class?.id_class,
+      // Tampilkan nama tahun ajaran, bukan id
+      tahunAjaran: laporan.child?.tahun_ajaran?.nama || '-', // <-- ini yang diubah
+      id_child: laporan.child?.id_child,
       file: laporan.file,
       fileName: laporan.file ? laporan.file.split('/').pop() : '',
     }))
@@ -270,27 +274,36 @@ const fileNameDisplay = computed(() => formData.value.file?.name || 'Pilih File'
 
 const submitForm = async () => {
   try {
-    const siswa = siswaOptions.value.find(s => s.id_child == selectedSiswa.value)
-    // Ambil id_teacher dari NIP
-    const idTeacher = await getTeacherIdByNip(selectedNip.value)
-    if (!idTeacher) {
-      alert('Guru dengan NIP tersebut tidak ditemukan!')
+    if (!formData.value.file) {
+      alert('Silakan pilih file PDF terlebih dahulu!')
       return
     }
+    const siswa = siswaOptions.value.find(s => s.id_child == selectedSiswa.value)
+    const idTeacher = await getTeacherIdByNip(selectedNip.value)
     const form = new FormData()
-    form.append('id_teacher', idTeacher)
-    form.append('id_class', selectedKelas.value)
-    form.append('id_parent', siswa?.id_parent)
-    form.append('id_child', selectedSiswa.value)
     form.append('file', formData.value.file)
-    await axios.post('http://localhost:8000/api/laporan', form)
-    alert('Laporan berhasil diunggah!')
+
+    if (isEditing.value && editingIndex.value !== null) {
+      // Edit laporan (PUT)
+      const laporan = daftarLaporan.value[editingIndex.value]
+      form.append('_method', 'PUT') 
+      await axios.post(`http://localhost:8000/api/laporan/${laporan.id}`, form, {} )
+      alert('Laporan berhasil diupdate!')
+    } else {
+      // Tambah laporan (POST)
+      form.append('id_teacher', idTeacher)
+      form.append('id_class', selectedKelas.value)
+      form.append('id_parent', siswa?.id_parent)
+      form.append('id_child', selectedSiswa.value)
+      await axios.post('http://localhost:8000/api/laporan', form)
+      alert('Laporan berhasil diunggah!')
+    }
     formVisible.value = false
     resetForm()
     await fetchLaporan()
   } catch (err) {
-    console.error('Gagal upload laporan:', err)
-    alert('Gagal upload laporan: ' + (err.response?.data?.message || err.message))
+    console.error('Gagal upload/update laporan:', err)
+    alert('Gagal upload/update laporan: ' + (err.response?.data?.message || err.message))
   }
 }
 
@@ -315,17 +328,18 @@ const editLaporan = (index) => {
   const laporan = daftarLaporan.value[index]
   isRestoring.value = true
 
-  formData.value.tahunAjaran = laporan.tahunAjaran
-  formData.value.kelas = laporan.kelas
-  formData.value.nama = laporan.nama
-  formData.value.nis = laporan.nis
-  formData.value.file = laporan.file
-  formData.value.fileName = laporan.fileName
-  editingIndex.value = index
-  isEditing.value = true
-  formVisible.value = true
+  // Set dropdown ke id asli
+  selectedTahunAjaran.value = laporan.tahunAjaran // ini harus id tahun ajaran
+  selectedKelas.value = laporan.kelas_id || laporan.kelasId || laporan.kelas // pastikan ini id_class
+  selectedSiswa.value = laporan.id_child || laporan.siswa_id || laporan.nis // pastikan ini id_child
 
-  // Matikan flag setelah data dipulihkan
+  // Kosongkan file, user harus upload ulang
+  formData.value.file = null
+  formData.value.fileName = ''
+  editingIndex.value = index
+
+  showForm('edit')
+
   setTimeout(() => {
     isRestoring.value = false
   }, 0)
@@ -336,9 +350,17 @@ const cancelForm = () => {
   resetForm()
 }
 
-const hapusLaporan = (index) => {
-  indexToDelete.value = index
-  confirmVisible.value = true
+const hapusLaporan = async (index) => {
+  const laporan = daftarLaporan.value[index]
+  if (confirm('Yakin ingin menghapus laporan ini?')) {
+    try {
+      await axios.delete(`http://localhost:8000/api/laporan/${laporan.id}`)
+      daftarLaporan.value.splice(index, 1)
+      alert('Laporan berhasil dihapus!')
+    } catch (err) {
+      alert('Gagal menghapus laporan: ' + (err.response?.data?.message || err.message))
+    }
+  }
 }
 
 const konfirmasiHapus = () => {
