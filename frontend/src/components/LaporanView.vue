@@ -139,6 +139,29 @@ import axios from 'axios'
 
 const router = useRouter()
 const daftarLaporan = ref([])
+
+async function fetchLaporan() {
+  try {
+    const res = await axios.get('http://localhost:8000/api/laporan')
+    // Mapping agar tabel mudah dibaca
+    daftarLaporan.value = res.data.data.map(laporan => ({
+      nama: laporan.child?.name || '-', // Nama anak
+      nis: laporan.child?.nis || '-',
+      kelas: laporan.class?.class || '-',
+      tahunAjaran: laporan.child?.id_tahun_ajaran || '-', // Tampilkan id tahun ajaran (atau mapping manual ke nama)
+      file: laporan.file,
+      fileName: laporan.file ? laporan.file.split('/').pop() : '',
+    }))
+  } catch (err) {
+    console.error('Gagal mengambil daftar laporan:', err)
+  }
+}
+
+// Panggil saat mounted dan setelah upload
+onMounted(() => {
+  fetchLaporan()
+})
+
 const formVisible = ref(false)
 const isEditing = ref(false)
 const editingIndex = ref(null)
@@ -264,6 +287,7 @@ const submitForm = async () => {
     alert('Laporan berhasil diunggah!')
     formVisible.value = false
     resetForm()
+    await fetchLaporan()
   } catch (err) {
     console.error('Gagal upload laporan:', err)
     alert('Gagal upload laporan: ' + (err.response?.data?.message || err.message))

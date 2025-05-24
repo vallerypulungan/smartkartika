@@ -39,7 +39,7 @@ class LaporanController extends Controller
     // List semua laporan
     public function index()
     {
-        $laporan = Report::with(['child', 'parent', 'teacher', 'class'])->get();
+        $laporan = Report::with(['child.tahunAjaran', 'parent', 'teacher', 'class'])->get();
         return response()->json(['data' => $laporan]);
     }
 
