@@ -1,7 +1,7 @@
 <template>
   <div class="popup-overlay">
     <div class="popup-container">
-      <h2>{{ title }}</h2>
+      <h2 v-html="title"></h2>
       <button class="popup-button" @click="$emit('close')">OKE</button>
     </div>
   </div>

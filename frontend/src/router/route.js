@@ -24,10 +24,10 @@ const routes = [
   { path: '/auth', name: 'auth', component: loginPage },
   { path: '/berita', name: 'home', component: MainHome },
   { path: '/login', name: 'login', component: FormPswd },
-  { path: '/profil', name: 'profil', component: ProfilView },
   { path: '/dashboard-guru', name: 'dashboardGuru', component: DashboardGuru,
-      children: [
+    children: [
       { path: 'home', name: 'home', component: MainHome },
+      { path: 'profil', name: 'profil', component: ProfilView },
       { path: 'upload', name: 'upload', component: LaporanView },
       { path: 'upberita', name: 'upberita', component: UpNews },
       { path: 'manage', name: 'manage', component: KelolaKegiatan },

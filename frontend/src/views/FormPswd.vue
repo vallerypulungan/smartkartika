@@ -3,6 +3,8 @@
     <!-- Versi Mobile -->
     <div class="mobile-panel">
       <div class="atas">
+        <h2>SMARTKARTIKA</h2>
+        <p>Semua Kegiatan Dapat Kemudahan</p>
       </div>
       <div class="bawah">
         <h2>Masuk Ke Smartkartika</h2>
@@ -13,94 +15,102 @@
             v-model="username"
             type="username"
             class="input-box"
+            placeholder="Username"
+            required
           />
           <label for="password-input" class="input-label">Kode</label>
-          <input
-            id="password-input"
-            v-model="password"
-            type="password"
-            class="input-box"
-          />
-          <!-- <a href="#" class="forgot-password">Lupa kode role?</a> -->
+          <div class="password-wrapper">
+            <input
+              id="password-input"
+              v-model="password"
+              :type="showPassword ? 'text' : 'password'"
+              class="input-box"
+              placeholder="Password"
+              required
+            />
+            <button type="button" class="toggle-password" @click="showPassword = !showPassword">
+              <img :src="showPassword ? eyeOff : eye" alt="Toggle Password" />
+            </button>
+          </div>
         </div>
 
         <button @click="handleLogin" class="login-button">Masuk</button>
-
+        <div class="login-redirect">
+          <span>
+            Belum punya akun?
+            <router-link to="/registerteach" class="login-link">Daftar di sini (Guru)</router-link>
+          </span>
+        </div>
       </div>
     </div>
+    <PopupMessage
+      v-if="showAlert"
+      :title="'Login gagal. <br>Periksa username dan password.'"
+      @close="showAlert = false"
+    />
   </div>
 </template>
 
-<script>
-import { ref } from 'vue';
-import axios from 'axios';
-import { useRouter } from 'vue-router';
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+import eye from '@/assets/eye.png'
+import eyeOff from '@/assets/eye-off.png'
+import PopupMessage from '@/components/MessagePopup.vue'
 
+const router = useRouter()
+const showAlert = ref(false)
+const showPassword = ref(false)
+const username = ref('')
+const password = ref('')
 
-export default {
-  setup() {
-    const router = useRouter();
-    const username = ref('');
-    const password = ref('');
+const handleLogin = async () => {
+  try {
+    const response = await axios.post('http://localhost:8000/api/login', {
+      username: username.value,
+      password: password.value
+    })
 
-    const handleLogin = async () => {
-      try {
-        const response = await axios.post('http://localhost:8000/api/login', {
-          username: username.value,
-          password: password.value
-        });
+    if (response.data.status === 'success') {
+      localStorage.setItem('userName', response.data.name)
+      alert(response.data.message)
 
-        if (response.data.status === 'success') {
-          
-          localStorage.setItem('userName', response.data.name);
-          alert(response.data.message);
+      localStorage.setItem('isLoggedIn', 'true')
+      localStorage.setItem('role', response.data.role)
 
-          localStorage.setItem('isLoggedIn', 'true');
-          localStorage.setItem('role', response.data.role);
-
-          // Cek role untuk menentukan ke mana diarahkan
-          if (response.data.role === 'guru') {
-            localStorage.setItem('user', JSON.stringify({
-              name: response.data.name,
-              email: response.data.email,
-              nip: response.data.nip,
-              telepon: response.data.num_telp // pastikan backend mengirim num_telp
-            }))
-            localStorage.setItem('userName', response.data.name)
-            router.push('/dashboard-guru');
-          } else if (response.data.role === 'ortu') {
-
-            localStorage.setItem('user', JSON.stringify({
-              id_parent: response.data.id_parent,
-              username: response.data.username,
-              email: response.data.email,
-              name: response.data.name,
-              num_telp: response.data.num_telp,
-              alamat: response.data.alamat
-            }))
-            localStorage.setItem('userName', response.data.name)
-            router.push('/dashboardortu')
-          }
-          localStorage.setItem('nip', response.data.nip);
-          localStorage.setItem('id_teacher', response.data.id_teacher)
-
-        }
-      } catch (error) {
-        alert('Login gagal. Periksa username dan password.');
+      if (response.data.role === 'guru') {
+        localStorage.setItem('user', JSON.stringify({
+          name: response.data.name,
+          email: response.data.email,
+          nip: response.data.nip,
+          telepon: response.data.num_telp // pastikan backend mengirim num_telp
+        }))
+        localStorage.setItem('userName', response.data.name)
+        router.push('/dashboard-guru')
+      } else if (response.data.role === 'ortu') {
+        localStorage.setItem('user', JSON.stringify({
+          id_parent: response.data.id_parent,
+          username: response.data.username,
+          email: response.data.email,
+          name: response.data.name,
+          num_telp: response.data.num_telp,
+          alamat: response.data.alamat
+        }))
+        localStorage.setItem('userName', response.data.name)
+        router.push('/dashboardortu')
       }
-    };
 
-    return {
-      username,
-      password,
-      handleLogin
-    };
+      localStorage.setItem('nip', response.data.nip)
+      localStorage.setItem('id_teacher', response.data.id_teacher)
+    }
+  } catch (error) {
+    showAlert.value = true
   }
 }
 </script>
 
 <style scoped>
-/* Layout Dasar */
 .container {
   display: flex;
   height: 100vh;
@@ -112,13 +122,11 @@ export default {
 }
 
 .mobile-panel .atas {
-  flex: 1;
-  background-size: cover;
-  background-position: center;
+  display: none;
 }
 
 .mobile-panel .bawah {
-  flex:1;
+  flex: 1;
   background-color: white;
   width: 100%;
   display: flex;
@@ -127,13 +135,12 @@ export default {
   justify-content: center;
   padding: 20px;
   margin: 0;
-  border-top-left-radius: 40px;
-  border-top-right-radius: 40px;
+  border-radius: 0;
 }
 
 .mobile-panel .bawah h2 {
-  font-size: 1.8rem;
-  font-weight: 900;
+  font-size: 1.5rem;
+  font-weight: 600;
   color: #000;
   margin-top: 0;
   margin-bottom: 50px;
@@ -145,14 +152,14 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: 100%;
+  width: 80%;
   margin-bottom: 20px;
 }
 
 .mobile-panel .input-label {
   color: #000;
   font-size: 14px;
-  margin-bottom: 10px;
+  margin-bottom: 7px;
 }
 
 .mobile-panel .input-box {
@@ -160,19 +167,37 @@ export default {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  margin-bottom: 1rem;
 }
 
-.mobile-panel .forgot-password {
+.mobile-panel .input-box:focus::placeholder {
+  color: transparent;
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-wrapper input {
+  flex: 1;
+}
+
+.toggle-password {
   position: absolute;
-  bottom: -20px;
-  right: 0;
-  font-size: 12px;
-  color: #2c3930;
-  text-decoration: none;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
 }
 
-.mobile-panel .forgot-password:hover {
-  text-decoration: underline;
+.toggle-password img {
+  width: 12px;
+  height: 12px;
+  margin-bottom: 0.7rem;
 }
 
 .mobile-panel .login-button {
@@ -183,12 +208,28 @@ export default {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  width: 80%;
-
+  width: 50%;
+  margin-bottom: 1rem;
 }
 
 .mobile-panel .login-button:hover {
   background-color: #1f2922;
+}
+
+.login-redirect {
+  text-align: center;
+  font-size: 12px;
+  color: #000;
+}
+
+.login-link {
+  color: #2c3930;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.login-link:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 768px) {
@@ -216,24 +257,60 @@ export default {
     flex-direction: row;
     width: 100%;
     height: 100vh;
+    background-color: #2c3930;
   }
 
   .mobile-panel .atas {
-    width: 50%;
-    background-size: cover;
-    background-position: center;
+    flex: 1;
+    width: 100%;
+    background-color: #2c3930;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
   }
 
   .mobile-panel .bawah {
-    width: 50%;
+    flex: 2;
+    width: 100%;
+    max-width: 750px;
     background-color: white;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 40px;
+    padding: 2rem;
     border-radius: 0;
-    border-top-left-radius: 40px;
-    border-bottom-left-radius: 40px;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+  }
+
+  .mobile-panel .bawah h2 {
+    font-size: 1.5rem;
+  }
+
+  .mobile-panel .input-container {
+    width: 70%;
+  }
+
+  .mobile-panel .login-button {
+    width: 40%;
+  }
+  .login-redirect {
+    margin-top: 0.5rem;
+    text-align: center;
+    font-size: 14px;
+    color: #000;
+  }
+
+  .login-link {
+    color: #2c3930;
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  .login-link:hover {
+    text-decoration: underline;
   }
 }
 </style>
