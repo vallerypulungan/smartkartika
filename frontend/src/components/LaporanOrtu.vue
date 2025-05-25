@@ -17,8 +17,6 @@
     <div class="form-laporan">
       <h2 class="title">Daftar Laporan Siswa</h2>
       <h2 class="title nama">{{ siswa.nama }} - {{ siswa.nis }}</h2>
-
-      <!-- Tabel -->
       <div class="table-wrapper">
         <table class="laporan-table">
           <thead>
@@ -36,7 +34,7 @@
               <td>{{ laporan.kelas }}</td>
               <td>{{ laporan.tahunAjaran }}</td>
               <td>
-                <a v-if="laporan.file" :href="getFileUrl(laporan.file)" target="_blank">
+                <a v-if="laporan.file" :href="laporan.file" target="_blank">
                   {{ laporan.fileName || 'Lihat File' }}
                 </a>
                 <span v-else>-</span>
@@ -66,35 +64,47 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import ConfirmModal from '@/components/BlokPopup.vue'
+import axios from 'axios'
 
 const router = useRouter()
-
-// Contoh data siswa dan laporan
-const siswa = ref({
-  nama: 'Ani',
-  nis: '001',
-})
-
-const daftarLaporan = ref([
-  {
-    kelas: '1A',
-    tahunAjaran: '2022/2023',
-    file: null,
-    fileName: 'laporan_ani.pdf',
-  },
-  {
-    kelas: '1A',
-    tahunAjaran: '2022/2023',
-    file: null,
-    fileName: 'rapor_ani_semester2.pdf',
-  },
-])
-
+const siswa = ref({ nama: '', nis: '' })
+const daftarLaporan = ref([])
 const confirmUnduh = ref(false)
 const indexToUnduh = ref(null)
+
+// Ambil id_parent dari localStorage
+let userStorage = {}
+try {
+  userStorage = JSON.parse(localStorage.getItem('user') || '{}')
+} catch (e) {
+  userStorage = {}
+}
+
+onMounted(async () => {
+  // Ambil data anak ortu yang login
+  if (userStorage.id_parent) {
+    const anakRes = await axios.get(`http://localhost:8000/api/children?parent=${userStorage.id_parent}`)
+    if (anakRes.data.data.length > 0) {
+      // Ambil anak pertama (atau tampilkan semua dengan v-for jika ingin)
+      const anak = anakRes.data.data[0]
+      siswa.value = {
+        nama: anak.name,
+        nis: anak.nis
+      }
+      // Ambil laporan berdasarkan id_child
+      const laporanRes = await axios.get(`http://localhost:8000/api/laporan/anak/${anak.id_child}`)
+      daftarLaporan.value = laporanRes.data.data.map(laporan => ({
+        kelas: laporan.class?.class || '-',
+        tahunAjaran: laporan.child?.tahun_ajaran?.nama || '-', // <-- ini penting!
+        file: laporan.file,
+        fileName: laporan.file ? laporan.file.split('/').pop() : '',
+      }))
+    }
+  }
+})
 
 const tampilkanKonfirmasi = (index) => {
   indexToUnduh.value = index
@@ -104,21 +114,12 @@ const tampilkanKonfirmasi = (index) => {
 const konfirmasiUnduh = () => {
   const laporan = daftarLaporan.value[indexToUnduh.value]
   if (laporan.file) {
-    window.open(getFileUrl(laporan.file), '_blank')
+    window.open(laporan.file, '_blank')
   } else {
     alert('File tidak tersedia.')
   }
   confirmUnduh.value = false
   indexToUnduh.value = null
-}
-
-const getFileUrl = (file) => {
-  try {
-    return file ? URL.createObjectURL(file) : ''
-  } catch (e) {
-    console.error('Gagal membuat URL file:', e)
-    return ''
-  }
 }
 
 const goBack = () => {

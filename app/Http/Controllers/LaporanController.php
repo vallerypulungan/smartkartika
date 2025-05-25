@@ -46,7 +46,7 @@ class LaporanController extends Controller
     // Laporan berdasarkan anak
     public function byChild($id_child)
     {
-        $laporan = Report::with(['teacher', 'class', 'parent'])
+        $laporan = Report::with(['teacher', 'class', 'parent', 'child.tahunAjaran'])
             ->where('id_child', $id_child)
             ->get();
         return response()->json(['data' => $laporan]);

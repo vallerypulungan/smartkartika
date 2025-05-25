@@ -109,7 +109,7 @@
               </td>
 
               <td>
-                <button class="laporan-button unduh">Unduh</button>
+                <button class="laporan-button unduh" @click="unduhLaporan(index)">Unduh</button>
                 <button class="laporan-button edit" @click="editLaporan(index)">Edit</button>
                 <button class="laporan-button delete" @click="hapusLaporan(index)">Hapus</button>
               </td>
@@ -383,6 +383,15 @@ const getTeacherIdByNip = async (nip) => {
   const res = await axios.get('http://localhost:8000/api/teachers', { params: { nip } })
   // Pastikan endpoint ini mengembalikan array guru, ambil id_teacher pertama yang cocok
   return res.data.data[0]?.id_teacher || ''
+}
+
+const unduhLaporan = (index) => {
+  const laporan = daftarLaporan.value[index]
+  if (laporan.file) {
+    window.open(laporan.file, '_blank')
+  } else {
+    alert('File tidak tersedia.')
+  }
 }
 </script>
 

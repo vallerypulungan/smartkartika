@@ -1,42 +1,44 @@
 <template>
   <div class="container-auth">
-    <div class="atas" v-if="isMobile"></div>
-    <div class="bawah-wrapper">
-      <div class="panel">
-        <h2>Daftar Sebagai Guru</h2>
+    <div class="panel">
+      <h2>Daftar Sebagai Guru</h2>
+      <form @submit.prevent="handleRegister">
         <div class="input-container">
           <label class="input-label">Nama</label>
           <input v-model="form.name" type="text" class="input-box" required />
+
           <label class="input-label">NIP</label>
           <input v-model="form.nip" type="text" class="input-box" required />
+
           <label class="input-label">Email</label>
           <input v-model="form.email" type="email" class="input-box" required />
+
           <label class="input-label">Password</label>
           <input v-model="form.password" type="password" class="input-box" required />
+
           <label class="input-label">No Telepon</label>
-          <input v-model="form.phone" type="text" class="input-box" required />
+          <input v-model="form.num_telp" type="text" class="input-box" required />
         </div>
         <div class="login-wrapper">
-          <button @click="validateAndRegister" class="login-button">Daftar</button>
+          <button type="submit" class="login-button">Daftar</button>
         </div>
-        <div class="login-redirect">
-          <span
-            >Sudah punya akun?
-            <router-link to="/login" class="login-link">Masuk di sini</router-link></span
-          >
-        </div>
+      </form>
+      <div class="login-redirect">
+        <span>
+          Sudah punya akun?
+          <router-link to="/login" class="login-link">Masuk di sini</router-link>
+        </span>
       </div>
+      <Popup v-if="showPopup" :title="popupMessage" @close="showPopup = false" />
     </div>
-    <Popup v-if="showPopup" :title="popupMessage" @close="showPopup = false" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import axios from 'axios'
 import Popup from '@/components/MessagePopup.vue'
 
-const isMobile = ref(true)
 const showPopup = ref(false)
 const popupMessage = ref('')
 
@@ -45,33 +47,27 @@ const form = ref({
   nip: '',
   email: '',
   password: '',
-  phone: '',
+  num_telp: '',
 })
 
-const validateAndRegister = () => {
-  const { name, nip, email, password, phone } = form.value
-  if (!name || !nip || !email || !password || !phone) {
+const handleRegister = async () => {
+  // Validasi sederhana
+  if (!form.value.name || !form.value.nip || !form.value.email || !form.value.password || !form.value.num_telp) {
     popupMessage.value = 'Harap isi semua kolom terlebih dahulu.'
     showPopup.value = true
     return
   }
-  handleRegister()
-}
-
-const handleRegister = async () => {
   try {
-    const response = await axios.post('http://localhost:8000/api/register-teacher', form.value)
-    popupMessage.value = response.data.message
+    const response = await axios.post('http://localhost:8000/api/teachers', form.value)
+    popupMessage.value = response.data.message || 'Registrasi berhasil.'
     showPopup.value = true
+    // Reset form jika ingin
+    form.value = { name: '', nip: '', email: '', password: '', num_telp: '' }
   } catch (err) {
-    popupMessage.value = 'Registrasi gagal.'
+    popupMessage.value = err.response?.data?.message || 'Registrasi gagal.'
     showPopup.value = true
   }
 }
-
-onMounted(() => {
-  isMobile.value = window.innerWidth < 768
-})
 </script>
 
 <style scoped>
