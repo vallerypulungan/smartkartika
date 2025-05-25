@@ -125,6 +125,9 @@ class ChildController extends Controller
         if ($request->has('tahun')) {
             $query->where('id_tahun_ajaran', $request->tahun);
         }
+        if ($request->has('parent')) {
+            $query->where('id_parent', $request->parent);
+        }
 
         $children = $query->get();
         return response()->json(['data' => $children]);

@@ -5,24 +5,23 @@
       <button class="back-button" @click="goBack">
         <img src="@/assets/arrow-left.png" alt="" />
       </button>
-
-      <p class="username">{{ user.name || 'Pengguna' }}</p>
-      <p class="email">{{ user.email || 'email@gmail.com' }}</p>
+      <p class="username">{{ userName }}</p>
+      <p class="email">{{ userEmail }}</p>
     </div>
 
     <!-- Info Section -->
     <div class="profile-info">
       <div class="info-item">
         <label>Nama</label>
-        <p>{{ user.name || 'Nama Guru' }}</p>
+        <p>{{ userName }}</p>
       </div>
       <div class="info-item">
         <label>NIP</label>
-        <p>{{ user.nip || 'NIP' }}</p>
+        <p>{{ userNip }}</p>
       </div>
       <div class="info-item">
         <label>No Telepon</label>
-        <p>{{ user.telepon || 'No Telepon' }}</p>
+        <p>{{ userTelepon }}</p>
       </div>
     </div>
   </div>
@@ -32,7 +31,20 @@
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const user = JSON.parse(localStorage.getItem('user') || '{}')
+
+// Ambil data guru dari localStorage
+let userStorage = {}
+try {
+  userStorage = JSON.parse(localStorage.getItem('user') || '{}')
+} catch (e) {
+  userStorage = {}
+}
+
+// Mapping ke variabel untuk template
+const userName = userStorage.name || 'Pengguna'
+const userEmail = userStorage.email || 'email@gmail.com'
+const userNip = userStorage.nip || 'NIP'
+const userTelepon = userStorage.telepon || userStorage.num_telp || 'No Telepon'
 
 const goBack = () => {
   router.back()

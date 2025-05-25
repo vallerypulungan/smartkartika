@@ -23,9 +23,11 @@ class LoginController extends Controller
                 'status' => 'success',
                 'role' => 'guru',
                 'name' => $guru->name,
+                'email' => $guru->email,
+                'num_telp' => $guru->num_telp,
+                'nip' => $guru->nip,
                 'message' => 'Login Guru berhasil',
                 'redirect' => '/dashboard-guru',
-                'nip' => $guru->nip
             ]);
         }
     
@@ -35,9 +37,14 @@ class LoginController extends Controller
             return response()->json([
                 'status' => 'success',
                 'role' => 'ortu',
+                'id_parent' => $ortu->id_parent,
                 'name' => $ortu->name,
+                'email' => $ortu->email,
+                'num_telp' => $ortu->num_telp,
+                'alamat' => $ortu->alamat,
+                'username' => $ortu->username,
                 'message' => 'Login Orang Tua berhasil',
-                'redirect' => '/dashboardortu'
+                'redirect' => '/dashboardortu',
             ]);
         }
     

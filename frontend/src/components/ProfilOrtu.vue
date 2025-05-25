@@ -6,37 +6,67 @@
         <img src="@/assets/arrow-left.png" alt="" />
       </button>
 
-      <p class="username">{{ user.username || 'Pengguna' }}</p>
-      <p class="email">{{ user.email || 'email@gmail.com' }}</p>
+      <p class="username">{{ userName }}</p>
+      <p class="email">{{ userEmail || 'email@gmail.com' }}</p>
     </div>
 
     <!-- Info Section -->
     <div class="profile-info">
       <div class="info-item">
         <label>Nama</label>
-        <p>{{ user.wali || 'Nama Wali' }}</p>
+        <p>{{ userName }}</p>
       </div>
       <div class="info-item">
         <label>Nama Siswa</label>
-        <p>{{ user.nama || 'Nama Siswa' }}</p>
+        <p>{{ anak.name || 'Nama Siswa' }}</p>
       </div>
       <div class="info-item">
         <label>No Telepon</label>
-        <p>{{ user.telepon || 'No Telepon' }}</p>
+        <p>{{ userTelp || 'No Telepon' }}</p>
       </div>
       <div class="info-item">
         <label>Alamat</label>
-        <p>{{ user.alamat || 'Alamat' }}</p>
+        <p>{{ userAlamat || 'Alamat' }}</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const user = JSON.parse(localStorage.getItem('user') || '{}')
+const user = ref({})
+const anak = ref({})
+
+// Ambil data ortu dari localStorage
+let userStorage = {}
+try {
+  userStorage = JSON.parse(localStorage.getItem('user') || '{}')
+} catch (e) {
+  userStorage = {}
+}
+const userName = ref(userStorage.name || localStorage.getItem('userName') || 'Pengguna')
+const userEmail = ref(userStorage.email || 'aku')
+const userTelp = ref(userStorage.num_telp || '')
+const userAlamat = ref(userStorage.alamat || '')
+
+onMounted(async () => {
+  if (userStorage.id_parent) {
+    const res = await axios.get(`http://localhost:8000/api/children?parent=${userStorage.id_parent}`)
+    if (res.data.data.length > 0) {
+      anak.value = res.data.data[0]
+      user.value = anak.value.parent
+      // Fallback jika localStorage kosong
+      if (!userName.value) userName.value = user.value.name
+      if (!userEmail.value) userEmail.value = user.value.email
+      if (!userTelp.value) userTelp.value = user.value.num_telp
+      if (!userAlamat.value) userAlamat.value = user.value.alamat
+    }
+  }
+})
 
 const goBack = () => {
   router.back()

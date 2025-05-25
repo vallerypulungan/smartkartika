@@ -51,6 +51,8 @@ export default {
         });
 
         if (response.data.status === 'success') {
+          
+          localStorage.setItem('userName', response.data.name);
           alert(response.data.message);
 
           localStorage.setItem('isLoggedIn', 'true');
@@ -58,11 +60,27 @@ export default {
 
           // Cek role untuk menentukan ke mana diarahkan
           if (response.data.role === 'guru') {
+            localStorage.setItem('user', JSON.stringify({
+              name: response.data.name,
+              email: response.data.email,
+              nip: response.data.nip,
+              telepon: response.data.num_telp // pastikan backend mengirim num_telp
+            }))
+            localStorage.setItem('userName', response.data.name)
             router.push('/dashboard-guru');
           } else if (response.data.role === 'ortu') {
-            router.push('/dashboardortu'); // ke ProfilView.vue
+
+            localStorage.setItem('user', JSON.stringify({
+              id_parent: response.data.id_parent,
+              username: response.data.username,
+              email: response.data.email,
+              name: response.data.name,
+              num_telp: response.data.num_telp,
+              alamat: response.data.alamat
+            }))
+            localStorage.setItem('userName', response.data.name)
+            router.push('/dashboardortu')
           }
-          localStorage.setItem('userName', response.data.name);
           localStorage.setItem('nip', response.data.nip);
           localStorage.setItem('id_teacher', response.data.id_teacher)
 
