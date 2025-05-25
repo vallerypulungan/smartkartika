@@ -43,9 +43,6 @@
             </p>
             <p>Selamat Datang</p>
           </div>
-          <div class="berita-hari-ini">
-            <h3>Berita Utama</h3>
-          </div>
         </div>
         <div v-if="!selectedBerita" class="berita-list">
           <div
@@ -66,14 +63,14 @@
           <!-- Kotak Gambar + Judul + Subjudul -->
           <div class="berita-card">
             <img :src="selectedBerita.image" alt="detail" class="detail-image" />
-            <div class="berita-card-text">
-              <h2 class="detail-title">{{ selectedBerita.title }}</h2>
-              <p class="detail-subtitle">{{ selectedBerita.subtitle }}</p>
-            </div>
           </div>
 
           <!-- Label Deskripsi dan Box -->
           <div class="detail-description">
+            <div class="berita-card-text">
+              <h2 class="detail-title">{{ selectedBerita.title }}</h2>
+              <p class="detail-subtitle">{{ selectedBerita.subtitle }}</p>
+            </div>
             <strong class="description-label">Deskripsi :</strong>
             <div class="description-box">
               <p>{{ selectedBerita.description }}</p>
@@ -167,10 +164,17 @@ window.addEventListener('resize', () => {
   justify-content: flex-end;
 }
 
+.back-button {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
 .back-button img {
-  width: 24px;
-  height: 24px;
-  filter: brightness(0) invert(1);
+  filter: invert(1);
 }
 
 .app-title {
@@ -204,17 +208,17 @@ window.addEventListener('resize', () => {
   top: 0;
   background-color: #fff;
   z-index: 10;
-  min-height: 100px;
+  min-height: 80px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   border-bottom: 1px solid #ccc;
   margin-top: 0;
+  margin-bottom: 0.5rem;
 }
 
 .greeting-text {
   font-size: 0.9rem;
-  margin-bottom: 1rem;
   color: #2c3930;
   margin-left: 0.8rem;
 }
@@ -229,12 +233,6 @@ window.addEventListener('resize', () => {
   color: #2c3930;
 }
 
-.berita-hari-ini h3 {
-  font-size: 0.8rem;
-  font-weight: bold;
-  color: #2c3930;
-  margin-left: 1rem;
-}
 
 /* Berita List */
 .berita-list {
@@ -244,7 +242,7 @@ window.addEventListener('resize', () => {
 }
 
 .berita-item {
-  width: 65%;
+  width: 60%;
   background: #a27b5c;
   border-radius: 12px;
   overflow: hidden;
@@ -253,6 +251,7 @@ window.addEventListener('resize', () => {
   display: flex;
   flex-direction: column;
   margin: 0 auto;
+  margin-bottom: 0.5rem;
 }
 
 .berita-image {
@@ -273,7 +272,7 @@ window.addEventListener('resize', () => {
 }
 
 .berita-subtitle {
-  font-size: 14px;
+  font-size: 10px;
   color: white;
 }
 
@@ -305,13 +304,13 @@ window.addEventListener('resize', () => {
 }
 
 .berita-card-text {
-  padding: 16px;
+  padding: 8px;
 }
 
 .detail-title {
   font-size: 15px;
   font-weight: bold;
-  color: #ffffff;
+  color: #000;
   margin-bottom: 8px;
 }
 
@@ -322,28 +321,27 @@ window.addEventListener('resize', () => {
 
 /* Deskripsi */
 .detail-description {
-  padding: 0 1rem;
+  padding: 8px;
 }
 
-.description-label {
-  font-size: 12px;
-  color: #000;
-  margin-bottom: 8px;
-  display: block;
-}
 
 .description-box {
   background-color: #e0e0e0;
   color: #333;
-  padding: 16px;
+  padding: 8px;
   border-radius: 8px;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
 @media (min-width: 769px) {
   .berita-item {
+    display: flex;
+    flex-direction: column;
     width: 50%;
+  }
+  .berita-image {
+    height: 250px;
   }
   .berita-card {
     width: 50%;

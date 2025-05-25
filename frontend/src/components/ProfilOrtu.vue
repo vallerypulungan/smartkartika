@@ -81,6 +81,10 @@ const goBack = () => {
   cursor: pointer;
 }
 
+.back-button img {
+  filter: invert(1);
+}
+
 .profile-info {
   display: flex;
   flex-direction: column;
@@ -109,5 +113,12 @@ const goBack = () => {
   font-weight: bold;
   margin: 0.2rem 0 0;
   color: #000;
+}
+
+@media (min-width: 768px) {
+  .profile-info {
+    padding: 3rem;
+    padding-top: 1rem;
+  }
 }
 </style>
