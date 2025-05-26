@@ -168,7 +168,7 @@ onMounted(async () => {
 async function fetchClasses() {
   try {
     const response = await axios.get('http://localhost:8000/api/classes')
-    classList.value = response.data.data
+    classList.value = response.data.data.filter(kls => kls.class !== 'Lulus TK')
     // Inisialisasi classData kosong per kelas
     classList.value.forEach(kls => {
       if (!classData.value[kls.class]) {
@@ -639,6 +639,7 @@ watch([activeTab, selectedTahunAjaran], () => {
 .table-section {
   overflow-x: auto;
   flex-grow: 1;
+  -webkit-overflow-scrolling: touch;
 }
 
 .styled-table {
@@ -654,6 +655,11 @@ watch([activeTab, selectedTahunAjaran], () => {
   position: sticky;
   top: 0;
   z-index: 2;
+  font-size: 0.85rem;
+}
+
+.styled-table th {
+  font-weight: 525;
 }
 
 .styled-table th,
@@ -661,6 +667,7 @@ watch([activeTab, selectedTahunAjaran], () => {
   padding: 10px 14px;
   border-bottom: 1px solid #e0e0e0;
   border: 1px solid #ccc;
+  color: #000;
 }
 
 .styled-table th:nth-child(1),
@@ -715,10 +722,14 @@ watch([activeTab, selectedTahunAjaran], () => {
 }
 
 @media (max-width: 768px) {
+  .class-table-container {
+    height: 100vh;
+  }
   .page-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0.5rem;
     background:
       linear-gradient(rgba(44, 57, 48, 0.93), rgba(44, 57, 48, 0.93)), url('@/assets/bg.png');
   }
@@ -749,11 +760,26 @@ watch([activeTab, selectedTahunAjaran], () => {
     align-items: center;
   }
 
+  .back-button img {
+    filter: invert(1);
+  }
+
   .app-title {
     font-size: 1.3rem;
     font-style: italic;
     font-weight: bold;
     color: #fff;
+  }
+
+  .table-section {
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    overflow-x: auto;
+    table-layout: fixed;
+  }
+
+  .styled-table {
+    min-width: 800px;
   }
 }
 </style>

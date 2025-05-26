@@ -290,6 +290,7 @@ const goBack = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0.5rem;
   background:
     linear-gradient(rgba(44, 57, 48, 0.93), rgba(44, 57, 48, 0.93)), url('@/assets/bg.png');
 }
@@ -318,6 +319,10 @@ const goBack = () => {
   cursor: pointer;
   display: flex;
   align-items: center;
+}
+
+.back-button img {
+  filter: invert(1);
 }
 
 .app-title {
@@ -354,7 +359,7 @@ const goBack = () => {
   width: 100%;
   border-collapse: collapse;
   background: #fff;
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   table-layout: fixed;
 }
 
@@ -371,7 +376,7 @@ const goBack = () => {
 
 .laporan-table th:nth-child(1),
 .laporan-table td:nth-child(1) {
-  width: 3%;
+  width: 5%;
 }
 
 .laporan-table th:nth-child(2),
@@ -391,7 +396,12 @@ const goBack = () => {
 
 .laporan-table th:nth-child(5),
 .laporan-table td:nth-child(5) {
-  width: 45%;
+  width: 40%;
+}
+
+.laporan-table th:nth-child(6),
+.laporan-table td:nth-child(6) {
+  width: 15%;
 }
 
 .laporan-table th {

@@ -239,6 +239,7 @@ function confirmBack() {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0.5rem;
   background:
     linear-gradient(rgba(44, 57, 48, 0.93), rgba(44, 57, 48, 0.93)), url('@/assets/bg.png');
 }
@@ -267,6 +268,10 @@ function confirmBack() {
   cursor: pointer;
   display: flex;
   align-items: center;
+}
+
+.back-button img {
+  filter: invert(1);
 }
 
 .app-title {
