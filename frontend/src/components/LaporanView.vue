@@ -372,7 +372,7 @@ const konfirmasiHapus = () => {
 }
 
 const goBack = () => {
-  router.back('home')
+  router.push('home')
 }
 
 const user = JSON.parse(localStorage.getItem('user') || '{}')
@@ -408,6 +408,7 @@ const unduhLaporan = (index) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0.5rem;
   background:
     linear-gradient(rgba(44, 57, 48, 0.93), rgba(44, 57, 48, 0.93)), url('@/assets/bg.png');
 }
@@ -436,6 +437,10 @@ const unduhLaporan = (index) => {
   cursor: pointer;
   display: flex;
   align-items: center;
+}
+
+.back-button img {
+  filter: invert(1);
 }
 
 .app-title {
@@ -744,7 +749,7 @@ const unduhLaporan = (index) => {
 
   .laporan-table th:nth-child(7),
   .laporan-table td:nth-child(7) {
-    width: 20%;
+    width: 15%;
   }
 }
 </style>

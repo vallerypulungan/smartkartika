@@ -73,8 +73,13 @@ const mainArticle = computed(() => allArticles.value[selectedArticleIndex.value]
 
 const sideArticles = computed(() => {
   const start = currentPage.value * articlesPerPage.value
-  return allArticles.value.slice(start, start + articlesPerPage.value)
+  const end = start + articlesPerPage.value
+
+  const sliced = allArticles.value.slice(start, end)
+
+  return sliced.filter((_, idx) => (start + idx) !== selectedArticleIndex.value)
 })
+
 
 function switchMainArticle(index) {
   selectedArticleIndex.value = currentPage.value * articlesPerPage.value + index
@@ -214,7 +219,7 @@ const goBack = () => {
 
 .main-image {
   width: 100%;
-  height: auto;
+  height: 200px;
   object-fit: cover;
 }
 
@@ -324,6 +329,7 @@ const goBack = () => {
   .main-article {
     flex: unset;
     width: 100%;
+    height: 180px;
   }
 
   .main-date {
@@ -332,6 +338,7 @@ const goBack = () => {
 
   .main-image {
     height: 180px;
+    object-fit: cover;
   }
 
   .main-title {

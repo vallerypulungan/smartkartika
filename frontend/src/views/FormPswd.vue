@@ -112,6 +112,7 @@ const handleLogin = async () => {
 
 <style scoped>
 .container {
+  font-family: Arial, Helvetica, sans-serif;
   display: flex;
   height: 100vh;
 }
@@ -269,6 +270,11 @@ const handleLogin = async () => {
     justify-content: center;
     align-items: center;
     color: #fff;
+  }
+
+  .mobile-panel .atas h2 {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
   }
 
   .mobile-panel .bawah {

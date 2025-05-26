@@ -101,7 +101,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 
@@ -133,6 +133,20 @@ function goTo(name) {
 function toggleSubmenu() {
   showSubmenu.value = !showSubmenu.value
 }
+
+function isSubmenuRoute(name) {
+  return ['infosiswa', 'infoguru'].includes(name)
+}
+
+watch(
+  () => route.name,
+  (newVal) => {
+    if (isSubmenuRoute(newVal)) {
+      showSubmenu.value = true
+    }
+  },
+  { immediate: true }
+)
 
 async function logout() {
   try {
@@ -198,20 +212,21 @@ onBeforeUnmount(() => {
   height: 40px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 5px;
   cursor: pointer;
   padding: 0 12px 0 0;
-  border-radius: 12px;
+  border-radius: 5px;
   transition: background 0.3s;
   overflow: hidden;
+  margin-bottom: 0.2rem;
 }
 
 .menu.submenu {
   height: 40px;
-  border-radius: 8px;
+  border-radius: 5px;
   gap: 0;
   padding: 0;
-  margin-left: 1rem;
+  margin-left: 0.5rem;
   flex-direction: row;
   border: none;
 }

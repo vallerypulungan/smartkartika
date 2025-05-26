@@ -123,11 +123,13 @@
     />
 
     <SuccessDialog v-if="showFail" title="Perubahan Gagal Disimpan" @close="showFail = false" />
-    <SuccessDialog
-      v-if="showSuccessDelete"
-      title="Beita Berhasil Dihapus"
-      @close="showSuccessDelete = false"
-    />
+    <div class="popupwrapper" :style="{ zIndex: 9999 }">
+      <SuccessDialog
+        v-if="showSuccessDelete"
+        title="Beita Berhasil Dihapus"
+        @close="showSuccessDelete = false"
+      />
+    </div>
 
     <SuccessDialog
       v-if="showFailDelete"
@@ -422,7 +424,6 @@ const goBack = () => {
 .berita-item {
   width: 70%;
   background: #2c3930;
-  box-shadow: 2px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -595,10 +596,15 @@ const goBack = () => {
     font-size: 1rem;
   }
   .berita-card {
-    width: 40%;
+    width: 60%;
+    margin: 0;
+    margin-left: 1.5rem;
   }
   .save-button {
     margin-top: 1rem;
+    width: 15%;
+  }
+  .delete-button {
     width: 15%;
   }
 }
