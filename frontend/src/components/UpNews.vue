@@ -87,24 +87,36 @@
       @cancel="showConfirmBack = false"
     />
 
-    <PopupSuccess v-if="showSuccess" :title="'FILE BERHASIL DIUNGGAH'" @close="resetForm" />
+    <PopupSuccess v-if="showSuccess" :title="'File berhasil diunggah'" @close="resetForm" />
 
     <PopupFoto
       v-if="showWarningFoto"
-      :title="'PILIH FOTO DAHULU'"
+      :title="'Pilih foto terlebih dahulu'"
       @close="showWarningFoto = false"
     />
 
     <PopupJudul
       v-if="showWarningTitle"
-      :title="'ISI JUDUL TERLEBIH DAHULU'"
+      :title="'Isi judul terlebih dahulu'"
       @close="showWarningTitle = false"
     />
 
     <PopupDeskripsi
       v-if="showWarningRincian"
-      :title="'ISI RINCIAN KEGIATAN DAHULU'"
+      :title="'Isi deskripsi terlebih dahulu'"
       @close="showWarningRincian = false"
+    />
+
+    <PopupDeskripsi
+      v-if="showFailUp"
+      :title="'Gagal Upload'"
+      @close="showFailUp = false"
+    />
+
+    <PopupDeskripsi
+      v-if="showAlertFile"
+      :title="'File tidak ditemukan'"
+      @close="showAlertFile = false"
     />
   </div>
 </template>
@@ -130,7 +142,9 @@ const showConfirmBack = ref(false)
 const showSuccess = ref(false)
 const showWarningFoto = ref(false)
 const showWarningRincian = ref(false)
-const showWarningTitle = ref(false) // Tambahan jika ingin popup judul kosong
+const showWarningTitle = ref(false)
+const showFailUp = ref(false)
+const showAlertFile = ref(false)
 const nip = localStorage.getItem('nip');
 
 const router = useRouter()
@@ -182,7 +196,7 @@ async function submitUpload() {
     await saveToDatabase(previewImage.value, title.value, description.value)
     showSuccess.value = true
   } catch (error) {
-    console.error('Gagal upload:', error)
+    showFailUp.value = true
   }
 }
 
@@ -191,7 +205,7 @@ async function saveToDatabase(imageData, titleText, descriptionText) {
   const file = fileInput?.files[0];
 
   if (!file) {
-    alert('File tidak ditemukan');
+    showAlertFile.value = true
     return;
   }
 

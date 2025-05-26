@@ -111,7 +111,7 @@
               <td>
                 <button class="laporan-button unduh" @click="unduhLaporan(index)">Unduh</button>
                 <button class="laporan-button edit" @click="editLaporan(index)">Edit</button>
-                <button class="laporan-button delete" @click="hapusLaporan(index)">Hapus</button>
+                <button class="laporan-button delete" @click="mintaKonfirmasiHapus(index)">Hapus</button>
               </td>
             </tr>
           </tbody>
@@ -128,6 +128,43 @@
       @confirm="konfirmasiHapus"
       @cancel="confirmVisible = false"
     />
+    <div class="popup-wrapper" :style="{ zIndex: 1000 }">
+      <PopupMessage
+          v-if="showPilihPdf"
+          :title="'Silakan pilih file PDF terlebih dahulu!'"
+          @close="showPilihPdf = false"
+      />
+      <PopupMessage
+          v-if="showSuksesUnggah"
+          :title="'Laporan berhasil diunggah!'"
+          @close="showSuksesUnggah = false"
+      />
+      <PopupMessage
+          v-if="showSuksesEdit"
+          :title="'Laporan berhasil diupdate!'"
+          @close="showSuksesEdit = false"
+      />
+      <PopupMessage
+          v-if="showFailUp"
+          :title="'Gagal upload/update laporan'"
+          @close="showFailUp = false"
+      />
+      <PopupMessage
+          v-if="showSuksesHapus"
+          :title="'Laporan berhasil dihapus'"
+          @close="showSuksesHapus = false"
+      />
+      <PopupMessage
+          v-if="showFailDelete"
+          :title="'Gagal menghapus laporan'"
+          @close="showFailDelete = false"
+      />
+      <PopupMessage
+          v-if="showFileNotExist"
+          :title="'File tidak tersedia'"
+          @close="showFileNotExist = false"
+      />
+    </div>
   </div>
 </template>
 
@@ -135,10 +172,39 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import ConfirmModal from '@/components/BlokPopup.vue'
+import PopupMessage from '@/components/MessagePopup.vue'
 import axios from 'axios'
+
+const showPilihPdf = ref(false)
+const showSuksesUnggah = ref(false)
+const showSuksesEdit = ref(false)
+const showFailUp = ref(false)
+const showSuksesHapus = ref(false)
+const showFailDelete = ref(false)
+const showFileNotExist = ref(false)
 
 const router = useRouter()
 const daftarLaporan = ref([])
+const formVisible = ref(false)
+const isEditing = ref(false)
+const editingIndex = ref(null)
+const confirmVisible = ref(false)
+const indexToDelete = ref(null)
+const isRestoring = ref(false)
+const tahunAjaranOptions = ref([])
+const kelasOptionsRaw = ref([])
+const siswaOptions = ref([])
+const selectedTahunAjaran = ref('')
+const selectedKelas = ref('')
+const selectedSiswa = ref('')
+const file = ref(null)
+const formData = ref({
+  nama: '',
+  kelas: '',
+  tahunAjaran: '',
+  file: null,
+  fileName: '',
+})
 
 async function fetchLaporan() {
   try {
@@ -152,6 +218,7 @@ async function fetchLaporan() {
       kelas_id: laporan.class?.id_class,
       // Tampilkan nama tahun ajaran, bukan id
       tahunAjaran: laporan.child?.tahun_ajaran?.nama || '-', // <-- ini yang diubah
+      id_tahun_ajaran: laporan.child?.tahun_ajaran?.id || '',
       id_child: laporan.child?.id_child,
       file: laporan.file,
       fileName: laporan.file ? laporan.file.split('/').pop() : '',
@@ -165,29 +232,6 @@ async function fetchLaporan() {
 onMounted(() => {
   fetchLaporan()
 })
-
-const formVisible = ref(false)
-const isEditing = ref(false)
-const editingIndex = ref(null)
-const confirmVisible = ref(false)
-const indexToDelete = ref(null)
-const isRestoring = ref(false)
-const formData = ref({
-  nama: '',
-  kelas: '',
-  tahunAjaran: '',
-  file: null,
-  fileName: '',
-})
-
-const tahunAjaranOptions = ref([])
-const kelasOptionsRaw = ref([])
-const siswaOptions = ref([])
-
-const selectedTahunAjaran = ref('')
-const selectedKelas = ref('')
-const selectedSiswa = ref('')
-const file = ref(null)
 
 // Ambil tahun ajaran saat mounted
 onMounted(async () => {
@@ -265,17 +309,25 @@ const resetForm = () => {
 }
 
 const handleFile = (e) => {
-  const file = e.target.files[0]
-  formData.value.file = file
-  formData.value.fileName = file ? file.name : ''
+  const file = e.target.files[0];
+  if (file && file.size > 10 * 1024 * 1024) { // 10 MB
+    alert('Ukuran file maksimal 10 MB.');
+    e.target.value = ''; // reset input file
+    formData.value.file = null;
+    formData.value.fileName = '';
+    return;
+  }
+  formData.value.file = file;
+  formData.value.fileName = file.name;
 }
+
 
 const fileNameDisplay = computed(() => formData.value.file?.name || 'Pilih File')
 
 const submitForm = async () => {
   try {
     if (!formData.value.file) {
-      alert('Silakan pilih file PDF terlebih dahulu!')
+      showPilihPdf.value = true
       return
     }
     const siswa = siswaOptions.value.find(s => s.id_child == selectedSiswa.value)
@@ -288,7 +340,7 @@ const submitForm = async () => {
       const laporan = daftarLaporan.value[editingIndex.value]
       form.append('_method', 'PUT')
       await axios.post(`http://localhost:8000/api/laporan/${laporan.id}`, form, {} )
-      alert('Laporan berhasil diupdate!')
+      showSuksesEdit.value = true
     } else {
       // Tambah laporan (POST)
       form.append('id_teacher', idTeacher)
@@ -296,14 +348,13 @@ const submitForm = async () => {
       form.append('id_parent', siswa?.id_parent)
       form.append('id_child', selectedSiswa.value)
       await axios.post('http://localhost:8000/api/laporan', form)
-      alert('Laporan berhasil diunggah!')
+      showSuksesUnggah.value = true
     }
     formVisible.value = false
     resetForm()
     await fetchLaporan()
   } catch (err) {
-    console.error('Gagal upload/update laporan:', err)
-    alert('Gagal upload/update laporan: ' + (err.response?.data?.message || err.message))
+    showFailUp.value = true
   }
 }
 
@@ -329,9 +380,10 @@ const editLaporan = (index) => {
   isRestoring.value = true
 
   // Set dropdown ke id asli
-  selectedTahunAjaran.value = laporan.tahunAjaran // ini harus id tahun ajaran
-  selectedKelas.value = laporan.kelas_id || laporan.kelasId || laporan.kelas // pastikan ini id_class
-  selectedSiswa.value = laporan.id_child || laporan.siswa_id || laporan.nis // pastikan ini id_child
+  selectedTahunAjaran.value = laporan.id_tahun_ajaran
+  selectedKelas.value = laporan.kelas_id
+  selectedSiswa.value = laporan.id_child
+
 
   // Kosongkan file, user harus upload ulang
   formData.value.file = null
@@ -350,22 +402,22 @@ const cancelForm = () => {
   resetForm()
 }
 
-const hapusLaporan = async (index) => {
-  const laporan = daftarLaporan.value[index]
-  if (confirm('Yakin ingin menghapus laporan ini?')) {
-    try {
-      await axios.delete(`http://localhost:8000/api/laporan/${laporan.id}`)
-      daftarLaporan.value.splice(index, 1)
-      alert('Laporan berhasil dihapus!')
-    } catch (err) {
-      alert('Gagal menghapus laporan: ' + (err.response?.data?.message || err.message))
-    }
-  }
+const mintaKonfirmasiHapus = (index) => {
+  indexToDelete.value = index
+  confirmVisible.value = true
 }
 
-const konfirmasiHapus = () => {
+const konfirmasiHapus = async () => {
   if (indexToDelete.value !== null) {
-    daftarLaporan.value.splice(indexToDelete.value, 1)
+    const laporan = daftarLaporan.value[indexToDelete.value]
+    try {
+      await axios.delete(`http://localhost:8000/api/laporan/${laporan.id}`)
+      daftarLaporan.value.splice(indexToDelete.value, 1)
+      showSuksesHapus.value = true
+    } catch (err) {
+      console.error(err)
+      showFailDelete.value = true
+    }
   }
   confirmVisible.value = false
   indexToDelete.value = null
@@ -390,7 +442,7 @@ const unduhLaporan = (index) => {
   if (laporan.file) {
     window.open(laporan.file, '_blank')
   } else {
-    alert('File tidak tersedia.')
+    showFileNotExist.value = true
   }
 }
 </script>
@@ -538,10 +590,6 @@ const unduhLaporan = (index) => {
   font-weight: 600;
 }
 
-.laporan-table tr:hover {
-  background-color: #f9f9f9;
-}
-
 .laporan-button {
   padding: 6px 12px;
   font-size: 0.8rem;
@@ -567,7 +615,7 @@ const unduhLaporan = (index) => {
 }
 .laporan-button.add:hover,
 .laporan-button.save:hover,
-.laporan-button.unduh {
+.laporan-button.unduh:hover {
   background-color: #27c04d;
 }
 
@@ -602,7 +650,7 @@ const unduhLaporan = (index) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 100;
 }
 
 .modal-content {
@@ -749,7 +797,7 @@ const unduhLaporan = (index) => {
 
   .laporan-table th:nth-child(7),
   .laporan-table td:nth-child(7) {
-    width: 15%;
+    width: 20%;
   }
 }
 </style>

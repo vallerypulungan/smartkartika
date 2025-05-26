@@ -327,13 +327,6 @@ function confirmPromoteOrLulus() {
   }
 }
 
-function handleTahunAjaranChange(event) {
-  const selected = event.target.value
-  if (selected === 'Tambah') {
-    showTambahTahunModal.value = true
-  }
-}
-
 function simpanTahunAjaran() {
   if (newTahunAjaran.value.trim()) {
     tahunAjaranOptions.value.push(newTahunAjaran.value.trim())

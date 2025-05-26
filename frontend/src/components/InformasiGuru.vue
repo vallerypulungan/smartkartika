@@ -119,7 +119,7 @@
 
     <div class="popup-wrapper" :style="{ zIndex: 9999 }">
       <PopupConfirm
-        v-if="showConfirmPromote"
+        v-if="showConfirmAdd"
         :title="'MENAMBAHKAN DATA GURU'"
         :message="'Apakah anda yakin untuk menambahkan data guru?'"
         :konfirmasi="'IYA'"
@@ -160,14 +160,29 @@
         @close="cancelSave"
       />
       <PopupMessage
+        v-if="showFailAdd"
+        :title="'Gagal menambahkan data guru'"
+        @close="showFailAdd = false"
+      />
+      <PopupMessage
         v-if="showSuccesEdit"
         :title="'Berhasil mengubah data guru'"
         @close="cancelSave"
       />
       <PopupMessage
+        v-if="showFailEdit"
+        :title="'Gagal mengubah data guru'"
+        @close="showFailEdit = false"
+      />
+      <PopupMessage
         v-if="showSuccesDelete"
         :title="'Berhasil menghapus data guru'"
         @close="cancelSave"
+      />
+      <PopupMessage
+        v-if="showFailDelete"
+        :title="'Gagal menghapus data guru'"
+        @close="showFailDelete = false"
       />
     </div>
   </div>
@@ -190,7 +205,7 @@ const classData = ref({
 
 const activeTab = ref('Registrasi')
 const searchQuery = ref('')
-const showConfirmPromote = ref(false)
+const showConfirmAdd = ref(false)
 const showPassword = ref(false)
 const showConfirmEdit = ref(false)
 const showConfirmDelete = ref(false)
@@ -203,6 +218,9 @@ const showSuccesDelete = ref(false)
 const originalForm = ref(null)
 const pendingTab = ref(null)
 const showConfirmChangeTab = ref(false)
+const showFailAdd = ref(false)
+const showFailEdit = ref(false)
+const showFailDelete = ref(false)
 const form = ref({
   nama: '',
   nip: '',
@@ -215,7 +233,7 @@ function submitForm() {
   if (editingIndex.value !== null) {
     showConfirmEdit.value = true
   } else {
-    showConfirmPromote.value = true
+    showConfirmAdd.value = true
   }
 }
 
@@ -247,6 +265,7 @@ const sortedTabs = computed(() => {
 })
 
 async function saveActivity() {
+  showConfirmAdd.value = false
   try {
     const response = await axios.post('http://localhost:8000/api/teachers', {
       name: form.value.nama,
@@ -257,14 +276,23 @@ async function saveActivity() {
     });
 
     classData.value['Daftar Guru'].push(response.data.data);
-    alert(response.data.message);
     resetForm();
     showSuccesAdd.value = true;
     setTimeout(() => {
       showSuccesAdd.value = false;
     }, 2000);
   } catch (error) {
-    console.error('Gagal menambahkan guru:', error);
+    showFailAdd.value = true
+  }
+}
+
+function resetForm() {
+    form.value = {
+    nama: '',
+    nip: '',
+    email: '',
+    telepon: '',
+    kode: '',
   }
 }
 
@@ -309,6 +337,7 @@ function confirmChangeTab() {
 }
 
 async function saveEdit() {
+  showConfirmEdit.value = false
   try {
     const teacherId = classData.value['Daftar Guru'][editingIndex.value].id;
 
@@ -320,14 +349,13 @@ async function saveEdit() {
     });
 
     classData.value['Daftar Guru'][editingIndex.value] = response.data.data;
-    alert(response.data.message);
     resetForm();
     showSuccesEdit.value = true; // Tampilkan notifikasi
     setTimeout(() => {
       showSuccesEdit.value = false;
     }, 2000);
   } catch (error) {
-    console.error('Gagal mengedit guru:', error);
+    showFailEdit.value = true
   }
 }
 
@@ -337,6 +365,7 @@ function deleteStudent(index) {
 }
 
 async function confirmDelete() {
+  showConfirmDelete.value = false
   try {
     const teacherId = classData.value['Daftar Guru'][deletingIndex.value].id;
 
@@ -344,14 +373,13 @@ async function confirmDelete() {
     await axios.delete(`http://localhost:8000/api/teachers/${teacherId}`);
     classData.value['Daftar Guru'].splice(deletingIndex.value, 1);
     showSuccesDelete.value = true;
-    alert(response.data.message);
   } catch (error) {
-    console.error('Gagal menghapus guru:', error);
+    showFailDelete.value = true
   }
 }
 
 function cancelSave() {
-  showConfirmPromote.value = false
+  showConfirmAdd.value = false
   showConfirmEdit.value = false
   showConfirmDelete.value = false
   editingIndex.value = null
@@ -389,7 +417,6 @@ onMounted(() => {
 .class-table-container {
   padding: 24px;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   max-width: 100%;
 }
 
@@ -653,6 +680,7 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0.5rem;
     background:
       linear-gradient(rgba(44, 57, 48, 0.93), rgba(44, 57, 48, 0.93)), url('@/assets/bg.png');
   }
@@ -683,6 +711,10 @@ onMounted(() => {
     align-items: center;
   }
 
+  .back-button img {
+    filter: invert(1);
+  }
+
   .app-title {
     font-size: 1.3rem;
     font-style: italic;
@@ -710,6 +742,19 @@ onMounted(() => {
   .form-group-row label {
     font-size: 0.8rem;
     font-weight: 500;
+  }
+
+  .table-section {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .styled-table {
+    width: 100%;
+    min-width: 900px;
+  }
+
+  .styled-table th {
+    border-left: 2px solid #ccc;
   }
 
   .styled-table th:nth-child(1),
