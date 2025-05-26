@@ -14,9 +14,15 @@ class DocumentationController extends Controller
 {
     public function index()
     {
-        $docs = \App\Models\Documentation::select('id_document', 'title', 'description', 'file_url', 'uploaded_by', 'created_at')
+        $docs = Documentation::select('id_document', 'title', 'description', 'file_url', 'uploaded_by', 'created_at')
             ->orderBy('created_at', 'desc')
             ->get();
+
+        // Tambahkan mapping agar file_url jadi URL publik
+        $docs->transform(function ($doc) {
+            $doc->file_url = asset('storage/' . $doc->file_url);
+            return $doc;
+        });
 
         return response()->json(['data' => $docs]);
     }
@@ -40,14 +46,14 @@ class DocumentationController extends Controller
 
         if ($request->hasFile('image')) {
             // Hapus gambar lama jika ada
-            if ($doc->file_url && Storage::exists(str_replace('storage/', 'public/', $doc->file_url))) {
-                Storage::delete(str_replace('storage/', 'public/', $doc->file_url));
+            if ($doc->file_url && Storage::exists('public/' . $doc->file_url)) {
+                Storage::delete('public/' . $doc->file_url);
             }
 
             $originalName = $request->file('image')->getClientOriginalName();
             $cleanedName = time() . '_' . preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalName);
-            $path = $request->file('image')->storeAs('public/documentations',$cleanedName);
-            $doc->file_url = 'storage/documentations/' . $cleanedName;
+            $path = $request->file('image')->storeAs('documentations', $cleanedName, 'public');
+            $doc->file_url = 'documentations/' . $cleanedName; // SIMPAN RELATIVE PATH
         }
 
         $doc->title = $title;
@@ -93,20 +99,18 @@ class DocumentationController extends Controller
         $cleanedName = time() . '_' . preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalName);
 
         $path = $request->file('image')->storeAs('documentations', $cleanedName, 'public');
-        // Gunakan path URL yang cocok dengan public/storage
-        $fileUrl = url(Storage::url($path)); 
 
         $doc = new Documentation();
         $doc->uploaded_by = $teacher->name;
         $doc->id_teacher = $teacher->id_teacher;
         $doc->title = $title;
         $doc->description = $description;
-        $doc->file_url = $fileUrl;
+        $doc->file_url = 'documentations/' . $cleanedName;
         $doc->save();
 
         return response()->json([
             'message' => 'Dokumentasi berhasil disimpan',
-            'file_url' => $fileUrl
+            'file_url' => asset('storage/' . $doc->file_url)
         ]);
     } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);

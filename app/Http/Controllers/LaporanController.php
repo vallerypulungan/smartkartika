@@ -23,14 +23,13 @@ class LaporanController extends Controller
         $originalName = $request->file('file')->getClientOriginalName();
         $cleanedName = time() . '_' . preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalName);
         $path = $request->file('file')->storeAs('laporan', $cleanedName, 'public');
-        $fileUrl = url(Storage::url($path)); // hasil: http://localhost:8000/storage/laporan/namafile.pdf
-
+        // Simpan hanya relative path
         $report = Report::create([
             'id_teacher' => $request->id_teacher,
             'id_class' => $request->id_class,
             'id_parent' => $request->id_parent,
             'id_child' => $request->id_child,
-            'file' => $fileUrl,
+            'file' => 'laporan/' . $cleanedName,
         ]);
 
         return response()->json(['message' => 'Laporan berhasil diupload', 'data' => $report]);
@@ -40,6 +39,10 @@ class LaporanController extends Controller
     public function index()
     {
         $laporan = Report::with(['child.tahunAjaran', 'parent', 'teacher', 'class'])->get();
+        $laporan->transform(function ($item) {
+            $item->file = asset('storage/' . $item->file);
+            return $item;
+        });
         return response()->json(['data' => $laporan]);
     }
 
@@ -91,15 +94,10 @@ class LaporanController extends Controller
             $originalName = $request->file('file')->getClientOriginalName();
             $cleanedName = time() . '_' . preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalName);
             $path = $request->file('file')->storeAs('laporan', $cleanedName, 'public');
-            $fileUrl = url(Storage::url($path));
-            $data['file'] = $fileUrl;
+            $data['file'] = 'laporan/' . $cleanedName;
         } else {
             // Jika tidak ada file baru, tetap gunakan file lama
-            $data['file'] = $report->file;
-        }
-
-        $report->update($data);
-
+            $data['file
         return response()->json(['message' => 'Laporan berhasil diupdate', 'data' => $report->fresh()]);
     }
 
