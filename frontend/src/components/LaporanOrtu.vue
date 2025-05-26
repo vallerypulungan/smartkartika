@@ -114,7 +114,12 @@ const tampilkanKonfirmasi = (index) => {
 const konfirmasiUnduh = () => {
   const laporan = daftarLaporan.value[indexToUnduh.value]
   if (laporan.file) {
-    window.open(laporan.file, '_blank')
+    const link = document.createElement('a')
+    link.href = laporan.file
+    link.download = laporan.fileName || ''
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   } else {
     alert('File tidak tersedia.')
   }

@@ -13,6 +13,11 @@ class ActivityController extends Controller
     public function index()
     {
         $activities = Activity::orderBy('created_at', 'desc')->get();
+        // Mapping agar image_url menjadi URL publik
+        $activities->transform(function ($item) {
+            $item->image_url = $item->image_url ? asset('storage/' . $item->image_url) : null;
+            return $item;
+        });
         return response()->json(['data' => $activities]);
     }
 
@@ -41,8 +46,8 @@ class ActivityController extends Controller
                 $originalName = $request->file('image')->getClientOriginalName();
                 $cleanedName = time() . '_' . preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalName);
                 $path = $request->file('image')->storeAs('activities', $cleanedName, 'public');
-                // Simpan URL lengkap seperti di DocumentationController
-                $activity->image_url = url(Storage::url($path));
+                // Simpan hanya relative path
+                $activity->image_url = 'activities/' . $cleanedName;
             }
 
             $activity->save();
@@ -73,13 +78,13 @@ class ActivityController extends Controller
         $activity->date = $request->date;
 
         if ($request->hasFile('image')) {
-            if ($activity->image_url && Storage::exists(str_replace(url('storage/'), 'public/', $activity->image_url))) {
-                Storage::delete(str_replace(url('storage/'), 'public/', $activity->image_url));
+            if ($activity->image_url && Storage::exists('public/' . $activity->image_url)) {
+                Storage::delete('public/' . $activity->image_url);
             }
             $originalName = $request->file('image')->getClientOriginalName();
             $cleanedName = time() . '_' . preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalName);
             $path = $request->file('image')->storeAs('activities', $cleanedName, 'public');
-            $activity->image_url = url(Storage::url($path));
+            $activity->image_url = 'activities/' . $cleanedName;
             }
 
         $activity->save();

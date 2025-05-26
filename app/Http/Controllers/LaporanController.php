@@ -52,6 +52,10 @@ class LaporanController extends Controller
         $laporan = Report::with(['teacher', 'class', 'parent', 'child.tahunAjaran'])
             ->where('id_child', $id_child)
             ->get();
+        $laporan->transform(function ($item) {
+            $item->file = asset('storage/' . $item->file);
+            return $item;
+        });
         return response()->json(['data' => $laporan]);
     }
 
@@ -61,6 +65,10 @@ class LaporanController extends Controller
         $laporan = Report::with(['teacher', 'class', 'child'])
             ->where('id_parent', $id_parent)
             ->get();
+        $laporan->transform(function ($item) {
+            $item->file = asset('storage/' . $item->file);
+            return $item;
+        });
         return response()->json(['data' => $laporan]);
     }
 
@@ -97,7 +105,10 @@ class LaporanController extends Controller
             $data['file'] = 'laporan/' . $cleanedName;
         } else {
             // Jika tidak ada file baru, tetap gunakan file lama
-            $data['file
+            $data['file'] = $report->file;
+        }
+
+        $report->update($data);
         return response()->json(['message' => 'Laporan berhasil diupdate', 'data' => $report->fresh()]);
     }
 
@@ -114,5 +125,10 @@ class LaporanController extends Controller
         $report->delete();
 
         return response()->json(['message' => 'Laporan berhasil dihapus']);
+    }
+
+    public function download($filename)
+    {
+        return response()->download(storage_path('app/public/' . $filename));
     }
 }
