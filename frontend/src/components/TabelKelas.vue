@@ -79,7 +79,7 @@
               <th>Nama</th>
               <th>NIS</th>
               <th>Tahun Ajaran</th>
-              <th>Gender</th>
+              <th>Jenis Kelamin</th>
             </tr>
           </thead>
           <tbody>
@@ -162,7 +162,6 @@ onMounted(async () => {
   if (classList.value.length > 0) {
     activeTab.value = classList.value[0].class
   }
-  // TODO: fetch data siswa per kelas dari API jika sudah ada endpoint-nya
 })
 
 async function fetchClasses() {

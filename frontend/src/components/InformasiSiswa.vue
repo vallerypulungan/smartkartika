@@ -373,8 +373,8 @@ const fetchSiswa = async () => {
         tanggalLahir: siswa.tanggal_lahir,
       },
       gender: siswa.gender,
-      kelas: siswa.class?.class ?? '-', // relasi ke model Class
-      tahunAjaran: siswa.tahun_ajaran?.nama ?? '-', // BENAR, sesuai hasil API
+      kelas: siswa.class?.class ?? '-',
+      tahunAjaran: siswa.tahun_ajaran?.nama ?? '-',
       orangTua: {
         wali: siswa.parent?.name ?? '-',
         email: siswa.parent?.email ?? '-',
