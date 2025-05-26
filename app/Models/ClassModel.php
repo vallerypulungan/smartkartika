@@ -11,9 +11,6 @@ class ClassModel extends Model
 
     protected $table = 'classes';
     protected $primaryKey = 'id_class';
-    public $incrementing = true;
-    protected $keyType = 'int';
-
     protected $fillable = ['class', 'class_level'];
 
     public function children()

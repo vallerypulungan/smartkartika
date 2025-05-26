@@ -132,4 +132,9 @@ class ChildController extends Controller
         $children = $query->get();
         return response()->json(['data' => $children]);
     }
+    public function show($id)
+    {
+        $child = Child::with(['parent', 'class', 'tahunAjaran'])->findOrFail($id);
+        return response()->json(['data' => $child]);
+    }
 }

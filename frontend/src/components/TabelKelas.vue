@@ -21,9 +21,10 @@
 
       <div class="tabs">
         <button
-          v-for="kelas in classList"
-          :key="kelas.id_class"
+          v-for="kelas in sortedTabs"
+          :key="kelas.id_class || kelas.class"
           :class="['tab-button', { active: activeTab === kelas.class }]"
+
           @click="() => switchTab(kelas.class)"
         >
           {{ kelas.class }}
@@ -237,33 +238,55 @@ const filteredData = computed(() => {
 })
 
 async function promoteStudents() {
-  const allKelas = sortedTabs.value.filter((k) => k !== 'Lulus Tk')
-  const currentIndex = allKelas.indexOf(activeTab.value)
-  const nextKelas =
-    currentIndex !== -1 && currentIndex < allKelas.length - 1
-      ? allKelas[currentIndex + 1]
-      : 'Lulus Tk'
+  const regularClasses = classList.value
+    .filter(k => k.class !== 'Lulus Tk')
+    .sort((a, b) => a.id_class - b.id_class)
 
-  // Ambil id_class tujuan
-  const nextKelasObj = classList.value.find(k => k.class === nextKelas)
-  const nextKelasId = nextKelasObj ? nextKelasObj.id_class : null
+  const lulusClass = classList.value.find(k => k.class === 'Lulus Tk')
 
   for (const siswa of selectedStudents.value) {
-    await axios.put(`http://localhost:8000/api/children/${siswa.id_child}`, {
-      nama: siswa.name,
-      nis: siswa.nis,
-      tempatLahir: siswa.tempat_lahir,        // dari snake_case ke camelCase
-      tanggalLahir: siswa.tanggal_lahir,
-      gender: siswa.gender,
-      kelas: nextKelasId,
-      tahunAjaran: siswa.id_tahun_ajaran,     // dari id_tahun_ajaran ke tahunAjaran
-      namaWali: siswa.parent?.name ?? '',
-      email: siswa.parent?.email ?? '',
-      alamat: siswa.parent?.alamat ?? '',
-      telepon: siswa.parent?.num_telp ?? '',
-      username: siswa.parent?.username ?? '',
-      kode: siswa.parent?.password ?? '',
-    })
+    const idx = regularClasses.findIndex(k => k.id_class === siswa.id_class)
+    let nextClassId = siswa.id_class
+
+    if (idx === regularClasses.length - 1 && lulusClass) {
+      nextClassId = lulusClass.id_class
+    } else if (idx !== -1 && idx < regularClasses.length - 1) {
+      nextClassId = regularClasses[idx + 1].id_class
+    }
+
+    // Ambil data siswa asli dari database
+    let dbSiswa = {}
+    try {
+      const res = await axios.get(`http://localhost:8000/api/children/${siswa.id_child}`)
+      dbSiswa = res.data.data || {}
+    } catch (e) {
+      dbSiswa = {}
+    }
+
+    // Siapkan payload: gunakan data lama, hanya ubah kelas/id_class
+    const payload = {
+      nama: dbSiswa.name || dbSiswa.nama,
+      nis: dbSiswa.nis,
+      tempatLahir: dbSiswa.tempat_lahir || dbSiswa.tempatLahir,
+      tanggalLahir: dbSiswa.tanggal_lahir || dbSiswa.tanggalLahir,
+      gender: dbSiswa.gender,
+      kelas: nextClassId,
+      tahunAjaran:
+        dbSiswa.id_tahun_ajaran
+        || (dbSiswa.tahun_ajaran && dbSiswa.tahun_ajaran.id)
+        || (dbSiswa.tahunAjaran && dbSiswa.tahunAjaran.id),
+      namaWali: dbSiswa.parent?.name || dbSiswa.namaWali,
+      email: dbSiswa.parent?.email || dbSiswa.email,
+      alamat: dbSiswa.parent?.alamat || dbSiswa.alamat,
+      telepon: dbSiswa.parent?.num_telp || dbSiswa.telepon,
+      username: dbSiswa.parent?.username || dbSiswa.username,
+      kode: dbSiswa.parent?.password || dbSiswa.kode,
+    }
+
+    // Update siswa hanya jika id_class berubah
+    if (nextClassId !== siswa.id_class) {
+      await axios.put(`http://localhost:8000/api/children/${siswa.id_child}`, payload)
+    }
   }
 
   await fetchSiswaByKelasTahun()
@@ -290,24 +313,62 @@ function switchTab(kelas) {
 }
 
 const sortedTabs = computed(() => {
-  const keys = Object.keys(classData.value)
-  const special = keys.filter((k) => k === 'Lulus Tk')
-  const regular = keys.filter((k) => k !== 'Lulus Tk').sort((a, b) => a.localeCompare(b))
-  return [...regular, ...special]
+  const regular = classList.value.filter(k => k.class !== 'Lulus Tk')
+  const lulus = classList.value.find(k => k.class === 'Lulus Tk')
+  return lulus ? [...regular, lulus] : regular
 })
 
-function addClass() {
-  const existing = Object.keys(classData.value).filter((k) => k !== 'Lulus Tk')
+async function addClass() {
+  // Ambil semua kelas regular (tanpa "Lulus Tk")
+  const regular = classList.value.filter(k => k.class !== 'Lulus Tk')
+  // Cari huruf berikutnya setelah kelas terakhir
   let nextCharCode = 67 // 'C'
-  while (existing.includes(`Kelas ${String.fromCharCode(nextCharCode)}`)) {
+  let newName = ''
+  let exists = true
+  do {
+    newName = `TK ${String.fromCharCode(nextCharCode)}`
+    exists = regular.some(k => k.class === newName)
     nextCharCode++
+  } while (exists)
+
+  // Tambah ke database
+  await axios.post('http://localhost:8000/api/classes', {
+    class: newName,
+    class_level: 'C'
+  })
+
+  await fetchClasses()
+
+  // Urutkan ulang regular berdasarkan id_class ASC
+  const sortedRegular = classList.value
+    .filter(k => k.class !== 'Lulus Tk')
+    .sort((a, b) => a.id_class - b.id_class)
+
+  // Kelas baru pasti yang namanya newName
+  const kelasBaru = sortedRegular.find(k => k.class === newName)
+  // Kelas sebelum kelas baru (kelas lama yang akan dipindah)
+  if (sortedRegular.length > 1 && kelasBaru) {
+    const idxBaru = sortedRegular.findIndex(k => k.class === newName)
+    const lastClassBeforeNew = idxBaru > 0 ? sortedRegular[idxBaru - 1].class : null
+    if (lastClassBeforeNew) {
+      const siswaToMove = classData.value[lastClassBeforeNew] || []
+      // Pindahkan semua siswa ke kelas baru
+      for (const siswa of siswaToMove) {
+        await axios.put(`http://localhost:8000/api/children/${siswa.id_child}`, {
+          ...siswa,
+          id_class: kelasBaru.id_class
+        })
+      }
+      // Refresh data siswa
+      await fetchSiswaByKelasTahun()
+    }
   }
-  const newName = `Kelas ${String.fromCharCode(nextCharCode)}`
-  classData.value[newName] = []
+
+  // Set tab aktif ke kelas baru
   activeTab.value = newName
 }
 
-function deleteClass() {
+async function deleteClass() {
   if (activeTab.value === 'Lulus Tk') return // Tidak bisa hapus Lulus TK
   const current = activeTab.value
   const keys = Object.keys(classData.value)
@@ -317,6 +378,13 @@ function deleteClass() {
   const nextTab = keys[index === 0 ? 1 : index - 1]
   activeTab.value = nextTab
   delete classData.value[current]
+
+  // Hapus kelas dari server
+  const kelasObj = classList.value.find(k => k.class === current)
+  const id_class = kelasObj ? kelasObj.id_class : null
+  if (id_class) {
+    await axios.delete(`http://localhost:8000/api/classes/${id_class}`)
+  }
 }
 
 function confirmPromoteOrLulus() {

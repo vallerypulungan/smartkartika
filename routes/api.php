@@ -28,6 +28,9 @@ Route::delete('/teachers/{id}', [TeacherController::class, 'destroy']);
 use App\Http\Controllers\ClassController;
 
 Route::get('/classes', [ClassController::class, 'index']);
+Route::post('/classes', [ClassController::class, 'store']);      // Tambah kelas
+Route::put('/classes/{id}', [ClassController::class, 'update']); // Edit kelas
+Route::delete('/classes/{id}', [ClassController::class, 'destroy']); // Hapus kelas
 
 use App\Http\Controllers\ChildController;
 use App\Http\Controllers\TahunAjaranController;
@@ -36,6 +39,7 @@ Route::get('/children', [ChildController::class, 'index']);      // GET: daftar 
 Route::post('/children', [ChildController::class, 'store']);     // POST: tambah siswa
 Route::put('/children/{id}', [ChildController::class, 'update']); // PUT: edit siswa
 Route::delete('/children/{id}', [ChildController::class, 'destroy']); // DELETE: hapus siswa
+Route::get('/children/{id}', [ChildController::class, 'show']); // Tambahkan baris ini
 
 Route::post('/tahun-ajaran', [TahunAjaranController::class, 'store']);
 Route::get('/tahun-ajaran', [TahunAjaranController::class, 'index']);
