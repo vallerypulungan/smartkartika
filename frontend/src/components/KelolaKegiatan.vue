@@ -36,9 +36,6 @@
                 accept="image/*"
                 required
               />
-              <div v-if="formItem.imageName || formItem.imageUrl" class="file-name">
-                <span v-if="formItem.imageName">{{ formItem.imageName }}</span>
-              </div>
             </div>
             <div class="modal-actions">
               <button class="laporan-button save" type="submit">
@@ -500,6 +497,7 @@ textarea {
   border: 1px solid #ccc;
   border-radius: 6px;
   color: #000;
+  font-family: inherit;
 }
 
 .modal-actions {

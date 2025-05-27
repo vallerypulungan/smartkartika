@@ -413,6 +413,8 @@ function confirmBack() {
   border: 1px solid #ccc;
   resize: vertical;
   box-sizing: border-box;
+  min-height: 80px;
+  font-family: inherit;
 }
 
 .submit-button {
