@@ -474,6 +474,7 @@ const sortedTabs = computed(() => {
 })
 
 async function saveActivity() {
+  showConfirmPromote.value = false
   try {
     const siswaBaru = {
       nama: form.value.nama,
@@ -493,12 +494,13 @@ async function saveActivity() {
 
     // Kirim ke backend
     const response = await axios.post('http://localhost:8000/api/children', siswaBaru);
+    await fetchSiswa()
 
     // Tambahkan ke array lokal jika ingin langsung tampil
     if (!classData.value['Daftar Siswa']) {
       classData.value['Daftar Siswa'] = [];
     }
-    classData.value['Daftar Siswa'].push(response.data.data);
+    //classData.value['Daftar Siswa'].push(response.data.data);
 
     // Reset form
     form.value = {
@@ -616,7 +618,13 @@ async function saveEdit() {
   }
 }
 
+function deleteStudent(index) {
+  deletingIndex.value = index
+  showConfirmDelete.value = true
+}
+
 async function confirmDelete() {
+  showConfirmDelete.value = false
   if (deletingIndex.value !== null) {
     const siswa = classData.value[activeTab.value][deletingIndex.value]
     try {
@@ -626,7 +634,6 @@ async function confirmDelete() {
     } catch (error) {
       showFailDelete.value = true
     }
-    showConfirmDelete.value = false
     deletingIndex.value = null
   }
 }

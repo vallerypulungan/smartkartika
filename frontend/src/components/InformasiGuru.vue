@@ -374,6 +374,7 @@ async function confirmDelete() {
     classData.value['Daftar Guru'].splice(deletingIndex.value, 1);
     showSuccesDelete.value = true;
   } catch (error) {
+     console.error('Gagal menghapus guru:', error.response ?? error);
     showFailDelete.value = true
   }
 }

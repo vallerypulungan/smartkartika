@@ -141,7 +141,7 @@
 
 <script setup>
 import axios from 'axios'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import HeaderDashboard from '@/components/HeaderDashboard.vue'
 import ConfirmDialog from '@/components/BlokPopup.vue'
 import SuccessDialog from '@/components/MessagePopup.vue'
@@ -161,6 +161,7 @@ const showFail = ref(false)
 const page = ref(1)
 const isLoading = ref(false)
 const contentArea = ref(null)
+let intervalId
 const editForm = ref({
   title: '',
   subtitle: '',
@@ -173,6 +174,14 @@ const nipGuru = localStorage.getItem('nip')
 
 onMounted(() => {
   fetchBerita()
+  intervalId = setInterval(() => {
+    if (!selectedBerita.value) fetchBerita()
+  }, 10000)
+})
+
+
+onBeforeUnmount(() => {
+  clearInterval(intervalId)
 })
 
 const fetchBerita = async () => {
@@ -195,7 +204,7 @@ const fetchBerita = async () => {
 
     // Tambahkan hanya jika ada item baru
     if (filteredItems.length > 0) {
-      beritaList.value = [...beritaList.value, ...filteredItems]
+      beritaList.value = [...filteredItems, ...beritaList.value]
       page.value++
     }
   } catch (error) {
@@ -504,6 +513,7 @@ const goBack = () => {
   border: none;
   resize: vertical;
   color: #000;
+  font-family: inherit;
 }
 
 .input-title:focus,

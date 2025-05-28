@@ -16,7 +16,7 @@
     <div class="class-table-container">
       <div class="top-bar">
         <h1>Daftar Siswa</h1>
-        <button class="add-class-button" @click="addClass">+ Tambah Kelas</button>
+        <button class="add-class-button" @click="triggerAddClass">+ Tambah Kelas</button>
       </div>
 
       <div class="tabs">
@@ -65,7 +65,7 @@
           class="promote-button"
           v-if="!isLulusTab"
           @click="confirmPromoteOrLulus"
-          :disabled="selectedStudents.length === 0"
+         :disabled="!selectedStudents[activeTab] || selectedStudents[activeTab].length === 0"
         >
           {{ isLastRegularClass ? 'Lulus' : 'Naik Kelas' }}
         </button>
@@ -86,7 +86,7 @@
           <tbody>
             <tr v-for="(student, index) in filteredData" :key="index">
               <td>
-                <input type="checkbox" :value="student" v-model="selectedStudents" />
+                <input type="checkbox" :value="student" v-model="selectedStudents[activeTab]" />
               </td>
               <td>{{ index + 1 }}</td>
               <td>{{ student.name }}</td>
@@ -104,7 +104,7 @@
         <button
           class="delete-class-button"
           @click="showDeleteClass = true"
-          :disabled="activeTab === 'Lulus Tk' || classList.length <= 1"
+          :disabled="isNonDeletableClass"
         >
           🗑 Hapus Kelas Ini
         </button>
@@ -141,6 +141,28 @@
         @confirm="deleteActivity"
         @cancel="cancelSave"
       />
+
+      <PopupConfirm
+        v-if="showAddClass"
+        :title="'TAMBAH KELAS'"
+        :message="'Apakah anda yakin untuk menambah kelas?'"
+        :konfirmasi="'TAMBAH'"
+        :batalkan="'BATAL'"
+        @confirm="addClass"
+        @cancel="showAddClass = false"
+      />
+
+      <PopupMessage
+        v-if="showSuccesAddClass"
+        :title="'Berhasil Menambahkan Kelas'"
+        @close="showSuccesAddClass = false"
+      />
+
+      <PopupMessage
+        v-if="showSuccesDeleteClass"
+        :title="'Berhasil Menghapus Kelas'"
+        @close="showSuccesDeleteClass = false"
+      />
     </div>
   </div>
 </template>
@@ -150,12 +172,27 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import PopupConfirm from '@/components/BlokPopup.vue'
+import PopupMessage from '@/components/MessagePopup.vue'
 
 const router = useRouter()
+const route = useRouter()
 
 const classList = ref([]) // Data kelas dari database
 const activeTab = ref('')
 const classData = ref({}) // Data siswa per kelas
+const searchQuery = ref('')
+const selectedTahunAjaran = ref('Semua')
+const selectedStudents = ref({})
+const showConfirmPromote = ref(false)
+const showConfirmLulus = ref(false)
+const showDeleteClass = ref(false)
+const tahunAjaranOptions = ref([])
+const showTambahTahunModal = ref(false)
+const newTahunAjaran = ref('')
+const showAddClass = ref(false)
+const showSuccesAddClass = ref(false)
+const showSuccesDeleteClass = ref(false)
+
 
 onMounted(async () => {
   await fetchClasses()
@@ -209,15 +246,6 @@ const fetchSiswaByKelasTahun = async () => {
   }
 }
 
-const searchQuery = ref('')
-const selectedTahunAjaran = ref('Semua')
-const selectedStudents = ref([])
-const showConfirmPromote = ref(false)
-const showConfirmLulus = ref(false)
-const showDeleteClass = ref(false)
-const tahunAjaranOptions = ref([])
-const showTambahTahunModal = ref(false)
-const newTahunAjaran = ref('')
 
 const filteredData = computed(() => {
   let data = classData.value[activeTab.value] || []
@@ -294,19 +322,27 @@ async function promoteStudents() {
 }
 
 const isLastRegularClass = computed(() => {
-  const regularClasses = sortedTabs.value.filter((k) => k !== 'Lulus Tk')
-  return activeTab.value === regularClasses[regularClasses.length - 1]
+  const regularClasses = classList.value
+    .filter(k => k.class !== 'Lulus Tk')
+    .sort((a, b) => a.id_class - b.id_class)
+  const lastClass = regularClasses[regularClasses.length - 1]
+  return lastClass && activeTab.value === lastClass.class
 })
 
 const isLulusTab = computed(() => activeTab.value === 'Lulus Tk')
 
 function toggleAll(event) {
+  if (!selectedStudents.value[activeTab.value]) {
+    selectedStudents.value[activeTab.value] = []
+  }
+
   if (event.target.checked) {
-    selectedStudents.value = [...filteredData.value]
+    selectedStudents.value[activeTab.value] = [...filteredData.value]
   } else {
-    selectedStudents.value = []
+    selectedStudents.value[activeTab.value] = []
   }
 }
+
 
 function switchTab(kelas) {
   activeTab.value = kelas
@@ -318,7 +354,12 @@ const sortedTabs = computed(() => {
   return lulus ? [...regular, lulus] : regular
 })
 
+function triggerAddClass() {
+  showAddClass.value = true
+}
+
 async function addClass() {
+  showAddClass.value = false
   // Ambil semua kelas regular (tanpa "Lulus Tk")
   const regular = classList.value.filter(k => k.class !== 'Lulus Tk')
   // Cari huruf berikutnya setelah kelas terakhir
@@ -352,7 +393,6 @@ async function addClass() {
     const lastClassBeforeNew = idxBaru > 0 ? sortedRegular[idxBaru - 1].class : null
     if (lastClassBeforeNew) {
       const siswaToMove = classData.value[lastClassBeforeNew] || []
-      // Pindahkan semua siswa ke kelas baru
       for (const siswa of siswaToMove) {
         await axios.put(`http://localhost:8000/api/children/${siswa.id_child}`, {
           ...siswa,
@@ -365,11 +405,16 @@ async function addClass() {
   }
 
   // Set tab aktif ke kelas baru
+  showSuccesAddClass.value = true
   activeTab.value = newName
 }
 
+const isNonDeletableClass = computed(() => {
+  return ['TK A', 'TK B', 'Lulus Tk'].includes(activeTab.value)
+})
+
 async function deleteClass() {
-  if (activeTab.value === 'Lulus Tk') return // Tidak bisa hapus Lulus TK
+  if (['TK A', 'TK B', 'Lulus Tk'].includes(activeTab.value)) return // Tidak bisa hapus Lulus TK
   const current = activeTab.value
   const keys = Object.keys(classData.value)
   if (keys.length <= 1) return
@@ -382,8 +427,17 @@ async function deleteClass() {
   // Hapus kelas dari server
   const kelasObj = classList.value.find(k => k.class === current)
   const id_class = kelasObj ? kelasObj.id_class : null
-  if (id_class) {
-    await axios.delete(`http://localhost:8000/api/classes/${id_class}`)
+    if (id_class) {
+    try {
+      await axios.delete(`http://localhost:8000/api/classes/${id_class}`)
+
+      // Hapus dari classList lokal
+      classList.value = classList.value.filter(k => k.class !== current)
+
+      showSuccesDeleteClass.value = true
+    } catch (error) {
+      console.error('Gagal menghapus kelas:', error)
+    }
   }
 }
 
@@ -428,6 +482,7 @@ function cancelSave() {
 function deleteActivity() {
   deleteClass()
   showDeleteClass.value = false
+  showSuccesDeleteClass.value = true
 }
 
 const goBack = () => {
@@ -436,6 +491,10 @@ const goBack = () => {
 
 watch([activeTab, selectedTahunAjaran], () => {
   fetchSiswaByKelasTahun()
+})
+
+watch(() => route.fullPath, () => {
+  fetchClasses()
 })
 </script>
 

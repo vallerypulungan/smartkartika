@@ -20,10 +20,10 @@
       <button class="laporan-button add" @click="showForm('add')">Tambah Laporan</button>
 
       <!-- FORM POPUP MENGAMBANG -->
-      <div v-if="formVisible" class="modal-overlay" @click.self="cancelForm">
+      <div v-if="formVisible" class="modal-overlay">
         <div class="modal-content">
           <h3 class="modal-title">{{ isEditing ? 'Edit Laporan' : 'Tambah Laporan' }}</h3>
-          <form @submit.prevent="submitForm" class="modal-form">
+          <form class="modal-form">
             <select v-model="selectedTahunAjaran" required>
               <option value="" disabled>Pilih Tahun Ajaran</option>
               <option v-for="tahun in tahunAjaranOptions" :key="tahun.id" :value="tahun.id">
@@ -63,10 +63,10 @@
                   <span class="file-name">{{ fileNameDisplay }}</span>
                 </template>
               </div>
-              <input type="file" name="file" @change="handleFile" accept="application/pdf" />
+              <input type="file" name="file" @change="handleFile" accept="application/pdf"  required/>
             </label>
             <div class="modal-actions">
-              <button type="submit" class="laporan-button save" :disabled="!formData.file">
+              <button type="button" class="laporan-button save" @click="submitForm">
                 {{ isEditing ? 'Simpan Perubahan' : 'Unggah' }}
               </button>
               <button type="button" class="laporan-button" @click="cancelForm">Batal</button>
@@ -164,6 +164,11 @@
           :title="'File tidak tersedia'"
           @close="showFileNotExist = false"
       />
+      <PopupMessage
+          v-if="showAlertUnggah"
+          :title="'Harap mengisi semua masukan'"
+          @close="showAlertUnggah = false"
+      />
     </div>
   </div>
 </template>
@@ -182,6 +187,7 @@ const showFailUp = ref(false)
 const showSuksesHapus = ref(false)
 const showFailDelete = ref(false)
 const showFileNotExist = ref(false)
+const showAlertUnggah = ref(false)
 
 const router = useRouter()
 const daftarLaporan = ref([])
@@ -299,10 +305,9 @@ watch(
 )
 
 const resetForm = () => {
-  formData.value.nama = ''
-  formData.value.nis = ''
-  formData.value.kelas = ''
-  formData.value.tahunAjaran = ''
+  selectedTahunAjaran.value = ''
+  selectedKelas.value = ''
+  selectedSiswa.value = ''
   formData.value.file = null
   formData.value.fileName = ''
   editingIndex.value = null
@@ -326,7 +331,10 @@ const fileNameDisplay = computed(() => formData.value.file?.name || 'Pilih File'
 
 const submitForm = async () => {
   try {
-    if (!formData.value.file) {
+    if (selectedTahunAjaran .value === '' || selectedKelas.value === '' || selectedSiswa.value === '') {
+      showAlertUnggah.value = true
+      return
+    } else if (!formData.value.file) {
       showPilihPdf.value = true
       return
     }
