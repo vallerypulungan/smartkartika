@@ -87,7 +87,7 @@ const handleLogin = async () => {
 
     if (response.data.status === 'success') {
       localStorage.setItem('userName', response.data.name)
-      //alert(response.data.message)
+      
 
       localStorage.setItem('isLoggedIn', 'true')
       localStorage.setItem('role', response.data.role)
@@ -97,7 +97,7 @@ const handleLogin = async () => {
           name: response.data.name,
           email: response.data.email,
           nip: response.data.nip,
-          telepon: response.data.num_telp
+          telepon: response.data.num_telp 
         }))
         localStorage.setItem('userName', response.data.name)
         showLoginGuru.value = true

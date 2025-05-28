@@ -56,7 +56,6 @@ class LoginController extends Controller
 
     public function logoutApi(Request $request)
     {
-        // Kalau kamu simpan token nanti, bisa revoke di sini
         return response()->json([
             'status' => 'success',
             'message' => 'Logout berhasil'

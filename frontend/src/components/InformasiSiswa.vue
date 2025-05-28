@@ -428,7 +428,6 @@ async function simpanTahunAjaran() {
   try {
     const response = await axios.post('http://localhost:8000/api/tahun-ajaran', { nama: tahunBaru })
     await fetchTahunAjaran()
-    // Pilih tahun ajaran yang baru saja ditambahkan
     form.value.tahunAjaran = response.data.data.id
     showTambahTahunModal.value = false
     tahunAwal.value = ''
@@ -459,7 +458,6 @@ const filteredData = computed(() => {
 
 function switchTab(kolom) {
   if (editingIndex.value !== null && kolom !== 'Registrasi') {
-    // Selalu konfirmasi saat sedang edit
     pendingTab.value = kolom
     showConfirmChangeTab.value = true
   } else {
@@ -482,8 +480,8 @@ async function saveActivity() {
       tempatLahir: form.value.tempatLahir,
       tanggalLahir: form.value.tanggalLahir,
       gender: form.value.gender,
-      kelas: form.value.kelas, // id_class
-      tahunAjaran: form.value.tahunAjaran, // id_tahun_ajaran
+      kelas: form.value.kelas, 
+      tahunAjaran: form.value.tahunAjaran,
       namaWali: form.value.namaWali,
       email: form.value.email,
       alamat: form.value.alamat,
@@ -492,17 +490,14 @@ async function saveActivity() {
       kode: form.value.kode,
     };
 
-    // Kirim ke backend
     const response = await axios.post('http://localhost:8000/api/children', siswaBaru);
     await fetchSiswa()
 
-    // Tambahkan ke array lokal jika ingin langsung tampil
     if (!classData.value['Daftar Siswa']) {
       classData.value['Daftar Siswa'] = [];
     }
     //classData.value['Daftar Siswa'].push(response.data.data);
 
-    // Reset form
     form.value = {
       nama: '',
       nis: '',
@@ -533,8 +528,8 @@ function editStudent(student, index) {
     tempatLahir: student.ttl?.tempatLahir || '',
     tanggalLahir: student.ttl?.tanggalLahir || '',
     gender: student.gender || '',
-    kelas: daftarKelas.value.find(k => k.nama === student.kelas)?.id || '', // cari id dari nama kelas
-    tahunAjaran: daftarTahunAjaran.value.find(t => t.nama === student.tahunAjaran)?.id || '', // cari id dari nama tahun ajaran
+    kelas: daftarKelas.value.find(k => k.nama === student.kelas)?.id || '', 
+    tahunAjaran: daftarTahunAjaran.value.find(t => t.nama === student.tahunAjaran)?.id || '', 
     namaWali: student.orangTua?.wali || '',
     email: student.orangTua?.email || '',
     alamat: student.orangTua?.alamat || '',
@@ -600,7 +595,7 @@ async function saveEdit() {
     editingTab.value = null
     activeTab.value = 'Daftar Siswa'
   }
-  // Reset form
+  
   form.value = {
     nama: '',
     nis: '',

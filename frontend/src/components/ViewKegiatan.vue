@@ -119,7 +119,6 @@ function handleResize() {
 onMounted(async () => {
   handleResize()
   window.addEventListener('resize', handleResize)
-  // Fetch kegiatan dari backend
   const res = await axios.get('http://localhost:8000/api/activities')
   allArticles.value = res.data.data.map(item => ({
     image: item.image_url,

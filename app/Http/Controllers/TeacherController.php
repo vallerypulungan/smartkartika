@@ -49,6 +49,7 @@ class TeacherController extends Controller
             'nip' => 'required|string|unique:teachers,nip,' . $teacher->id_teacher . ',id_teacher',
             'email' => 'required|email|unique:teachers,email,' . $teacher->id_teacher . ',id_teacher',
             'num_telp' => 'required|string',
+            'password' => 'required|string|min:6',
         ]);
 
         $updateData = [
@@ -56,6 +57,7 @@ class TeacherController extends Controller
             'nip' => $request->nip,
             'email' => $request->email,
             'num_telp' => $request->num_telp,
+            'password' => $request->password,
         ];
         if ($request->filled('password')) {
             $updateData['password'] = $request->password;

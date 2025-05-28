@@ -18,7 +18,6 @@ class DocumentationController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Tambahkan mapping agar file_url jadi URL publik
         $docs->transform(function ($doc) {
             $doc->file_url = asset('storage/' . $doc->file_url);
             return $doc;
@@ -35,7 +34,6 @@ class DocumentationController extends Controller
             'image' => 'nullable|image|max:10240',
         ]);
 
-        // Ambil data dari JSON jika tidak ditemukan di form-data
         $title = $request->input('title', $request->json('title'));
         $description = $request->input('description', $request->json('description'));
         $nip = $request->input('nip', $request->json('nip'));
@@ -45,7 +43,6 @@ class DocumentationController extends Controller
         $doc = Documentation::findOrFail($id);
 
         if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
             if ($doc->file_url && Storage::exists('public/' . $doc->file_url)) {
                 Storage::delete('public/' . $doc->file_url);
             }
@@ -53,7 +50,7 @@ class DocumentationController extends Controller
             $originalName = $request->file('image')->getClientOriginalName();
             $cleanedName = time() . '_' . preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalName);
             $path = $request->file('image')->storeAs('documentations', $cleanedName, 'public');
-            $doc->file_url = 'documentations/' . $cleanedName; // SIMPAN RELATIVE PATH
+            $doc->file_url = 'documentations/' . $cleanedName; 
         }
 
         $doc->title = $title;
@@ -88,7 +85,6 @@ class DocumentationController extends Controller
             'image' => 'required|image|max:10240',
         ]);
 
-        // Ambil data dari JSON jika tidak ditemukan di form-data
         $title = $request->input('title', $request->json('title'));
         $description = $request->input('description', $request->json('description'));
         $nip = $request->input('nip', $request->json('nip'));

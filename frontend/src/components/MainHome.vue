@@ -196,13 +196,9 @@ const fetchBerita = async () => {
       description: item.description,
       image: item.file_url,
     }))
-
-    // Cek apakah data sudah ada di beritaList berdasarkan ID
     const filteredItems = newItems.filter(newItem =>
       !beritaList.value.some(existing => existing.id === newItem.id)
     )
-
-    // Tambahkan hanya jika ada item baru
     if (filteredItems.length > 0) {
       beritaList.value = [...filteredItems, ...beritaList.value]
       page.value++
@@ -302,7 +298,7 @@ const goBack = () => {
     linear-gradient(rgba(44, 57, 48, 0.93), rgba(44, 57, 48, 0.93)), url('@/assets/bg.png');
 }
 
-/* Header saat lihat detail berita */
+
 .page-header {
   display: flex;
   align-items: center;
@@ -524,7 +520,7 @@ const goBack = () => {
   background-color: #ededed;
 }
 
-/* Tombol hapus di bawah kanan */
+/* Tombol hapus*/
 .detail-footer {
   display: flex;
   justify-content: flex-end;
@@ -532,7 +528,6 @@ const goBack = () => {
   padding-top: 1rem;
 }
 
-/* Optional perbaikan layout */
 .save-button {
   background-color: #31d249;
   color: white;
@@ -556,7 +551,6 @@ const goBack = () => {
   margin-bottom: 1rem;
 }
 
-/* Desktop responsive */
 @media (min-width: 768px) {
   .dashboard {
     display: flex;
