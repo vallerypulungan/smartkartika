@@ -109,6 +109,9 @@ class ChildController extends Controller
     public function destroy($id)
     {
         $child = Child::findOrFail($id);
+
+        \App\Models\Report::where('id_child', $child->id_child)->delete();
+
         $child->delete();
 
         return response()->json(['message' => 'Siswa berhasil dihapus']);
