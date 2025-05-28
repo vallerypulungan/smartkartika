@@ -106,7 +106,6 @@ class ChildController extends Controller
         return response()->json(['message' => 'Siswa & Orang Tua berhasil diupdate', 'data' => $child]);
     }
 
-    // Hapus siswa (opsional: hanya hapus siswa, ortu tetap)
     public function destroy($id)
     {
         $child = Child::findOrFail($id);

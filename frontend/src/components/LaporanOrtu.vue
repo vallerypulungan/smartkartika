@@ -75,7 +75,6 @@ const daftarLaporan = ref([])
 const confirmUnduh = ref(false)
 const indexToUnduh = ref(null)
 
-// Ambil id_parent dari localStorage
 let userStorage = {}
 try {
   userStorage = JSON.parse(localStorage.getItem('user') || '{}')
@@ -84,21 +83,18 @@ try {
 }
 
 onMounted(async () => {
-  // Ambil data anak ortu yang login
   if (userStorage.id_parent) {
     const anakRes = await axios.get(`http://localhost:8000/api/children?parent=${userStorage.id_parent}`)
     if (anakRes.data.data.length > 0) {
-      // Ambil anak pertama (atau tampilkan semua dengan v-for jika ingin)
       const anak = anakRes.data.data[0]
       siswa.value = {
         nama: anak.name,
         nis: anak.nis
       }
-      // Ambil laporan berdasarkan id_child
       const laporanRes = await axios.get(`http://localhost:8000/api/laporan/anak/${anak.id_child}`)
       daftarLaporan.value = laporanRes.data.data.map(laporan => ({
         kelas: laporan.class?.class || '-',
-        tahunAjaran: laporan.child?.tahun_ajaran?.nama || '-', // <-- ini penting!
+        tahunAjaran: laporan.child?.tahun_ajaran?.nama || '-', 
         file: laporan.file,
         fileName: laporan.file ? laporan.file.split('/').pop() : '',
       }))

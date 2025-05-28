@@ -216,9 +216,9 @@ const fetchBerita = async () => {
       id: item.id_document,
       title: item.title,
       description: item.description,
-      image: item.file_url, // URL dari backend
+      image: item.file_url, 
     }))
-    console.log(beritaList.value) // Log data untuk memastikan URL benar
+    console.log(beritaList.value)
   } catch (error) {
     console.error('Gagal memuat berita:', error)
   }
@@ -227,7 +227,7 @@ const fetchBerita = async () => {
 const selectBerita = (berita) => {
   selectedBerita.value = berita
   editForm.value = {
-    id: berita.id, // penting agar axios.put punya ID!
+    id: berita.id, 
     title: berita.title,
     description: berita.description,
     image: berita.image,

@@ -143,15 +143,13 @@ const daftarLaporan = ref([])
 async function fetchLaporan() {
   try {
     const res = await axios.get('http://localhost:8000/api/laporan')
-    // Mapping agar tabel mudah dibaca
     daftarLaporan.value = res.data.data.map(laporan => ({
       id: laporan.id,
       nama: laporan.child?.name || '-',
       nis: laporan.child?.nis || '-',
       kelas: laporan.class?.class || '-',
       kelas_id: laporan.class?.id_class,
-      // Tampilkan nama tahun ajaran, bukan id
-      tahunAjaran: laporan.child?.tahun_ajaran?.nama || '-', // <-- ini yang diubah
+      tahunAjaran: laporan.child?.tahun_ajaran?.nama || '-', 
       id_child: laporan.child?.id_child,
       file: laporan.file,
       fileName: laporan.file ? laporan.file.split('/').pop() : '',
@@ -161,7 +159,6 @@ async function fetchLaporan() {
   }
 }
 
-// Panggil saat mounted dan setelah upload
 onMounted(() => {
   fetchLaporan()
 })
@@ -189,17 +186,14 @@ const selectedKelas = ref('')
 const selectedSiswa = ref('')
 const file = ref(null)
 
-// Ambil tahun ajaran saat mounted
 onMounted(async () => {
   const tahunRes = await axios.get('http://localhost:8000/api/tahun-ajaran')
-  tahunAjaranOptions.value = tahunRes.data.data // [{id, nama}, ...]
+  tahunAjaranOptions.value = tahunRes.data.data 
 
-  // Jika ingin langsung ambil kelas
   const kelasRes = await axios.get('http://localhost:8000/api/classes')
-  kelasOptionsRaw.value = kelasRes.data.data // [{id_class, class, ...}]
+  kelasOptionsRaw.value = kelasRes.data.data 
 })
 
-// Ambil siswa berdasarkan filter
 watch([selectedTahunAjaran, selectedKelas], async () => {
   if (selectedTahunAjaran.value && selectedKelas.value) {
     const res = await axios.get('http://localhost:8000/api/children', {
@@ -208,7 +202,7 @@ watch([selectedTahunAjaran, selectedKelas], async () => {
         tahun: selectedTahunAjaran.value,
       }
     })
-    siswaOptions.value = res.data.data // [{id_child, name, nis, id_parent, ...}]
+    siswaOptions.value = res.data.data 
   } else {
     siswaOptions.value = []
   }
@@ -250,7 +244,7 @@ watch(
     const tahun = formData.value.tahunAjaran
     const kelas = formData.value.kelas
     const siswa = dataSiswa.value[tahun]?.[kelas]?.find((s) => s.nama === val)
-    formData.value.nis = siswa?.nis || '' // Menarik nis berdasarkan nama yang dipilih
+    formData.value.nis = siswa?.nis || '' 
   },
 )
 
@@ -284,13 +278,11 @@ const submitForm = async () => {
     form.append('file', formData.value.file)
 
     if (isEditing.value && editingIndex.value !== null) {
-      // Edit laporan (PUT)
       const laporan = daftarLaporan.value[editingIndex.value]
       form.append('_method', 'PUT')
       await axios.post(`http://localhost:8000/api/laporan/${laporan.id}`, form, {} )
       alert('Laporan berhasil diupdate!')
     } else {
-      // Tambah laporan (POST)
       form.append('id_teacher', idTeacher)
       form.append('id_class', selectedKelas.value)
       form.append('id_parent', siswa?.id_parent)
@@ -328,12 +320,10 @@ const editLaporan = (index) => {
   const laporan = daftarLaporan.value[index]
   isRestoring.value = true
 
-  // Set dropdown ke id asli
-  selectedTahunAjaran.value = laporan.tahunAjaran // ini harus id tahun ajaran
-  selectedKelas.value = laporan.kelas_id || laporan.kelasId || laporan.kelas // pastikan ini id_class
-  selectedSiswa.value = laporan.id_child || laporan.siswa_id || laporan.nis // pastikan ini id_child
+  selectedTahunAjaran.value = laporan.tahunAjaran 
+  selectedKelas.value = laporan.kelas_id || laporan.kelasId || laporan.kelas 
+  selectedSiswa.value = laporan.id_child || laporan.siswa_id || laporan.nis 
 
-  // Kosongkan file, user harus upload ulang
   formData.value.file = null
   formData.value.fileName = ''
   editingIndex.value = index
@@ -381,7 +371,6 @@ const teacherName = ref(user.name || '')
 
 const getTeacherIdByNip = async (nip) => {
   const res = await axios.get('http://localhost:8000/api/teachers', { params: { nip } })
-  // Pastikan endpoint ini mengembalikan array guru, ambil id_teacher pertama yang cocok
   return res.data.data[0]?.id_teacher || ''
 }
 

@@ -84,7 +84,7 @@ const handleLogin = async () => {
           name: response.data.name,
           email: response.data.email,
           nip: response.data.nip,
-          telepon: response.data.num_telp // pastikan backend mengirim num_telp
+          telepon: response.data.num_telp 
         }))
         localStorage.setItem('userName', response.data.name)
         router.push('/dashboard-guru')

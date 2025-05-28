@@ -104,14 +104,13 @@ const goBack = () => {
   selectedBerita.value = null
 }
 
-// Fetch berita dari API, sama seperti MainHome
 const fetchBerita = async () => {
   try {
     const response = await axios.get('http://localhost:8000/api/documentations');
     beritaList.value = response.data.data.map((item) => ({
       id: item.id_document,
       title: item.title,
-      subtitle: '', // Jika tidak ada subtitle di backend, bisa dikosongkan
+      subtitle: '', 
       description: item.description,
       image: item.file_url,
     }));

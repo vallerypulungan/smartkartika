@@ -13,7 +13,6 @@ class ActivityController extends Controller
     public function index()
     {
         $activities = Activity::orderBy('created_at', 'desc')->get();
-        // Mapping agar image_url menjadi URL publik
         $activities->transform(function ($item) {
             $item->image_url = $item->image_url ? asset('storage/' . $item->image_url) : null;
             return $item;
@@ -32,7 +31,6 @@ class ActivityController extends Controller
                 'nip' => 'required|string',
             ]);
 
-            // Cari guru berdasarkan NIP
             $teacher = Teacher::where('nip', $request->input('nip'))->first();
             if (!$teacher) return response()->json(['error' => 'Guru tidak ditemukan'], 401);
 
@@ -40,13 +38,12 @@ class ActivityController extends Controller
             $activity->activity_tittle = $request->input('activity_tittle');
             $activity->description = $request->input('description');
             $activity->date = $request->input('date');
-            $activity->id_teacher = $teacher->id_teacher; // ambil dari hasil pencarian guru
+            $activity->id_teacher = $teacher->id_teacher; 
 
             if ($request->hasFile('image')) {
                 $originalName = $request->file('image')->getClientOriginalName();
                 $cleanedName = time() . '_' . preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalName);
                 $path = $request->file('image')->storeAs('activities', $cleanedName, 'public');
-                // Simpan hanya relative path
                 $activity->image_url = 'activities/' . $cleanedName;
             }
 

@@ -87,7 +87,6 @@ const form = ref({
 })
 
 const handleRegister = async () => {
-  // Validasi sederhana
   if (!form.value.name || !form.value.nip || !form.value.email || !form.value.password || !form.value.num_telp) {
     popupMessage.value = 'Harap isi semua kolom terlebih dahulu.'
     showPopup.value = true
@@ -97,7 +96,6 @@ const handleRegister = async () => {
     const response = await axios.post('http://localhost:8000/api/teachers', form.value)
     popupMessage.value = response.data.message || 'Registrasi berhasil.'
     showPopup.value = true
-    // Reset form jika ingin
     form.value = { name: '', nip: '', email: '', password: '', num_telp: '' }
   } catch (err) {
     popupMessage.value = err.response?.data?.message || 'Registrasi gagal.'

@@ -130,7 +130,7 @@ const showConfirmBack = ref(false)
 const showSuccess = ref(false)
 const showWarningFoto = ref(false)
 const showWarningRincian = ref(false)
-const showWarningTitle = ref(false) // Tambahan jika ingin popup judul kosong
+const showWarningTitle = ref(false) 
 const nip = localStorage.getItem('nip');
 
 const router = useRouter()
@@ -200,7 +200,7 @@ async function saveToDatabase(imageData, titleText, descriptionText) {
   formData.append('title', titleText);
   formData.append('description', descriptionText);
   formData.append('nip', nip);
- // pastikan nip tersimpan
+ 
 
   await axios.post('http://localhost:8000/api/documentations', formData, {
     headers: {

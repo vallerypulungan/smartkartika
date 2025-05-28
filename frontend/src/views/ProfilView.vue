@@ -32,7 +32,6 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-// Ambil data guru dari localStorage
 let userStorage = {}
 try {
   userStorage = JSON.parse(localStorage.getItem('user') || '{}')
@@ -40,7 +39,6 @@ try {
   userStorage = {}
 }
 
-// Mapping ke variabel untuk template
 const userName = userStorage.name || 'Pengguna'
 const userEmail = userStorage.email || 'email@gmail.com'
 const userNip = userStorage.nip || 'NIP'

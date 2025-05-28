@@ -41,7 +41,6 @@ const router = useRouter()
 const user = ref({})
 const anak = ref({})
 
-// Ambil data ortu dari localStorage
 let userStorage = {}
 try {
   userStorage = JSON.parse(localStorage.getItem('user') || '{}')
@@ -59,7 +58,6 @@ onMounted(async () => {
     if (res.data.data.length > 0) {
       anak.value = res.data.data[0]
       user.value = anak.value.parent
-      // Fallback jika localStorage kosong
       if (!userName.value) userName.value = user.value.name
       if (!userEmail.value) userEmail.value = user.value.email
       if (!userTelp.value) userTelp.value = user.value.num_telp

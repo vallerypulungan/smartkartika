@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Storage;
 
 class LaporanController extends Controller
 {
-    // Upload laporan
     public function store(Request $request)
     {
         $request->validate([
@@ -23,7 +22,7 @@ class LaporanController extends Controller
         $originalName = $request->file('file')->getClientOriginalName();
         $cleanedName = time() . '_' . preg_replace('/[^A-Za-z0-9.\-_]/', '_', $originalName);
         $path = $request->file('file')->storeAs('laporan', $cleanedName, 'public');
-        // Simpan hanya relative path
+        
         $report = Report::create([
             'id_teacher' => $request->id_teacher,
             'id_class' => $request->id_class,
@@ -35,7 +34,6 @@ class LaporanController extends Controller
         return response()->json(['message' => 'Laporan berhasil diupload', 'data' => $report]);
     }
 
-    // List semua laporan
     public function index()
     {
         $laporan = Report::with(['child.tahunAjaran', 'parent', 'teacher', 'class'])->get();
@@ -46,7 +44,6 @@ class LaporanController extends Controller
         return response()->json(['data' => $laporan]);
     }
 
-    // Laporan berdasarkan anak
     public function byChild($id_child)
     {
         $laporan = Report::with(['teacher', 'class', 'parent', 'child.tahunAjaran'])
@@ -59,7 +56,6 @@ class LaporanController extends Controller
         return response()->json(['data' => $laporan]);
     }
 
-    // Laporan berdasarkan ortu
     public function byParent($id_parent)
     {
         $laporan = Report::with(['teacher', 'class', 'child'])
@@ -76,7 +72,6 @@ class LaporanController extends Controller
     {
         $report = Report::findOrFail($id);
 
-        // Validasi: semua field boleh nullable, kecuali file tetap dicek jika ada
         $request->validate([
             'id_teacher' => 'nullable|exists:teachers,id_teacher',
             'id_class' => 'nullable|exists:classes,id_class',
@@ -85,7 +80,6 @@ class LaporanController extends Controller
             'file' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
-        // Siapkan data update, gunakan data lama jika tidak dikirim
         $data = [
             'id_teacher' => $request->input('id_teacher', $report->id_teacher),
             'id_class' => $request->input('id_class', $report->id_class),
@@ -93,7 +87,6 @@ class LaporanController extends Controller
             'id_child' => $request->input('id_child', $report->id_child),
         ];
 
-        // Jika ada file baru, hapus file lama dan upload file baru
         if ($request->hasFile('file')) {
             if ($report->file) {
                 $oldPath = str_replace(url('/storage'), 'public', $report->file);
@@ -104,7 +97,6 @@ class LaporanController extends Controller
             $path = $request->file('file')->storeAs('laporan', $cleanedName, 'public');
             $data['file'] = 'laporan/' . $cleanedName;
         } else {
-            // Jika tidak ada file baru, tetap gunakan file lama
             $data['file'] = $report->file;
         }
 
@@ -116,7 +108,6 @@ class LaporanController extends Controller
     {
         $report = Report::findOrFail($id);
 
-        // Hapus file dari storage
         if ($report->file) {
             $oldPath = str_replace(url('/storage'), 'public', $report->file);
             Storage::delete($oldPath);

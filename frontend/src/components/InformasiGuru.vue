@@ -232,7 +232,6 @@ const filteredData = computed(() => {
 
 function switchTab(kolom) {
   if (editingIndex.value !== null && kolom !== 'Registrasi') {
-    // Selalu konfirmasi saat sedang edit
     pendingTab.value = kolom
     showConfirmChangeTab.value = true
   } else {
@@ -278,7 +277,7 @@ async function fetchTeachers() {
       email: teacher.email,
       num_telp: teacher.num_telp,
     }));
-    console.log('Data guru:', classData.value['Daftar Guru']); // Debugging
+    console.log('Data guru:', classData.value['Daftar Guru']); 
   } catch (error) {
     console.error('Gagal mengambil data guru:', error);
   }
@@ -287,7 +286,7 @@ async function fetchTeachers() {
 function editStudent(teacher, index) {
   const combinedForm = { ...teacher }
   form.value = combinedForm
-  originalForm.value = JSON.parse(JSON.stringify(combinedForm)) // Simpan data awal
+  originalForm.value = JSON.parse(JSON.stringify(combinedForm)) 
   editingIndex.value = index
   editingTab.value = activeTab.value
   activeTab.value = 'Registrasi'
@@ -317,12 +316,13 @@ async function saveEdit() {
       nip: form.value.nip,
       email: form.value.email,
       num_telp: form.value.telepon,
+      password: form.value.kode,
     });
 
     classData.value['Daftar Guru'][editingIndex.value] = response.data.data;
     alert(response.data.message);
     resetForm();
-    showSuccesEdit.value = true; // Tampilkan notifikasi
+    showSuccesEdit.value = true; 
     setTimeout(() => {
       showSuccesEdit.value = false;
     }, 2000);
