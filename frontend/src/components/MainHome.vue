@@ -185,9 +185,9 @@ const fetchBerita = async () => {
       id: item.id_document,
       title: item.title,
       description: item.description,
-      image: item.file_url, // URL dari backend
+      image: item.file_url, 
     }))
-    console.log(beritaList.value) // Log data untuk memastikan URL benar
+    console.log(beritaList.value) 
   } catch (error) {
     console.error('Gagal memuat berita:', error)
   } finally {

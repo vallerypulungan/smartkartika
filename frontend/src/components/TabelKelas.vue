@@ -153,9 +153,9 @@ import PopupConfirm from '@/components/BlokPopup.vue'
 
 const router = useRouter()
 
-const classList = ref([]) // Data kelas dari database
+const classList = ref([]) 
 const activeTab = ref('')
-const classData = ref({}) // Data siswa per kelas
+const classData = ref({}) 
 
 onMounted(async () => {
   await fetchClasses()
@@ -169,7 +169,6 @@ async function fetchClasses() {
   try {
     const response = await axios.get('http://localhost:8000/api/classes')
     classList.value = response.data.data.filter(kls => kls.class !== 'Lulus TK')
-    // Inisialisasi classData kosong per kelas
     classList.value.forEach(kls => {
       if (!classData.value[kls.class]) {
         classData.value[kls.class] = []
@@ -183,7 +182,7 @@ async function fetchClasses() {
 const fetchTahunAjaran = async () => {
   try {
     const response = await axios.get('http://localhost:8000/api/tahun-ajaran')
-    tahunAjaranOptions.value = response.data.data // [{id, nama}, ...]
+    tahunAjaranOptions.value = response.data.data 
   } catch (error) {
     console.error('Gagal mengambil tahun ajaran:', error)
   }
@@ -199,10 +198,9 @@ const fetchSiswaByKelasTahun = async () => {
     if (selectedTahunAjaran.value !== 'Semua') params.tahun = selectedTahunAjaran.value
 
     const response = await axios.get('http://localhost:8000/api/children', { params })
-    // Simpan hanya untuk kelas aktif
     classData.value[activeTab.value] = response.data.data.map(siswa => ({
       ...siswa,
-      tahunAjaran: siswa.tahun_ajaran, // mapping ke objek tahun_ajaran
+      tahunAjaran: siswa.tahun_ajaran, 
     }))
   } catch (error) {
     console.error('Gagal mengambil data siswa:', error)
@@ -254,7 +252,6 @@ async function promoteStudents() {
       nextClassId = regularClasses[idx + 1].id_class
     }
 
-    // Ambil data siswa asli dari database
     let dbSiswa = {}
     try {
       const res = await axios.get(`http://localhost:8000/api/children/${siswa.id_child}`)
@@ -263,7 +260,6 @@ async function promoteStudents() {
       dbSiswa = {}
     }
 
-    // Siapkan payload: gunakan data lama, hanya ubah kelas/id_class
     const payload = {
       nama: dbSiswa.name || dbSiswa.nama,
       nis: dbSiswa.nis,
@@ -283,7 +279,6 @@ async function promoteStudents() {
       kode: dbSiswa.parent?.password || dbSiswa.kode,
     }
 
-    // Update siswa hanya jika id_class berubah
     if (nextClassId !== siswa.id_class) {
       await axios.put(`http://localhost:8000/api/children/${siswa.id_child}`, payload)
     }
@@ -319,10 +314,8 @@ const sortedTabs = computed(() => {
 })
 
 async function addClass() {
-  // Ambil semua kelas regular (tanpa "Lulus Tk")
   const regular = classList.value.filter(k => k.class !== 'Lulus Tk')
-  // Cari huruf berikutnya setelah kelas terakhir
-  let nextCharCode = 67 // 'C'
+  let nextCharCode = 67 
   let newName = ''
   let exists = true
   do {
@@ -331,7 +324,6 @@ async function addClass() {
     nextCharCode++
   } while (exists)
 
-  // Tambah ke database
   await axios.post('http://localhost:8000/api/classes', {
     class: newName,
     class_level: 'C'
@@ -339,37 +331,31 @@ async function addClass() {
 
   await fetchClasses()
 
-  // Urutkan ulang regular berdasarkan id_class ASC
   const sortedRegular = classList.value
     .filter(k => k.class !== 'Lulus Tk')
     .sort((a, b) => a.id_class - b.id_class)
 
-  // Kelas baru pasti yang namanya newName
   const kelasBaru = sortedRegular.find(k => k.class === newName)
-  // Kelas sebelum kelas baru (kelas lama yang akan dipindah)
   if (sortedRegular.length > 1 && kelasBaru) {
     const idxBaru = sortedRegular.findIndex(k => k.class === newName)
     const lastClassBeforeNew = idxBaru > 0 ? sortedRegular[idxBaru - 1].class : null
     if (lastClassBeforeNew) {
       const siswaToMove = classData.value[lastClassBeforeNew] || []
-      // Pindahkan semua siswa ke kelas baru
       for (const siswa of siswaToMove) {
         await axios.put(`http://localhost:8000/api/children/${siswa.id_child}`, {
           ...siswa,
           id_class: kelasBaru.id_class
         })
       }
-      // Refresh data siswa
       await fetchSiswaByKelasTahun()
     }
   }
 
-  // Set tab aktif ke kelas baru
   activeTab.value = newName
 }
 
 async function deleteClass() {
-  if (activeTab.value === 'Lulus Tk') return // Tidak bisa hapus Lulus TK
+  if (activeTab.value === 'Lulus Tk') return 
   const current = activeTab.value
   const keys = Object.keys(classData.value)
   if (keys.length <= 1) return
@@ -379,7 +365,6 @@ async function deleteClass() {
   activeTab.value = nextTab
   delete classData.value[current]
 
-  // Hapus kelas dari server
   const kelasObj = classList.value.find(k => k.class === current)
   const id_class = kelasObj ? kelasObj.id_class : null
   if (id_class) {

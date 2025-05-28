@@ -215,8 +215,7 @@ async function fetchLaporan() {
       nis: laporan.child?.nis || '-',
       kelas: laporan.class?.class || '-',
       kelas_id: laporan.class?.id_class,
-      // Tampilkan nama tahun ajaran, bukan id
-      tahunAjaran: laporan.child?.tahun_ajaran?.nama || '-', // <-- ini yang diubah
+      tahunAjaran: laporan.child?.tahun_ajaran?.nama || '-', 
       id_child: laporan.child?.id_child,
       file: laporan.file,
       fileName: laporan.file ? laporan.file.split('/').pop() : '',
@@ -304,9 +303,9 @@ const resetForm = () => {
 
 const handleFile = (e) => {
   const file = e.target.files[0];
-  if (file && file.size > 10 * 1024 * 1024) { // 10 MB
+  if (file && file.size > 10 * 1024 * 1024) {
     alert('Ukuran file maksimal 10 MB.');
-    e.target.value = ''; // reset input file
+    e.target.value = ''; 
     formData.value.file = null;
     formData.value.fileName = '';
     return;
@@ -371,12 +370,10 @@ const editLaporan = (index) => {
   const laporan = daftarLaporan.value[index]
   isRestoring.value = true
 
-  // Set dropdown ke id asli
-  selectedTahunAjaran.value = laporan.tahunAjaran // ini harus id tahun ajaran
-  selectedKelas.value = laporan.kelas_id || laporan.kelasId || laporan.kelas // pastikan ini id_class
-  selectedSiswa.value = laporan.id_child || laporan.siswa_id || laporan.nis // pastikan ini id_child
+  selectedTahunAjaran.value = laporan.tahunAjaran 
+  selectedKelas.value = laporan.kelas_id || laporan.kelasId || laporan.kelas 
+  selectedSiswa.value = laporan.id_child || laporan.siswa_id || laporan.nis 
 
-  // Kosongkan file, user harus upload ulang
   formData.value.file = null
   formData.value.fileName = ''
   editingIndex.value = index
