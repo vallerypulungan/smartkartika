@@ -159,7 +159,6 @@ const showSuccessDelete = ref(false)
 const showFailDelete = ref(false)
 const showFail = ref(false)
 const page = ref(1)
-const itemsPerPage = 3
 const isLoading = ref(false)
 const contentArea = ref(null)
 const editForm = ref({
@@ -171,68 +170,43 @@ const editForm = ref({
 
 const nipGuru = localStorage.getItem('nip')
 
-const dummyBerita = Array.from({ length: 15 }, (_, i) => ({
-  id: i + 1,
-  title: `Berita ${i + 1}`,
-  subtitle: `Subjudul berita ${i + 1}`,
-  description: `Deskripsi lengkap berita ${i + 1}.`,
-  image: `https://via.placeholder.com/400x200?text=Berita+${i + 1}`,
-}))
-
-const loadMoreBerita = () => {
-  if (isLoading.value) return
-  isLoading.value = true
-
-  setTimeout(() => {
-    const start = (page.value - 1) * itemsPerPage
-    const end = page.value * itemsPerPage
-    const nextItems = dummyBerita.slice(start, end)
-    beritaList.value = [...beritaList.value, ...nextItems]
-    page.value++
-    isLoading.value = false
-  }, 300)
-}
-
-const handleScroll = () => {
-  const el = contentArea.value
-  if (!el) return
-
-  const bottomReached = el.scrollTop + el.clientHeight >= el.scrollHeight - 10
-
-  if (bottomReached && beritaList.value.length < dummyBerita.length) {
-    loadMoreBerita()
-  }
-}
 
 onMounted(() => {
   fetchBerita()
-  contentArea.value?.addEventListener('scroll', handleScroll)
 })
 
 const fetchBerita = async () => {
+  if (isLoading.value) return
+  isLoading.value = true
+
   try {
-    const response = await axios.get('http://localhost:8000/api/documentations')
-    beritaList.value = response.data.data.map((item) => ({
+    const response = await axios.get(`http://localhost:8000/api/documentations?page=${page.value}`)
+    const newItems = response.data.data.map((item) => ({
       id: item.id_document,
       title: item.title,
       description: item.description,
-      image: item.file_url, 
+      image: item.file_url, // URL dari backend
     }))
-    console.log(beritaList.value)
+    console.log(beritaList.value) // Log data untuk memastikan URL benar
   } catch (error) {
     console.error('Gagal memuat berita:', error)
+  } finally {
+    isLoading.value = false
   }
 }
+
+
 
 const selectBerita = (berita) => {
   selectedBerita.value = berita
   editForm.value = {
-    id: berita.id, 
+    id: berita.id, // penting agar axios.put punya ID!
     title: berita.title,
     description: berita.description,
     image: berita.image,
   }
 }
+
 
 const saveChanges = () => {
   Object.assign(selectedBerita.value, editForm.value)
@@ -345,6 +319,10 @@ const goBack = () => {
   height: 24px;
 }
 
+.back-button img {
+  filter: invert(1);
+}
+
 .app-title {
   font-size: 1.3rem;
   font-weight: bold;
@@ -385,7 +363,7 @@ const goBack = () => {
 .greeting-text {
   font-size: 1rem;
   font-weight: bold;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.8rem;
   color: #8b8b8b;
   margin-left: 0.8rem;
 }
@@ -433,7 +411,7 @@ const goBack = () => {
 
 .berita-image {
   width: 100%;
-  height: 350px;
+  height: 275px;
   max-height: 350px;
   border-radius: 8px;
   object-fit: cover;
@@ -495,6 +473,7 @@ const goBack = () => {
   margin-top: 1rem;
   border: none;
   margin-left: 1.5rem;
+  width: 90%;
 }
 
 .input-title {
@@ -508,13 +487,13 @@ const goBack = () => {
 }
 
 .textarea-description {
-  width: 400px;
+  width: 100%;
   font-size: 0.8rem;
-  min-height: 100px;
+  min-height: 150px;
   padding: 0.5rem;
   border: none;
   resize: vertical;
-  color: #7a7878;
+  color: #000;
 }
 
 .input-title:focus,
@@ -541,7 +520,7 @@ const goBack = () => {
   padding: 8px 14px;
   border-radius: 8px;
   cursor: pointer;
-  width: 30%;
+  width: 25%;
   font-size: 0.8rem;
 }
 
@@ -549,7 +528,7 @@ const goBack = () => {
   background-color: #e74c3c;
   color: white;
   border: none;
-  padding: 10px 16px;
+  padding: 10px 14px;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.8rem;
@@ -575,7 +554,7 @@ const goBack = () => {
     margin-bottom: 0;
   }
   .back-button img {
-    filter: invert(1);
+    filter: invert(0);
   }
   .app-title {
     color: #2c3930;

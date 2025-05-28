@@ -48,6 +48,16 @@
       :title="'Login gagal. <br>Periksa username dan password.'"
       @close="showAlert = false"
     />
+    <PopupMessage
+      v-if="showLoginGuru"
+      :title="'Login Guru Berhasil'"
+      @close="showLogin = false"
+    />
+    <PopupMessage
+      v-if="showLoginOrtu"
+      :title="'Login Orang Tua Berhasil'"
+      @close="showAlert = false"
+    />
   </div>
 </template>
 
@@ -64,6 +74,9 @@ const showAlert = ref(false)
 const showPassword = ref(false)
 const username = ref('')
 const password = ref('')
+const showLoginGuru = ref(false)
+const showLoginOrtu = ref(false)
+
 
 const handleLogin = async () => {
   try {
@@ -74,7 +87,7 @@ const handleLogin = async () => {
 
     if (response.data.status === 'success') {
       localStorage.setItem('userName', response.data.name)
-      alert(response.data.message)
+      //alert(response.data.message)
 
       localStorage.setItem('isLoggedIn', 'true')
       localStorage.setItem('role', response.data.role)
@@ -84,10 +97,13 @@ const handleLogin = async () => {
           name: response.data.name,
           email: response.data.email,
           nip: response.data.nip,
-          telepon: response.data.num_telp 
+          telepon: response.data.num_telp // pastikan backend mengirim num_telp
         }))
         localStorage.setItem('userName', response.data.name)
-        router.push('/dashboard-guru')
+        showLoginGuru.value = true
+        setTimeout(() => {
+          router.push('/dashboard-guru')
+        }, 1500)
       } else if (response.data.role === 'ortu') {
         localStorage.setItem('user', JSON.stringify({
           id_parent: response.data.id_parent,
@@ -98,7 +114,10 @@ const handleLogin = async () => {
           alamat: response.data.alamat
         }))
         localStorage.setItem('userName', response.data.name)
-        router.push('/dashboardortu')
+        showLoginOrtu.value = true
+        setTimeout(() => {
+          router.push('/dashboardortu')
+        }, 1500)
       }
 
       localStorage.setItem('nip', response.data.nip)

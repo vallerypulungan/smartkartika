@@ -59,8 +59,7 @@
           </div>
         </div>
 
-        <div v-else class="berita-detail">
-          <!-- Kotak Gambar + Judul + Subjudul -->
+        <div v-else class="berita-detail">>
           <div class="berita-card">
             <img :src="selectedBerita.image" alt="detail" class="detail-image" />
           </div>
@@ -71,9 +70,12 @@
               <h2 class="detail-title">{{ selectedBerita.title }}</h2>
               <p class="detail-subtitle">{{ selectedBerita.subtitle }}</p>
             </div>
-            <strong class="description-label">Deskripsi :</strong>
             <div class="description-box">
-              <p>{{ selectedBerita.description }}</p>
+              <textarea
+                class="description-textarea"
+                :value="selectedBerita.description"
+                readonly
+              ></textarea>
             </div>
           </div>
         </div>
@@ -237,14 +239,14 @@ window.addEventListener('resize', () => {
 .berita-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 10px;
 }
 
 .berita-item {
   width: 60%;
+  height: 175px;
   background: #a27b5c;
-  border-radius: 12px;
-  overflow: hidden;
+  border-radius: 5px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   display: flex;
@@ -257,15 +259,17 @@ window.addEventListener('resize', () => {
   width: 100%;
   height: 140px;
   object-fit: cover;
+  border-radius: 5px;
 }
 
 .berita-info {
-  padding: 12px;
+  padding: 6px;
   color: white;
+  margin-left: 0.7rem;
 }
 
 .berita-title {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   margin-bottom: 4px;
 }
@@ -279,31 +283,27 @@ window.addEventListener('resize', () => {
 .berita-detail {
   display: flex;
   flex-direction: column;
-  gap: 24px;
   padding: 1rem;
   height: 100%;
-  height: 100%;
+  overflow-y: auto;
+  margin: 0 auto;
+  width: 100%;
 }
 
 /* Kartu berita */
 .berita-card {
-  background-color: #a27b5c;
   border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  width: 70%;
-  margin: 0 auto;
-  margin-top: 1rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.5rem;
 }
 
 .detail-image {
-  width: 100%;
-  height: 150px;
+  width: 425px;
+  height: 350px;
   object-fit: cover;
-}
-
-.berita-card-text {
-  padding: 8px;
+  border-radius: 5px;
 }
 
 .detail-title {
@@ -313,37 +313,60 @@ window.addEventListener('resize', () => {
   margin-bottom: 8px;
 }
 
-.detail-subtitle {
-  font-size: 16px;
-  color: #cccccc;
-}
-
 /* Deskripsi */
 .detail-description {
-  padding: 8px;
+  padding: 5px;
 }
 
-
-.description-box {
-  background-color: #e0e0e0;
-  color: #333;
-  padding: 8px;
-  border-radius: 8px;
+.description-textarea {
+  width: 100%;
+  min-height: 120px;
+  resize: none;
   font-size: 12px;
-  line-height: 1.5;
+  border: none;
+  background-color: transparent;
+  overflow-y: auto;
+  border-radius: 8px;
+  color: #333;
+  box-sizing: border-box;
+  outline: none;
+  font-family: inherit;
 }
+
 
 @media (min-width: 769px) {
   .berita-item {
     display: flex;
     flex-direction: column;
     width: 50%;
+    height: 337px;
+    margin-bottom: 1rem;
+  }
+  .berita-title {
+    font-size: 14px;
   }
   .berita-image {
-    height: 250px;
+    height: 300px;
+  }
+  .berita-detail {
+    flex-direction: row;
   }
   .berita-card {
-    width: 50%;
+    flex: 2;
+    width: 700px;
+    margin: 0;
+    gap: 1rem;
+  }
+  .detail-image {
+    height: 440px;
+    width: 775px;
+  }
+  .detail-description {
+    flex: 1;
+    width: 60%;
+  }
+  .detail-title {
+    font-size: 1.5rem;
   }
 }
 </style>

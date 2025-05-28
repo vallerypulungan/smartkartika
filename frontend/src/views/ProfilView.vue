@@ -135,6 +135,7 @@ const goBack = () => {
   .profile-info {
     overflow: hidden;
     height: calc(100vh - 160px);
+    width: 90%;
   }
 }
 </style>

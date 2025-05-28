@@ -11,11 +11,11 @@ use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
-    
+
     public function loginApi(Request $request)
     {
         $credentials = $request->only('username', 'password');
-    
+
         // Cek sebagai Guru
         $guru = Teacher::where('nip', $credentials['username'])->first();
         if ($guru && $credentials['password'] === $guru->password) {
@@ -30,7 +30,7 @@ class LoginController extends Controller
                 'redirect' => '/dashboard-guru',
             ]);
         }
-    
+
         // Cek sebagai Orang Tua
         $ortu = ParentModel::where('num_telp', $credentials['username'])->first();
         if ($ortu && $credentials['password'] === $ortu->password) {
@@ -47,13 +47,13 @@ class LoginController extends Controller
                 'redirect' => '/dashboardortu',
             ]);
         }
-    
+
         return response()->json([
             'status' => 'fail',
             'message' => 'Username atau Password salah'
         ], 401);
     }
-    
+
     public function logoutApi(Request $request)
     {
         return response()->json([

@@ -23,9 +23,9 @@
         <div class="modal-content">
           <h3 class="modal-title">{{ isEditing ? 'Edit Kegiatan' : 'Tambah Kegiatan' }}</h3>
           <form @submit.prevent="submitForm" class="modal-form">
-            <input v-model="formItem.judul" placeholder="Judul" />
-            <input v-model="formItem.tanggal" type="date" />
-            <textarea v-model="formItem.deskripsi" placeholder="Deskripsi"></textarea>
+            <input v-model="formItem.judul" placeholder="Judul" required/>
+            <input v-model="formItem.tanggal" type="date" required/>
+            <textarea v-model="formItem.deskripsi" placeholder="Deskripsi" required></textarea>
             <div class="file-wrapper">
               <input
                 type="file"
@@ -34,13 +34,8 @@
                 class="hidden"
                 @change="handleImageUpload"
                 accept="image/*"
+                required
               />
-              <div v-if="formItem.imageName || formItem.imageUrl" class="file-name">
-                <span v-if="formItem.imageName">{{ formItem.imageName }}</span>
-                <span v-else-if="formItem.imageUrl">
-                  File sebelumnya: {{ formItem.imageUrl.split('/').pop() }}
-                </span>
-              </div>
             </div>
             <div class="modal-actions">
               <button class="laporan-button save" type="submit">
@@ -94,26 +89,26 @@
     <div class="popup-wrapper" :style="{ zIndex: 9999 }">
       <PopupGagal
         v-if="showAlert"
-        :title="'HARAP ISI SEMUA KOLOM TERLEBIH DAHULU'"
+        :title="'Gagal Menambahkan Kegiatan'"
         @close="cancelMessage"
       />
     </div>
 
     <PopupSuccess
       v-if="showSuccess"
-      :title="'KEGIATAN BERHASIL DITAMBAHKAN'"
+      :title="'Kegiatan berhasil ditambahkan'"
       @close="cancelMessage"
     />
 
     <PopupSuccess
       v-if="showSuccessEdit"
-      :title="'PERUBAHAN BERHASIL DISIMPAN'"
+      :title="'Perubahan berhasil disimpan'"
       @close="cancelMessage"
     />
 
     <PopupSuccess
       v-if="showSuccessDelete"
-      :title="'KEGIATAN BERHASIL DIHAPUS'"
+      :title="'Kegiatan berhasil dihapus'"
       @close="cancelMessage"
     />
   </div>
@@ -370,7 +365,7 @@ const goBack = () => {
 
 .laporan-table th:nth-child(1),
 .laporan-table td:nth-child(1) {
-  width: 5%;
+  width: 3%;
 }
 
 .laporan-table th:nth-child(2),
@@ -380,7 +375,7 @@ const goBack = () => {
 
 .laporan-table th:nth-child(3),
 .laporan-table td:nth-child(3) {
-  width: 10%;
+  width: 8%;
 }
 
 .laporan-table th:nth-child(4),
@@ -390,7 +385,7 @@ const goBack = () => {
 
 .laporan-table th:nth-child(5),
 .laporan-table td:nth-child(5) {
-  width: 40%;
+  width: 25%;
 }
 
 .laporan-table th:nth-child(6),
@@ -496,6 +491,7 @@ textarea {
   border: 1px solid #ccc;
   border-radius: 6px;
   color: #000;
+  font-family: inherit;
 }
 
 .modal-actions {
@@ -594,65 +590,34 @@ textarea {
     -webkit-overflow-scrolling: touch;
   }
 
-  .laporan-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85rem;
-    table-layout: fixed;
-    min-width: 500px;
-  }
-
-  .laporan-table th,
-  .laporan-table td {
-    border: 1px solid #ccc;
-    padding: 6px 8px;
-    text-align: left;
-    word-break: break-word;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: middle;
-  }
-
   .laporan-table th:nth-child(1),
   .laporan-table td:nth-child(1) {
     width: 3%;
-    min-width: 30px;
   }
 
   .laporan-table th:nth-child(2),
   .laporan-table td:nth-child(2) {
     width: 13%;
-    min-width: 120px;
   }
 
   .laporan-table th:nth-child(3),
   .laporan-table td:nth-child(3) {
     width: 10%;
-    min-width: 100px;
   }
 
   .laporan-table th:nth-child(4),
   .laporan-table td:nth-child(4) {
     width: 15%;
-    min-width: 150px;
-    white-space: normal;
   }
 
   .laporan-table th:nth-child(5),
   .laporan-table td:nth-child(5) {
     width: 20%;
-    min-width: 90px;
-    white-space: nowrap;
-    text-align: center;
   }
 
   .laporan-table th:nth-child(6),
   .laporan-table td:nth-child(6) {
     width: 15%;
-    min-width: 90px;
-    white-space: nowrap;
-    text-align: center;
   }
 
   .laporan-table {
@@ -663,14 +628,6 @@ textarea {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     width: 100%;
-  }
-
-  .laporan-table td:nth-child(4) {
-    max-height: 3.6em;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
   }
 }
 </style>

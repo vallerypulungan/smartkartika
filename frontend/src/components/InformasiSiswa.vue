@@ -258,9 +258,19 @@
         @close="cancelSave"
       />
       <PopupMessage
+        v-if="showFailAdd"
+        :title="'Gagal menambahkan informasi siswa'"
+        @close="showFailAdd = false"
+      />
+      <PopupMessage
         v-if="showSuccesEdit"
         :title="'Berhasil mengubah informasi siswa'"
         @close="cancelSave"
+      />
+      <PopupMessage
+        v-if="showFailEdit"
+        :title="'Gagal mengubah informasi siswa'"
+        @close="showFailEdit = false"
       />
       <PopupMessage
         v-if="showSuccesDelete"
@@ -268,11 +278,16 @@
         @close="cancelSave"
       />
       <PopupMessage
+        v-if="showFailDelete"
+        :title="'Gagal menghapus informasi siswa'"
+        @close="showFailDelete = false"
+      />
+      <PopupMessage
         v-if="showAlertTahunAjaran"
         :title="'Mohon isi kedua tahun ajaran dahulu'"
         @close="cancelSave"
       />
-      <PopupMessage v-if="showAlertTahun" :title="'Tahun ajaran sudah ada'" @close="cancelSave" />
+      <PopupMessage v-if="showAlertTahun" :title="'Tahun ajaran sudah ada atau gagal menambah'" @close="cancelSave" />
     </div>
   </div>
 </template>
@@ -309,6 +324,9 @@ const tahunAwal = ref('')
 const tahunAkhir = ref('')
 const showAlertTahunAjaran = ref(false)
 const showAlertTahun = ref(false)
+const showFailAdd = ref(false)
+const showFailEdit = ref(false)
+const showFailDelete = ref(false)
 
 const classData = ref({
   'Daftar Siswa': [],
@@ -415,7 +433,7 @@ async function simpanTahunAjaran() {
     tahunAwal.value = ''
     tahunAkhir.value = ''
   } catch (error) {
-    alert('Tahun ajaran sudah ada atau gagal menambah')
+    showAlertTahun.value = true
   }
 }
 
@@ -497,7 +515,7 @@ async function saveActivity() {
     showConfirmPromote.value = false;
     showSuccesAdd.value = true;
   } catch (error) {
-    alert('Gagal menambahkan siswa: ' + (error.response?.data?.message || error.message));
+    showFailAdd.value = true
   }
 }
 
@@ -568,7 +586,7 @@ async function saveEdit() {
       await fetchSiswa()
       showSuccesEdit.value = true
     } catch (error) {
-      alert('Gagal mengedit siswa: ' + (error.response?.data?.message || error.message))
+      showFailEdit.value = true
     }
     showConfirmEdit.value = false
     editingIndex.value = null
@@ -601,7 +619,7 @@ async function confirmDelete() {
       await fetchSiswa()
       showSuccesDelete.value = true
     } catch (error) {
-      alert('Gagal menghapus siswa: ' + (error.response?.data?.message || error.message))
+      showFailDelete.value = true
     }
     showConfirmDelete.value = false
     deletingIndex.value = null
@@ -651,7 +669,6 @@ const goBack = () => {
 .class-table-container {
   padding: 24px;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   max-width: 100%;
   display: flex;
   flex-direction: column;
@@ -1019,6 +1036,7 @@ const goBack = () => {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0.5rem;
     background:
       linear-gradient(rgba(44, 57, 48, 0.93), rgba(44, 57, 48, 0.93)), url('@/assets/bg.png');
   }
@@ -1047,6 +1065,10 @@ const goBack = () => {
     cursor: pointer;
     display: flex;
     align-items: center;
+  }
+
+  .back-button img {
+    filter: invert(1);
   }
 
   .app-title {
@@ -1081,6 +1103,57 @@ const goBack = () => {
 
   .form-button {
     margin-bottom: 0;
+  }
+  .table-section {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .styled-table {
+    width: 100%;
+    min-width: 900px;
+  }
+
+  .styled-table th {
+    border-left: 2px solid #ccc;
+  }
+
+  .styled-table th:nth-child(1),
+  .styled-table td:nth-child(1) {
+    width: 1%;
+  }
+
+  .styled-table th:nth-child(2),
+  .styled-table td:nth-child(2) {
+    width: 20%;
+  }
+
+  .styled-table th:nth-child(3),
+  .styled-table td:nth-child(3) {
+    width: 18%;
+  }
+
+  .styled-table th:nth-child(4),
+  .styled-table td:nth-child(4) {
+    width: 10%;
+  }
+
+  .styled-table th:nth-child(5),
+  .styled-table td:nth-child(5) {
+    width: 6%;
+  }
+
+  .styled-table th:nth-child(6),
+  .styled-table td:nth-child(6) {
+    width: 13%;
+  }
+
+  .styled-table th:nth-child(7),
+  .styled-table td:nth-child(7) {
+    width: 15%;
+  }
+  .styled-table th:nth-child(8),
+  .styled-table td:nth-child(8) {
+    width: 20%;
   }
 }
 </style>

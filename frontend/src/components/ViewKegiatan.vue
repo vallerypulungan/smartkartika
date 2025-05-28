@@ -18,7 +18,11 @@
         <div class="main-content">
           <p class="main-date">{{ mainArticle.date }}</p>
           <h2 class="main-title">{{ mainArticle.title }}</h2>
-          <p class="main-description">{{ mainArticle.description }}</p>
+          <textarea
+            class="main-description"
+            :value="mainArticle.description"
+            readonly
+          ></textarea>
         </div>
       </div>
 
@@ -29,7 +33,7 @@
             class="side-article"
             v-for="(article, index) in sideArticles"
             :key="index"
-            @click="switchMainArticle(index)"
+             @click="switchMainArticle(article.realIndex)"
           >
             <img :src="article.image" alt="Side" class="side-image" />
             <div class="side-content">
@@ -62,7 +66,7 @@ import axios from 'axios'
 
 const router = useRouter()
 const isMobile = ref(window.innerWidth <= 768)
-const articlesPerPage = ref(3)
+const articlesPerPage = ref(5)
 const currentPage = ref(0)
 const previousIsMobile = ref(isMobile.value)
 const selectedArticleIndex = ref(0)
@@ -75,15 +79,17 @@ const sideArticles = computed(() => {
   const start = currentPage.value * articlesPerPage.value
   const end = start + articlesPerPage.value
 
-  const sliced = allArticles.value.slice(start, end)
-
-  return sliced.filter((_, idx) => (start + idx) !== selectedArticleIndex.value)
+  return allArticles.value.slice(start, end)
+    .map((article, idx) => ({ ...article, realIndex: start + idx }))
+    .filter(article => article.realIndex !== selectedArticleIndex.value)
 })
 
 
-function switchMainArticle(index) {
-  selectedArticleIndex.value = currentPage.value * articlesPerPage.value + index
+
+function switchMainArticle(realIndex) {
+  selectedArticleIndex.value = realIndex
 }
+
 
 function nextPageMobile() {
   if ((currentPage.value + 1) * articlesPerPage.value < allArticles.value.length) {
@@ -102,7 +108,7 @@ function prevPageMobile() {
 function handleResize() {
   const wasMobile = previousIsMobile.value
   isMobile.value = window.innerWidth <= 768
-  articlesPerPage.value = isMobile.value ? 1 : 3
+  articlesPerPage.value = isMobile.value ? 1 : 5
   if (wasMobile !== isMobile.value) {
     const newPage = Math.floor(selectedArticleIndex.value / articlesPerPage.value)
     currentPage.value = newPage
@@ -153,22 +159,17 @@ const goBack = () => {
   flex-direction: column;
   height: 100vh;
   background-color: #dcd0d0;
+  overflow-x: auto;
+  width: 100%;
 }
 
-.news-container {
-  display: flex;
-  flex-direction: row;
-  gap: 2rem;
-  width: 100%;
-  margin: 1rem auto;
-  padding: 0 2rem;
-}
 
 .page-header {
   margin-bottom: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
   padding: 0.5rem;
   background:
     linear-gradient(rgba(162, 123, 92, 0.8), rgba(162, 123, 92, 0.8)), url('@/assets/bg.png');
@@ -208,33 +209,41 @@ const goBack = () => {
   margin: 0 auto;
 }
 
+.news-container {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  width: 100%;
+  margin: 1rem auto;
+  padding: 0 2rem;
+}
+
 .main-article {
-  flex: 1;
+  flex: 2;
   background-color: #fff;
   border-radius: 12px;
-  overflow: hidden;
   cursor: default;
+  max-width: 900px;
 }
 
 .main-image {
-  width: 100%;
-  height: 200px;
+  width: 900px;
+  height: 300px;
   object-fit: cover;
 }
 
 .main-content {
   padding: 1rem;
+  overflow-y: auto;
 }
 
 .main-date {
   font-size: 0.7rem;
   color: #888;
-  margin-bottom: 0.5rem;
 }
 
 .main-title {
   font-size: 1.2rem;
-  margin-bottom: 0.5rem;
   color: #222;
   font-weight: bold;
 }
@@ -242,16 +251,24 @@ const goBack = () => {
 .main-description {
   font-size: 0.8rem;
   color: #555;
-  max-height: 150px;
-  overflow-y: auto;
+  min-height: 70px;
+  width: 100%;
+  resize: vertical;
+  border: none;
+  background-color: transparent;
+  outline: none;
+  font-family: inherit;
 }
+
 
 .side-articles {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  width: 100%;
+  gap: 0.5rem;
 }
+
 
 .side-article {
   display: flex;
@@ -262,6 +279,7 @@ const goBack = () => {
   align-items: center;
   cursor: pointer;
   transition: background-color 0.2s;
+  width: 275px;
 }
 
 .side-article:hover {
@@ -269,7 +287,7 @@ const goBack = () => {
 }
 
 .side-image {
-  width: 80px;
+  width: 100px;
   height: 80px;
   object-fit: cover;
   border-radius: 8px;
@@ -293,7 +311,7 @@ const goBack = () => {
 .pagination-buttons {
   display: flex;
   justify-content: space-between;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
 .pagination-buttons button {
@@ -326,17 +344,20 @@ const goBack = () => {
   }
 
   .main-article {
-    flex: unset;
-    width: 100%;
-    height: 180px;
+    flex: 1;
+    width: 400px;
+    height: 150px;
+    margin: 0 auto;
   }
 
   .main-date {
     font-size: 0.5rem;
+    margin-top: 0;
   }
 
   .main-image {
-    height: 180px;
+    width: 400px;
+    height: 250px;
     object-fit: cover;
   }
 
@@ -348,35 +369,8 @@ const goBack = () => {
   .main-description {
     font-size: 0.6rem;
   }
-
-  .side-articles {
-    display: none;
-    flex: unset;
-    width: 100%;
-  }
-
-  .side-article {
-    gap: 0.6rem;
-    padding: 0.6rem;
-  }
-
-  .side-image {
-    width: 60px;
-    height: 60px;
-    border-radius: 6px;
-  }
-
-  .side-title {
-    font-size: 0.6rem;
-  }
-
-  .side-date {
-    font-size: 0.4rem;
-  }
-
   .pagination-buttons {
-    margin-top: 0.5rem;
-    gap: 0.5rem;
+    gap: 1rem;
     width: 40%;
   }
 
