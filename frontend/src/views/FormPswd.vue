@@ -35,12 +35,6 @@
         </div>
 
         <button @click="handleLogin" class="login-button">Masuk</button>
-        <div class="login-redirect">
-          <span>
-            Belum punya akun?
-            <router-link to="/registerteach" class="login-link">Daftar di sini (Guru)</router-link>
-          </span>
-        </div>
       </div>
     </div>
     <PopupMessage
@@ -87,7 +81,7 @@ const handleLogin = async () => {
 
     if (response.data.status === 'success') {
       localStorage.setItem('userName', response.data.name)
-      
+
 
       localStorage.setItem('isLoggedIn', 'true')
       localStorage.setItem('role', response.data.role)
@@ -97,7 +91,7 @@ const handleLogin = async () => {
           name: response.data.name,
           email: response.data.email,
           nip: response.data.nip,
-          telepon: response.data.num_telp 
+          telepon: response.data.num_telp
         }))
         localStorage.setItem('userName', response.data.name)
         showLoginGuru.value = true
@@ -236,22 +230,6 @@ const handleLogin = async () => {
   background-color: #1f2922;
 }
 
-.login-redirect {
-  text-align: center;
-  font-size: 12px;
-  color: #000;
-}
-
-.login-link {
-  color: #2c3930;
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.login-link:hover {
-  text-decoration: underline;
-}
-
 @media (max-width: 768px) {
   .container {
     display: block;
@@ -320,22 +298,6 @@ const handleLogin = async () => {
 
   .mobile-panel .login-button {
     width: 40%;
-  }
-  .login-redirect {
-    margin-top: 0.5rem;
-    text-align: center;
-    font-size: 14px;
-    color: #000;
-  }
-
-  .login-link {
-    color: #2c3930;
-    font-weight: bold;
-    text-decoration: none;
-  }
-
-  .login-link:hover {
-    text-decoration: underline;
   }
 }
 </style>

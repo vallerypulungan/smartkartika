@@ -67,7 +67,7 @@
             <div class="icon-container submenu">
               <img src="@/assets/info-circle.png" alt="Info" />
             </div>
-            <span>Infromasi Siswa</span>
+            <span>Informasi Siswa</span>
           </div>
           <div
             class="menu submenu"
