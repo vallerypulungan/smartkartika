@@ -20,27 +20,49 @@ const routes = [
   { path: '/', component: WelcomePage },
   { path: '/login', name: 'login', component: FormPswd },
   { path: '/registerteach', component: RegisterTeacher },
-  { path: '/dashboard-guru', name: 'dashboardGuru', component: DashboardGuru,
+  { 
+    path: '/dashboard-guru',
+    name: 'dashboardGuru',
+    component: DashboardGuru,
+    meta: { role: 'guru' },
     children: [
       { path: 'home', name: 'home', component: MainHome },
       { path: 'profil', name: 'profil', component: ProfilView },
       { path: 'upload', name: 'upload', component: LaporanView },
       { path: 'upberita', name: 'upberita', component: UpNews },
       { path: 'manage', name: 'manage', component: KelolaKegiatan },
-      { path: 'kelas', name: 'kelas', component: TabelKelas},
-      { path : 'infosiswa', name: 'infosiswa', component: InformasiSiswa},
-      { path: 'infoguru', name: 'infoguru', component: InformasiGuru}
+      { path: 'kelas', name: 'kelas', component: TabelKelas },
+      { path: 'infosiswa', name: 'infosiswa', component: InformasiSiswa },
+      { path: 'infoguru', name: 'infoguru', component: InformasiGuru }
     ],
    },
-  { path: '/dashboardortu', component: DashboardOrtu },
-  { path: '/rapor', component: LaporanOrtu },
-  { path: '/profilp', component: ProfilOrtu },
-  { path: '/viewkegiatan', component: ViewKegiatan },
+  { path: '/dashboardortu', component: DashboardOrtu, meta: { role: 'ortu' } },
+  { path: '/rapor', component: LaporanOrtu, meta: { role: 'ortu' } },
+  { path: '/profilp', component: ProfilOrtu, meta: { role: 'ortu' } },
+  { path: '/viewkegiatan', component: ViewKegiatan, meta: { role: 'ortu' } },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
+  const userRole = localStorage.getItem('role')
+
+  if (to.meta.role) {
+    if (!isLoggedIn) {
+      next('/login')
+    } else if (to.meta.role !== userRole) {
+      alert('Akses ditolak! Anda tidak memiliki izin untuk halaman ini.')
+      next(false)
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
 })
 
 export default router
