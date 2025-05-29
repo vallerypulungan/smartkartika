@@ -35,6 +35,7 @@
         </div>
 
         <button @click="handleLogin" class="login-button">Masuk</button>
+        <button @click="popup.open('Tes popup manual')">Tes Popup</button>
       </div>
     </div>
     <PopupMessage
@@ -70,7 +71,8 @@ const username = ref('')
 const password = ref('')
 const showLoginGuru = ref(false)
 const showLoginOrtu = ref(false)
-
+import { usePopupStore } from '@/stores/popupStores'
+const popup = usePopupStore()
 
 const handleLogin = async () => {
   try {

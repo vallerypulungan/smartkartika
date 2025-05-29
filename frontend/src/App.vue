@@ -1,11 +1,10 @@
 <template>
   <div>
     <router-view />
+    <PopupModal />
   </div>
 </template>
 
-<script>
-export default {
-  name: 'App',
-};
+<script setup>
+import PopupModal from '@/components/PopupSistem.vue'
 </script>

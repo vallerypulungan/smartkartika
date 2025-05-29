@@ -7,7 +7,8 @@ import router from './router/route'
 import axios from 'axios'
 
 const app = createApp(App)
+const pinia = createPinia()
 
 app.use(router)
-app.use(createPinia())
+app.use(pinia)
 app.mount('#app')

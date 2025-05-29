@@ -15,12 +15,16 @@ import ViewKegiatan from '@/components/ViewKegiatan.vue'
 import TabelKelas from '@/components/TabelKelas.vue'
 import InformasiSiswa from '@/components/InformasiSiswa.vue'
 import InformasiGuru from '@/components/InformasiGuru.vue'
+import { usePopupStore } from '@/stores/popupStores'
+import { createPinia } from 'pinia'
+
+const pinia = createPinia()
 
 const routes = [
   { path: '/', component: WelcomePage },
   { path: '/login', name: 'login', component: FormPswd },
   { path: '/registerteach', component: RegisterTeacher },
-  { 
+  {
     path: '/dashboard-guru',
     name: 'dashboardGuru',
     component: DashboardGuru,
@@ -51,12 +55,16 @@ router.beforeEach((to, from, next) => {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
   const userRole = localStorage.getItem('role')
 
+  const popup = usePopupStore()
+
   if (to.meta.role) {
     if (!isLoggedIn) {
       next('/login')
     } else if (to.meta.role !== userRole) {
-      alert('Akses ditolak! Anda tidak memiliki izin untuk halaman ini.')
-      next(false)
+      popup.open('Akses ditolak! Anda tidak memiliki izin untuk halaman ini.')
+      setTimeout(() => {
+        next(false)
+      }, 300)
     } else {
       next()
     }
@@ -64,5 +72,6 @@ router.beforeEach((to, from, next) => {
     next()
   }
 })
+
 
 export default router
