@@ -108,7 +108,7 @@ const goBack = () => {
 
 const fetchBerita = async () => {
   try {
-    const response = await axios.get('http://localhost:8000/api/documentations');
+    const response = await axios.get('https://smarkatika-si.my.id/api/documentations');
     beritaList.value = response.data.data.map((item) => ({
       id: item.id_document,
       title: item.title,

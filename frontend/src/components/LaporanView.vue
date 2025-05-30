@@ -214,7 +214,7 @@ const formData = ref({
 
 async function fetchLaporan() {
   try {
-    const res = await axios.get('http://localhost:8000/api/laporan')
+    const res = await axios.get('https://smarkatika-si.my.id/api/laporan')
     daftarLaporan.value = res.data.data.map(laporan => ({
       id: laporan.id,
       nama: laporan.child?.name || '-',
@@ -236,16 +236,16 @@ onMounted(() => {
 })
 
 onMounted(async () => {
-  const tahunRes = await axios.get('http://localhost:8000/api/tahun-ajaran')
+  const tahunRes = await axios.get('https://smarkatika-si.my.id/api/tahun-ajaran')
   tahunAjaranOptions.value = tahunRes.data.data 
 
-  const kelasRes = await axios.get('http://localhost:8000/api/classes')
+  const kelasRes = await axios.get('https://smarkatika-si.my.id/api/classes')
   kelasOptionsRaw.value = kelasRes.data.data 
 })
 
 watch([selectedTahunAjaran, selectedKelas], async () => {
   if (selectedTahunAjaran.value && selectedKelas.value) {
-    const res = await axios.get('http://localhost:8000/api/children', {
+    const res = await axios.get('https://smarkatika-si.my.id/api/children', {
       params: {
         kelas: selectedKelas.value,
         tahun: selectedTahunAjaran.value,
@@ -339,14 +339,14 @@ const submitForm = async () => {
     if (isEditing.value && editingIndex.value !== null) {
       const laporan = daftarLaporan.value[editingIndex.value]
       form.append('_method', 'PUT')
-      await axios.post(`http://localhost:8000/api/laporan/${laporan.id}`, form, {} )
+      await axios.post(`https://smarkatika-si.my.id/api/laporan/${laporan.id}`, form, {} )
       showSuksesEdit.value = true
     } else {
       form.append('id_teacher', idTeacher)
       form.append('id_class', selectedKelas.value)
       form.append('id_parent', siswa?.id_parent)
       form.append('id_child', selectedSiswa.value)
-      await axios.post('http://localhost:8000/api/laporan', form)
+      await axios.post('https://smarkatika-si.my.id/api/laporan', form)
       showSuksesUnggah.value = true
     }
     formVisible.value = false
@@ -407,7 +407,7 @@ const konfirmasiHapus = async () => {
   if (indexToDelete.value !== null) {
     const laporan = daftarLaporan.value[indexToDelete.value]
     try {
-      await axios.delete(`http://localhost:8000/api/laporan/${laporan.id}`)
+      await axios.delete(`https://smarkatika-si.my.id/api/laporan/${laporan.id}`)
       daftarLaporan.value.splice(indexToDelete.value, 1)
       showSuksesHapus.value = true
     } catch (err) {
@@ -428,7 +428,7 @@ const selectedNip = ref(user.nip || '')
 const teacherName = ref(user.name || '')
 
 const getTeacherIdByNip = async (nip) => {
-  const res = await axios.get('http://localhost:8000/api/teachers', { params: { nip } })
+  const res = await axios.get('https://smarkatika-si.my.id/api/teachers', { params: { nip } })
   return res.data.data[0]?.id_teacher || ''
 }
 

@@ -125,7 +125,7 @@ const items = ref([])
 const router = useRouter()
 
 async function fetchActivities() {
-  const res = await axios.get('http://localhost:8000/api/activities')
+  const res = await axios.get('https://smarkatika-si.my.id/api/activities')
   items.value = res.data.data.map(item => ({
     id_activity: item.id_activity,
     judul: item.activity_tittle,
@@ -189,12 +189,12 @@ async function submitForm() {
   try {
     if (isEditing.value && editedIndex.value !== null) {
       const id = items.value[editedIndex.value].id_activity;
-      await axios.post(`http://localhost:8000/api/activities/${id}?_method=PUT`, formData, {
+      await axios.post(`https://smarkatika-si.my.id/api/activities/${id}?_method=PUT`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       showSuccessEdit.value = true;
     } else {
-      await axios.post('http://localhost:8000/api/activities', formData, {
+      await axios.post('https://smarkatika-si.my.id/api/activities', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       showSuccess.value = true;
@@ -217,7 +217,7 @@ async function saveActivity() {
   if (indexToDelete.value !== null) {
     try {
       const id = items.value[indexToDelete.value].id_activity;
-      await axios.delete(`http://localhost:8000/api/activities/${id}`);
+      await axios.delete(`https://smarkatika-si.my.id/api/activities/${id}`);
       await fetchActivities(); 
       showSuccessDelete.value = true;
     } catch (error) {
