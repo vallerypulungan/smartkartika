@@ -73,7 +73,7 @@
         </template>
       </div>
       <!-- Tombol logout di bawah -->
-      <div v-if="isLoggedIn" class="sidebar-item-logout" @click="goTo('/logout')">
+      <div v-if="isLoggedIn" class="sidebar-item-logout" @click="logout">
         <div class="icon-container">
           <img src="@/assets/upload-alt.png" alt="" class="icon-img" />
         </div>
@@ -89,6 +89,7 @@ import { ref } from 'vue'
 import { defineProps } from 'vue'
 import ChevronDown from '@/assets/chevron-down-sm.png'
 import ChevronRight from '@/assets/chevron-right-sm.png'
+import axios from 'axios'
 
 const router = useRouter()
 const showSubmenu = ref(false)
@@ -106,6 +107,23 @@ const { isLoggedIn } = defineProps({
 
 function toggleSubmenu() {
   showSubmenu.value = !showSubmenu.value
+}
+
+async function logout() {
+  try {
+    const response = await axios.post('http://localhost:8000/api/logout')
+    if (response.data.status === 'success') {
+      localStorage.removeItem('isLoggedIn')
+      localStorage.removeItem('role')
+      localStorage.removeItem('userName')
+      router.push('/login')
+    } else {
+      alert('Logout gagal dari server.')
+    }
+  } catch (error) {
+    console.error('Logout error:', error)
+    alert('Logout gagal karena koneksi atau server.')
+  }
 }
 
 function goTo(route) {

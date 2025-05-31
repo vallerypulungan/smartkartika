@@ -54,7 +54,7 @@ const userAlamat = ref(userStorage.alamat || '')
 
 onMounted(async () => {
   if (userStorage.id_parent) {
-    const res = await axios.get(`https://smarkatika-si.my.id/api/children?parent=${userStorage.id_parent}`)
+    const res = await axios.get(`http://localhost:8000/api/children?parent=${userStorage.id_parent}`)
     if (res.data.data.length > 0) {
       anak.value = res.data.data[0]
       user.value = anak.value.parent
