@@ -204,7 +204,7 @@ onMounted(async () => {
 
 async function fetchClasses() {
   try {
-    const response = await axios.get('https://smarkatika-si.my.id/api/classes')
+    const response = await axios.get('http://localhost:8000/api/classes')
     classList.value = response.data.data.filter(kls => kls.class !== 'Lulus TK')
     classList.value.forEach(kls => {
       if (!classData.value[kls.class]) {
@@ -218,7 +218,7 @@ async function fetchClasses() {
 
 const fetchTahunAjaran = async () => {
   try {
-    const response = await axios.get('https://smarkatika-si.my.id/api/tahun-ajaran')
+    const response = await axios.get('http://localhost:8000/api/tahun-ajaran')
     tahunAjaranOptions.value = response.data.data
   } catch (error) {
     console.error('Gagal mengambil tahun ajaran:', error)
@@ -234,7 +234,7 @@ const fetchSiswaByKelasTahun = async () => {
     if (id_class) params.kelas = id_class
     if (selectedTahunAjaran.value !== 'Semua') params.tahun = selectedTahunAjaran.value
 
-    const response = await axios.get('https://smarkatika-si.my.id/api/children', { params })
+    const response = await axios.get('http://localhost:8000/api/children', { params })
     classData.value[activeTab.value] = response.data.data.map(siswa => ({
       ...siswa,
       tahunAjaran: siswa.tahun_ajaran,
@@ -282,7 +282,7 @@ async function promoteStudents() {
 
     let dbSiswa = {}
     try {
-      const res = await axios.get(`https://smarkatika-si.my.id/api/children/${siswa.id_child}`)
+      const res = await axios.get(`http://localhost:8000/api/children/${siswa.id_child}`)
       dbSiswa = res.data.data || {}
     } catch (e) {
       dbSiswa = {}
@@ -308,7 +308,7 @@ async function promoteStudents() {
     }
 
     if (nextClassId !== siswa.id_class) {
-      await axios.put(`https://smarkatika-si.my.id/api/children/${siswa.id_child}`, payload)
+      await axios.put(`http://localhost:8000/api/children/${siswa.id_child}`, payload)
     }
   }
 
@@ -366,7 +366,7 @@ async function addClass() {
     nextCharCode++
   } while (exists)
 
-  await axios.post('https://smarkatika-si.my.id/api/classes', {
+  await axios.post('http://localhost:8000/api/classes', {
     class: newName,
     class_level: 'C'
   })
@@ -384,7 +384,7 @@ async function addClass() {
     if (lastClassBeforeNew) {
       const siswaToMove = classData.value[lastClassBeforeNew] || []
       for (const siswa of siswaToMove) {
-        await axios.put(`https://smarkatika-si.my.id/api/children/${siswa.id_child}`, {
+        await axios.put(`http://localhost:8000/api/children/${siswa.id_child}`, {
           ...siswa,
           id_class: kelasBaru.id_class
         })
@@ -417,7 +417,7 @@ async function deleteClass() {
   const id_class = kelasObj ? kelasObj.id_class : null
     if (id_class) {
     try {
-      await axios.delete(`https://smarkatika-si.my.id/api/classes/${id_class}`)
+      await axios.delete(`http://localhost:8000/api/classes/${id_class}`)
 
       // Hapus dari classList lokal
       classList.value = classList.value.filter(k => k.class !== current)

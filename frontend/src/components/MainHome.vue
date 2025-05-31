@@ -189,7 +189,7 @@ const fetchBerita = async () => {
   isLoading.value = true
 
   try {
-    const response = await axios.get(`https://smarkatika-si.my.id/api/documentations?page=${page.value}`)
+    const response = await axios.get(`http://localhost:8000/api/documentations?page=${page.value}`)
     const newItems = response.data.data.map((item) => ({
       id: item.id_document,
       title: item.title,
@@ -253,7 +253,7 @@ const deleteBerita = () => {
 
 const handleConfirmDelete = async () => {
   try {
-    await axios.delete(`https://smarkatika-si.my.id/api/documentations/${selectedBerita.value.id}`)
+    await axios.delete(`http://localhost:8000/api/documentations/${selectedBerita.value.id}`)
     beritaList.value = beritaList.value.filter((b) => b.id !== selectedBerita.value.id)
     selectedBerita.value = null
     showSuccessDelete.value = true
@@ -267,7 +267,7 @@ const handleConfirmDelete = async () => {
 
 const handleConfirmSave = async () => {
   try {
-    await axios.put(`https://smarkatika-si.my.id/api/documentations/${selectedBerita.value.id}`, {
+    await axios.put(`http://localhost:8000/api/documentations/${selectedBerita.value.id}`, {
       title: editForm.value.title,
       description: editForm.value.description,
       nip: nipGuru,

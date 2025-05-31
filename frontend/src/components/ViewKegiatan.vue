@@ -119,7 +119,7 @@ function handleResize() {
 onMounted(async () => {
   handleResize()
   window.addEventListener('resize', handleResize)
-  const res = await axios.get('https://smarkatika-si.my.id/api/activities')
+  const res = await axios.get('http://localhost:8000/api/activities')
   allArticles.value = res.data.data.map(item => ({
     image: item.image_url,
     title: item.activity_tittle,

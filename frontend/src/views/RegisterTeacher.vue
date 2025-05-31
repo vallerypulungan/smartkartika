@@ -93,7 +93,7 @@ const handleRegister = async () => {
     return
   }
   try {
-    const response = await axios.post('https://smarkatika-si.my.id/api/teachers', form.value)
+    const response = await axios.post('http://localhost:8000/api/teachers', form.value)
     popupMessage.value = response.data.message || 'Registrasi berhasil.'
     showPopup.value = true
     form.value = { name: '', nip: '', email: '', password: '', num_telp: '' }

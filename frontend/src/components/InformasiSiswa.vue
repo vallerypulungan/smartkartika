@@ -355,7 +355,7 @@ onMounted(() => {
 
 async function fetchKelas() {
   try {
-    const response = await axios.get('https://smarkatika-si.my.id/api/classes')
+    const response = await axios.get('http://localhost:8000/api/classes')
 
     daftarKelas.value = response.data.data.map(k => ({
       id: k.id_class,
@@ -368,7 +368,7 @@ async function fetchKelas() {
 
 async function fetchTahunAjaran() {
   try {
-    const response = await axios.get('https://smarkatika-si.my.id/api/tahun-ajaran')
+    const response = await axios.get('http://localhost:8000/api/tahun-ajaran')
     daftarTahunAjaran.value = response.data.data.map(t => ({
       id: t.id,
       nama: t.nama
@@ -380,7 +380,7 @@ async function fetchTahunAjaran() {
 
 const fetchSiswa = async () => {
   try {
-    const response = await axios.get('https://smarkatika-si.my.id/api/children')
+    const response = await axios.get('http://localhost:8000/api/children')
 
     classData.value['Daftar Siswa'] = response.data.data.map(siswa => ({
       id: siswa.id_child,
@@ -426,7 +426,7 @@ async function simpanTahunAjaran() {
   if (!tahunAwal.value || !tahunAkhir.value) return
   const tahunBaru = `${tahunAwal.value}/${tahunAkhir.value}`
   try {
-    const response = await axios.post('https://smarkatika-si.my.id/api/tahun-ajaran', { nama: tahunBaru })
+    const response = await axios.post('http://localhost:8000/api/tahun-ajaran', { nama: tahunBaru })
     await fetchTahunAjaran()
     form.value.tahunAjaran = response.data.data.id
     showTambahTahunModal.value = false
@@ -490,7 +490,7 @@ async function saveActivity() {
       kode: form.value.kode,
     };
 
-    const response = await axios.post('https://smarkatika-si.my.id/api/children', siswaBaru);
+    const response = await axios.post('http://localhost:8000/api/children', siswaBaru);
     await fetchSiswa()
 
     if (!classData.value['Daftar Siswa']) {
@@ -570,7 +570,7 @@ async function saveEdit() {
   if (editingIndex.value !== null && editingTab.value) {
     const siswa = classData.value[editingTab.value][editingIndex.value]
     try {
-      await axios.put(`https://smarkatika-si.my.id/api/children/${siswa.id}`, {
+      await axios.put(`http://localhost:8000/api/children/${siswa.id}`, {
         nama: form.value.nama,
         nis: form.value.nis,
         tempatLahir: form.value.tempatLahir,
@@ -623,7 +623,7 @@ async function confirmDelete() {
   if (deletingIndex.value !== null) {
     const siswa = classData.value[activeTab.value][deletingIndex.value]
     try {
-      await axios.delete(`https://smarkatika-si.my.id/api/children/${siswa.id}`)
+      await axios.delete(`http://localhost:8000/api/children/${siswa.id}`)
       await fetchSiswa()
       showSuccesDelete.value = true
     } catch (error) {

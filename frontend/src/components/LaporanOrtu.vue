@@ -84,14 +84,14 @@ try {
 
 onMounted(async () => {
   if (userStorage.id_parent) {
-    const anakRes = await axios.get(`https://smarkatika-si.my.id/api/children?parent=${userStorage.id_parent}`)
+    const anakRes = await axios.get(`http://localhost:8000/api/children?parent=${userStorage.id_parent}`)
     if (anakRes.data.data.length > 0) {
       const anak = anakRes.data.data[0]
       siswa.value = {
         nama: anak.name,
         nis: anak.nis
       }
-      const laporanRes = await axios.get(`https://smarkatika-si.my.id/api/laporan/anak/${anak.id_child}`)
+      const laporanRes = await axios.get(`http://localhost:8000/api/laporan/anak/${anak.id_child}`)
       daftarLaporan.value = laporanRes.data.data.map(laporan => ({
         kelas: laporan.class?.class || '-',
         tahunAjaran: laporan.child?.tahun_ajaran?.nama || '-', 

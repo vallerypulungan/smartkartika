@@ -150,7 +150,7 @@ watch(
 
 async function logout() {
   try {
-    const response = await axios.post('https://smarkatika-si.my.id/api/logout')
+    const response = await axios.post('http://localhost:8000/api/logout')
     if (response.data.status === 'success') {
       localStorage.removeItem('isLoggedIn')
       localStorage.removeItem('role')

@@ -266,7 +266,7 @@ const sortedTabs = computed(() => {
 async function saveActivity() {
   showConfirmAdd.value = false
   try {
-    const response = await axios.post('https://smarkatika-si.my.id/api/teachers', {
+    const response = await axios.post('http://localhost:8000/api/teachers', {
       name: form.value.nama,
       nip: form.value.nip,
       email: form.value.email,
@@ -297,7 +297,7 @@ function resetForm() {
 
 async function fetchTeachers() {
   try {
-    const response = await axios.get('https://smarkatika-si.my.id/api/teachers');
+    const response = await axios.get('http://localhost:8000/api/teachers');
     classData.value['Daftar Guru'] = response.data.data.map((teacher) => ({
       id: teacher.id_teacher,
       name: teacher.name,
@@ -340,7 +340,7 @@ async function saveEdit() {
   try {
     const teacherId = classData.value['Daftar Guru'][editingIndex.value].id;
 
-    const response = await axios.put(`https://smarkatika-si.my.id/api/teachers/${teacherId}`, {
+    const response = await axios.put(`http://localhost:8000/api/teachers/${teacherId}`, {
       name: form.value.nama,
       nip: form.value.nip,
       email: form.value.email,
@@ -370,7 +370,7 @@ async function confirmDelete() {
     const teacherId = classData.value['Daftar Guru'][deletingIndex.value].id;
 
 
-    await axios.delete(`https://smarkatika-si.my.id/api/teachers/${teacherId}`);
+    await axios.delete(`http://localhost:8000/api/teachers/${teacherId}`);
     classData.value['Daftar Guru'].splice(deletingIndex.value, 1);
     showSuccesDelete.value = true;
   } catch (error) {
