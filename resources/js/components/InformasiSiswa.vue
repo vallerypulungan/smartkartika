@@ -145,7 +145,7 @@
           <div class="form-row">
             <div class="form-group">
               <label>Username</label>
-              <input v-model="form.username" type="text" placeholder="Username" required />
+              <input v-model="form.username" type="text" placeholder="Isi dengan nomor telepon" required />
             </div>
             <div class="form-group">
               <label>Password</label>

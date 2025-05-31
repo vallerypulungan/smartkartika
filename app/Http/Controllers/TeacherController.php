@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Teacher;
+use Illuminate\Support\Facades\Hash;
 
 class TeacherController extends Controller
 {
@@ -33,7 +34,7 @@ class TeacherController extends Controller
             'nip' => $request->nip,
             'email' => $request->email,
             'num_telp' => $request->num_telp,
-            'password' => $request->password,
+            'password' => Hash::make($request->password), // hash password
         ]);
 
         return response()->json(['message' => 'Guru berhasil ditambahkan', 'data' => $teacher]);
@@ -57,10 +58,9 @@ class TeacherController extends Controller
             'nip' => $request->nip,
             'email' => $request->email,
             'num_telp' => $request->num_telp,
-            'password' => $request->password,
         ];
         if ($request->filled('password')) {
-            $updateData['password'] = $request->password;
+            $updateData['password'] = Hash::make($request->password); // hash password
         }
         $teacher->update($updateData);
 

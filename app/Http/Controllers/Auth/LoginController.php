@@ -18,7 +18,7 @@ class LoginController extends Controller
 
         // Cek sebagai Guru
         $guru = Teacher::where('nip', $credentials['username'])->first();
-        if ($guru && $credentials['password'] === $guru->password) {
+        if ($guru && Hash::check($credentials['password'], $guru->password)) {
             return response()->json([
                 'status' => 'success',
                 'role' => 'guru',
@@ -33,7 +33,7 @@ class LoginController extends Controller
 
         // Cek sebagai Orang Tua
         $ortu = ParentModel::where('num_telp', $credentials['username'])->first();
-        if ($ortu && $credentials['password'] === $ortu->password) {
+        if ($ortu && Hash::check($credentials['password'], $ortu->password)) {
             return response()->json([
                 'status' => 'success',
                 'role' => 'ortu',

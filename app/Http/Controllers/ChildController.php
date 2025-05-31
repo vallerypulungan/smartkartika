@@ -7,6 +7,7 @@ use App\Models\Child;
 use App\Models\ParentModel;
 use App\Models\TahunAjaran;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class ChildController extends Controller
 {
@@ -38,7 +39,7 @@ class ChildController extends Controller
                 'name' => $request->namaWali,
                 'alamat' => $request->alamat,
                 'num_telp' => $request->telepon,
-                'password' => $request->kode,
+                'password' => Hash::make($request->kode), // hash password
                 'username' => $request->telepon, // <-- ambil dari nomor telepon
             ]
         );
@@ -88,7 +89,7 @@ class ChildController extends Controller
             'email' => $request->email,
             'alamat' => $request->alamat,
             'num_telp' => $request->telepon,
-            'password' => $request->kode,
+            'password' => Hash::make($request->kode), // hash password
             'username' => $request->username,
         ]);
 
